@@ -1,0 +1,16 @@
+{
+    "kokkos-utils" : {
+        "value" : "0.0.1"
+    },
+    "dependencies" : {
+        "doxygen" : {
+            "value" : "1.10.0"
+        },
+        "googletest" : {
+            "value" : "1.14.0"
+        },
+        "kokkos" : {
+            "value" : "4.3.00"
+        }
+    }
+}

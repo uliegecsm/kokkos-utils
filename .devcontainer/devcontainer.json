@@ -1,0 +1,9 @@
+{
+    "image" : "ghcr.io/uliegecsm/kokkos-utils/kokkos-utils:latest",
+    "extensions" : [
+        "ms-vscode.cmake-tools",
+        "mhutchie.git-graph",
+        "ms-azuretools.vscode-docker"
+    ],
+    "onCreateCommand": "git config --global --add safe.directory $PWD"
+}
