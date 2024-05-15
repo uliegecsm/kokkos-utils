@@ -1,5 +1,5 @@
 {
-    "image" : "ghcr.io/uliegecsm/kokkos-utils/kokkos-utils:latest",
+    "dockerFile": "dockerfile",
     "extensions" : [
         "ms-vscode.cmake-tools",
         "mhutchie.git-graph",
