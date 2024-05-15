@@ -1,0 +1,124 @@
+name: Build
+
+on:
+    push:
+        branches:
+            - main
+            - develop
+    pull_request:
+        branches:
+            - main
+            - develop
+
+env:
+    REGISTRY: ghcr.io
+
+jobs:
+
+    set-vars:
+        runs-on: [ubuntu-latest]
+        outputs:
+            CI_IMAGE : ${{ steps.common.outputs.CI_IMAGE }}
+        steps:
+            - name: Export common variables.
+              id  : common
+              run : |
+                  echo "CI_IMAGE=${{ env.REGISTRY }}/${{ github.repository }}/kokkos-utils:latest" >> $GITHUB_OUTPUT
+
+    build-image:
+        needs: [set-vars]
+        runs-on: [ubuntu-latest]
+        container:
+            image: docker:latest
+        permissions:
+            packages: write
+        steps:
+            - name: Checkout code.
+              uses: actions/checkout@v4
+
+            - name: Login to GitHub Container Registry.
+              uses: docker/login-action@v3
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Build Docker image.
+              run : |
+                  apk add jq
+
+                  DOXYGEN_VERSION=$(jq .dependencies.doxygen.value version.json -j)
+                  GOOGLETEST_VERSION=$(jq .dependencies.googletest.value version.json -j)
+                  KOKKOS_VERSION=$(jq .dependencies.kokkos.value version.json -j)
+
+                  docker buildx build                                      \
+                      --pull                                               \
+                      --push                                               \
+                      --file dockerfile                                    \
+                      --platform linux/amd64                               \
+                      --tag ${{ needs.set-vars.outputs.CI_IMAGE }}         \
+                      --cache-from ${{ needs.set-vars.outputs.CI_IMAGE }}  \
+                      --build-arg BUILDKIT_INLINE_CACHE=1                  \
+                      --build-arg DOXYGEN_VERSION=${DOXYGEN_VERSION}       \
+                      --build-arg GOOGLETEST_VERSION=${GOOGLETEST_VERSION} \
+                      --build-arg KOKKOS_VERSION=${KOKKOS_VERSION}         \
+                      --build-arg KOKKOS_PRESET=OpenMP                     \
+                      --label "org.opencontainers.image.source=${{ github.repositoryUrl }}" \
+                      .
+
+    build-library:
+        needs: [set-vars, build-image]
+        runs-on: [ubuntu-latest]
+        container:
+            image: ${{ needs.set-vars.outputs.CI_IMAGE }}
+        steps:
+            - name: Checkout code.
+              uses: actions/checkout@v4
+
+            - name: Configure and build.
+              run : |
+                  cmake -S .    --preset=OpenMP
+                  cmake --build --preset=OpenMP
+
+    build-documentation:
+        needs: [set-vars, build-image]
+        runs-on: [ubuntu-latest]
+        container:
+            image: ${{ needs.set-vars.outputs.CI_IMAGE }}
+        steps:
+            - name: Checkout code.
+              uses: actions/checkout@v4
+
+            - name: Build Doxygen documentation.
+              run : |
+                  cmake -S . --preset=OpenMP
+                  cmake --build --preset=OpenMP --target=docs
+
+            - name: Upload Pages artifacts.
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  path: build-with-OpenMP/docs/html
+
+    # The deploy job is heavily inspired from https://github.com/actions/deploy-pages.
+    deploy:
+        # The deployment only happens if the library can be built and the documentation generated.
+        needs: [build-library, build-documentation]
+        runs-on: [ubuntu-latest]
+
+        # The deployment only happens for 'main' or 'develop' branch.
+        if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/develop"]'), github.ref) }}
+
+        # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+        permissions:
+            pages: write      # to deploy to Pages
+            id-token: write   # to verify the deployment originates from an appropriate source
+
+        # Deploy to the github-pages environment
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+
+        steps:
+            - name: Deploy to GitHub Pages.
+              id  : deployment
+              uses: actions/deploy-pages@v4

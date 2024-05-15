@@ -1,0 +1,23 @@
+{
+    "version"   : 3,
+    "configurePresets" : [
+        {
+            "name"          : "default",
+            "binaryDir"     : "${sourceDir}/build-with-${presetName}",
+            "cacheVariables" : {
+                "CMAKE_BUILD_TYPE"              : "Release",
+                "CMAKE_CXX_EXTENSIONS"          : "OFF"
+            }
+        },
+        {
+            "name"        : "OpenMP",
+            "inherits"    : "default"
+        }
+    ],
+    "buildPresets" : [
+        {
+            "name"            : "OpenMP",
+            "configurePreset" : "OpenMP"
+        }
+    ]
+}
