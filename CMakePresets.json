@@ -16,8 +16,32 @@
     ],
     "buildPresets" : [
         {
+            "name"            : "default",
+            "configurePreset" : "default",
+            "inheritConfigureEnvironment" : true
+        },
+        {
             "name"            : "OpenMP",
-            "configurePreset" : "OpenMP"
+            "configurePreset" : "OpenMP",
+            "inherits"        : "default"
+        }
+    ],
+    "testPresets": [
+        {
+            "name"            : "default",
+            "configurePreset" : "default",
+            "inheritConfigureEnvironment" : true,
+            "output"          : {"outputOnFailure": true},
+            "execution"       : {
+                "noTestsAction"  : "error",
+                "stopOnFailure"  : false,
+                "scheduleRandom" : true
+            }
+        },
+        {
+            "name"            : "OpenMP",
+            "configurePreset" : "OpenMP",
+            "inherits"        : "default"
         }
     ]
 }

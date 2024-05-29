@@ -35,5 +35,26 @@ find_package(
     REQUIRED
 )
 
+#---- Build the kokkos::utils library.
+add_library(kokkos_utils INTERFACE)
+add_library(kokkos::utils ALIAS kokkos_utils)
+
+target_sources(
+    kokkos_utils
+    INTERFACE
+        FILE_SET concepts
+            TYPE HEADERS
+            BASE_DIRS include
+            FILES include/concepts/View.hpp
+)
+
+target_include_directories(kokkos_utils INTERFACE "include")
+
+target_compile_definitions(kokkos_utils INTERFACE KOKKOS_IMPL_PUBLIC_INCLUDE)
+
+#---- Testing.
+enable_testing()
+add_subdirectory(tests)
+
 #---- Documentation.
 add_subdirectory(docs)

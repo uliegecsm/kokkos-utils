@@ -88,6 +88,10 @@ jobs:
                   cmake -S .    --preset=OpenMP
                   cmake --build --preset=OpenMP
 
+            - name: Test.
+              run : |
+                  ctest --preset=OpenMP
+
     build-documentation:
         needs: [set-vars, build-image]
         runs-on: [ubuntu-latest]

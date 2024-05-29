@@ -18,6 +18,5 @@ set(DOXYGEN_SOURCE_BROWSER YES)
 #     See also https://cmake.org/cmake/help/latest/module/FindDoxygen.html.
 doxygen_add_docs(
     docs
-
-    ${HOMEPAGE_MD}
+    ${PROJECT_SOURCE_DIR}
 )
