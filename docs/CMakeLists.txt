@@ -1,9 +1,11 @@
 #--- Find Doxygen.
-find_package(
-    Doxygen
-    ${DOXYGEN_VERSION}
-    REQUIRED
-)
+if(NOT TARGET Doxygen::doxygen)
+    find_package(
+        Doxygen
+        ${DOXYGEN_VERSION}
+        REQUIRED
+    )
+endif()
 
 #---- Our 'homepage' is the README file.
 set(HOMEPAGE_MD ${CMAKE_SOURCE_DIR}/README.md)
