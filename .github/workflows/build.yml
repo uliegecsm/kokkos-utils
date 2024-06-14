@@ -63,7 +63,7 @@ jobs:
                   context: .
                   platforms: linux/amd64,linux/arm64
                   push: ${{ github.ref == 'refs/heads/develop' }}
-                  file: dockerfile
+                  file: docker/dockerfile
                   tags: ${{ needs.set-vars.outputs.CI_IMAGE }}
                   cache-from: type=registry,ref=${{ needs.set-vars.outputs.CI_IMAGE }}
                   cache-to: type=inline
