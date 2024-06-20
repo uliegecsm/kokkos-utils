@@ -38,13 +38,21 @@ function(add_one_test)
             ${SOURCE_FILE}
     )
 
+    # Compile options.
+    target_compile_options(
+        ${EXECUTABLE_NAME}
+        PRIVATE
+            -Wall
+            -Wextra
+            -Werror
+    )
+
     # Link the executable to the library, GTest and Kokkos.
     target_link_libraries(
         ${EXECUTABLE_NAME}
         PRIVATE
             Kokkos::utils
-            GTest::gtest_main
-            Kokkos::kokkoscore
+            test_common
     )
 
     # Add the test to CTest.
@@ -54,6 +62,23 @@ function(add_one_test)
     )
 
 endfunction()
+
+# Common test library (object-like) which each test links to.
+add_library(test_common OBJECT)
+target_sources(
+    test_common
+    PRIVATE
+        main.cpp
+)
+target_link_libraries(
+    test_common
+    PUBLIC
+        GTest::gtest
+        Kokkos::kokkoscore
+)
+
+### TESTS : atomics ###
+add_subdirectory(atomics)
 
 ### TESTS : concepts ###
 add_subdirectory(concepts)

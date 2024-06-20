@@ -52,6 +52,7 @@ add_library(Kokkos::utils ALIAS KokkosUtils)
 target_sources(
     KokkosUtils
     INTERFACE
+        include/kokkos-utils/atomics/InsertOp.hpp
         include/kokkos-utils/concepts/View.hpp
 )
 
