@@ -3,6 +3,7 @@
 #include "Kokkos_Core.hpp"
 
 #include "kokkos-utils/atomics/InsertOp.hpp"
+#include "kokkos-utils/concepts/View.hpp"
 
 using execution_space = Kokkos::DefaultExecutionSpace;
 
@@ -19,6 +20,32 @@ using execution_space = Kokkos::DefaultExecutionSpace;
 namespace Kokkos::utils::tests::atomics
 {
 
+template <concepts::View view_t>
+struct InsertMinTest
+{
+    view_t data;
+    int trials;
+    utils::atomics::InsertMin inserter {};
+
+    template <typename Exec>
+    void apply(const Exec& exec) const
+    {
+        Kokkos::parallel_for(
+            "atomics::InsertMin",
+            Kokkos::RangePolicy<execution_space>(exec, 0, trials),
+            *this
+        );
+    }
+
+    template <std::integral T>
+    KOKKOS_FUNCTION
+    void operator()(const T trial) const
+    {
+        inserter.op(data, 0, trials - trial - 2);
+        inserter.op(data, 1, 2);
+    }
+};
+
 //! @test Check that @ref Kokkos::utils::atomics::InsertMin works as expected.
 TEST(atomics, InsertMin)
 {
@@ -26,22 +53,12 @@ TEST(atomics, InsertMin)
 
     constexpr int trials = 150;
 
-    const execution_space space {};
+    const execution_space exec {};
 
-    const view_t data(Kokkos::view_alloc(space, "data"), 2);
+    const view_t data(Kokkos::view_alloc(exec, "data"), 2);
 
-    const utils::atomics::InsertMin insert_min {};
-
-    Kokkos::parallel_for(
-        "atomics::InsertMin",
-        Kokkos::RangePolicy<execution_space>(space, 0, trials),
-        KOKKOS_LAMBDA(const int trial)
-        {
-            insert_min.op(data, 0, trials - trial - 2);
-            insert_min.op(data, 1, 2);
-        }
-    );
-    space.fence();
+    InsertMinTest{.data = data, .trials = trials}.apply(exec);
+    exec.fence();
 
     const auto mirror = Kokkos::create_mirror_view_and_copy(Kokkos::DefaultHostExecutionSpace{}, data);
 

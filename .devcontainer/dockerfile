@@ -1,4 +1,4 @@
-FROM ghcr.io/uliegecsm/kokkos-utils/kokkos-utils:latest
+FROM ghcr.io/uliegecsm/kokkos-utils/kokkos-utils:gcc-OpenMP
 
 # Install gpg and gnupg2 allows the container to use GPG keys to sign commits.
 # See also:
