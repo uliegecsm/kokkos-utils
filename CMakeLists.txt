@@ -53,6 +53,8 @@ target_sources(
     KokkosUtils
     INTERFACE
         include/kokkos-utils/atomics/InsertOp.hpp
+
+        include/kokkos-utils/concepts/DualView.hpp
         include/kokkos-utils/concepts/View.hpp
 )
 
