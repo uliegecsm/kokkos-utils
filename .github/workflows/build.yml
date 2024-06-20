@@ -9,6 +9,10 @@ on:
         branches:
             - main
             - develop
+    schedule:
+        # As advised by https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule,
+        # let's start the scheduled action at a somewhat random time to avoid periods of high load.
+        - cron: '42 5 * * 3'
 
 env:
     REGISTRY: ghcr.io
