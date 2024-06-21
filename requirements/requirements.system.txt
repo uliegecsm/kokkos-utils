@@ -6,7 +6,6 @@ ca-certificates
 git
 
 # Builders
-cmake
 make
 
 # Compilers

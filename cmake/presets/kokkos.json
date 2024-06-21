@@ -12,17 +12,32 @@
             }
         },
         {
-            "name"        : "OpenMP",
+            "name"        : "gcc-OpenMP",
             "inherits"    : "default",
             "cacheVariables" : {
+                "CMAKE_C_COMPILER"     : "gcc",
+                "CMAKE_CXX_COMPILER"   : "g++",
                 "Kokkos_ENABLE_OPENMP" : "ON"
+            }
+        },
+        {
+            "name"           : "nvidia-Cuda",
+            "inherits"       : "default",
+            "cacheVariables" : {
+                "CMAKE_C_COMPILER"   : "${sourceDir}/bin/nvcc_wrapper",
+                "CMAKE_CXX_COMPILER" : "${sourceDir}/bin/nvcc_wrapper",
+                "Kokkos_ENABLE_CUDA" : "ON"
             }
         }
     ],
     "buildPresets" : [
         {
-            "name"            : "OpenMP",
-            "configurePreset" : "OpenMP"
+            "name"            : "gcc-OpenMP",
+            "configurePreset" : "gcc-OpenMP"
+        },
+        {
+            "name"            : "nvidia-Cuda",
+            "configurePreset" : "nvidia-Cuda"
         }
     ]
 }

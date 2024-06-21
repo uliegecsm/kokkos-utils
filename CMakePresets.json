@@ -10,8 +10,18 @@
             }
         },
         {
-            "name"        : "OpenMP",
-            "inherits"    : "default"
+            "name"           : "gcc-OpenMP",
+            "inherits"       : "default",
+            "cacheVariables" : {
+                "CMAKE_CXX_COMPILER" : "g++"
+            }
+        },
+        {
+            "name"           : "nvidia-Cuda",
+            "inherits"       : "default",
+            "cacheVariables" : {
+                "CMAKE_CXX_COMPILER" : "$penv{Kokkos_ROOT}/bin/nvcc_wrapper"
+            }
         }
     ],
     "buildPresets" : [
@@ -21,8 +31,13 @@
             "inheritConfigureEnvironment" : true
         },
         {
-            "name"            : "OpenMP",
-            "configurePreset" : "OpenMP",
+            "name"            : "gcc-OpenMP",
+            "configurePreset" : "gcc-OpenMP",
+            "inherits"        : "default"
+        },
+        {
+            "name"            : "nvidia-Cuda",
+            "configurePreset" : "nvidia-Cuda",
             "inherits"        : "default"
         }
     ],
@@ -39,8 +54,13 @@
             }
         },
         {
-            "name"            : "OpenMP",
-            "configurePreset" : "OpenMP",
+            "name"            : "gcc-OpenMP",
+            "configurePreset" : "gcc-OpenMP",
+            "inherits"        : "default"
+        },
+        {
+            "name"            : "nvidia-Cuda",
+            "configurePreset" : "nvidia-Cuda",
             "inherits"        : "default"
         }
     ]

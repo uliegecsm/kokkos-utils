@@ -27,7 +27,7 @@ jobs:
             - name: Export common variables.
               id  : common
               run : |
-                  echo "CI_IMAGE=${{ env.REGISTRY }}/${{ github.repository }}/kokkos-utils:latest" >> $GITHUB_OUTPUT
+                  echo "CI_IMAGE=${{ env.REGISTRY }}/${{ github.repository }}/kokkos-utils" >> $GITHUB_OUTPUT
 
     build-image:
         needs: [set-vars]
@@ -36,6 +36,19 @@ jobs:
             image: docker:latest
         permissions:
             packages: write
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - backend        : Cuda
+                      compiler_family: nvidia
+                      base_image     : nvidia/cuda:12.3.2-devel-ubuntu22.04
+                      platforms      : linux/amd64
+                      kokkos_arch    : VOLTA70
+                    - backend        : OpenMP
+                      compiler_family: gcc
+                      base_image     : ubuntu:24.04
+                      platforms      : linux/amd64,linux/arm64
         steps:
             - name: Checkout code.
               uses: actions/checkout@v4
@@ -44,9 +57,10 @@ jobs:
               run: |
                   apk add jq
 
-                  echo "DOXYGEN_VERSION=$(jq .dependencies.doxygen.value version.json -j)" >> $GITHUB_ENV
+                  echo "CMAKE_VERSION=$(     jq .dependencies.cmake.value      version.json -j)" >> $GITHUB_ENV
+                  echo "DOXYGEN_VERSION=$(   jq .dependencies.doxygen.value    version.json -j)" >> $GITHUB_ENV
                   echo "GOOGLETEST_VERSION=$(jq .dependencies.googletest.value version.json -j)" >> $GITHUB_ENV
-                  echo "KOKKOS_VERSION=$(jq .dependencies.kokkos.value version.json -j)" >> $GITHUB_ENV
+                  echo "KOKKOS_VERSION=$(    jq .dependencies.kokkos.value     version.json -j)" >> $GITHUB_ENV
 
             - name: Set up QEMU.
               uses: docker/setup-qemu-action@v3
@@ -65,60 +79,75 @@ jobs:
               uses: docker/build-push-action@v5
               with:
                   context: .
-                  platforms: linux/amd64,linux/arm64
+                  platforms: ${{ matrix.platforms }}
                   push: ${{ github.ref == 'refs/heads/develop' }}
                   file: docker/dockerfile
-                  tags: ${{ needs.set-vars.outputs.CI_IMAGE }}
-                  cache-from: type=registry,ref=${{ needs.set-vars.outputs.CI_IMAGE }}
+                  tags: ${{ needs.set-vars.outputs.CI_IMAGE }}:${{ matrix.compiler_family }}-${{ matrix.backend }}
+                  cache-from: type=registry,ref=${{ needs.set-vars.outputs.CI_IMAGE }}:${{ matrix.compiler_family }}-${{ matrix.backend }}
                   cache-to: type=inline
+                  target: final
                   build-args: |
+                      BASE_IMAGE=${{ matrix.base_image }}
+                      CMAKE_VERSION=${{ env.CMAKE_VERSION }}
                       DOXYGEN_VERSION=${{ env.DOXYGEN_VERSION }}
                       GOOGLETEST_VERSION=${{ env.GOOGLETEST_VERSION }}
+                      KOKKOS_ARCH=${{ matrix.kokkos_arch }}
+                      KOKKOS_PRESET=${{ matrix.compiler_family }}-${{ matrix.backend }}
                       KOKKOS_VERSION=${{ env.KOKKOS_VERSION }}
-                      KOKKOS_PRESET=OpenMP
                   labels: "org.opencontainers.image.source=${{ github.repositoryUrl }}"
 
-    build-library:
+    build-library-and-test:
         needs: [set-vars, build-image]
         runs-on: [ubuntu-latest]
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - backend        : Cuda
+                      compiler_family: nvidia
+                      run_tests      : false
+                    - backend        : OpenMP
+                      compiler_family: gcc
+                      run_tests      : true
         container:
-            image: ${{ needs.set-vars.outputs.CI_IMAGE }}
+            image: ${{ needs.set-vars.outputs.CI_IMAGE }}:${{ matrix.compiler_family }}-${{ matrix.backend }}
         steps:
             - name: Checkout code.
               uses: actions/checkout@v4
 
             - name: Configure and build.
               run : |
-                  cmake -S .    --preset=OpenMP
-                  cmake --build --preset=OpenMP
+                  cmake -S .    --preset=${{ matrix.compiler_family }}-${{ matrix.backend }} --warn-uninitialized -Werror=dev
+                  cmake --build --preset=${{ matrix.compiler_family }}-${{ matrix.backend }}
 
             - name: Test.
+              if  : ${{ matrix.run_tests }}
               run : |
-                  ctest --preset=OpenMP
+                  ctest --preset=${{ matrix.compiler_family }}-${{ matrix.backend }}
 
     build-documentation:
         needs: [set-vars, build-image]
         runs-on: [ubuntu-latest]
         container:
-            image: ${{ needs.set-vars.outputs.CI_IMAGE }}
+            image: ${{ needs.set-vars.outputs.CI_IMAGE }}:gcc-OpenMP
         steps:
             - name: Checkout code.
               uses: actions/checkout@v4
 
             - name: Build Doxygen documentation.
               run : |
-                  cmake -S . --preset=OpenMP
-                  cmake --build --preset=OpenMP --target=docs
+                  cmake -S .    --preset=gcc-OpenMP --warn-uninitialized -Werror=dev
+                  cmake --build --preset=gcc-OpenMP --target=docs
 
             - name: Upload Pages artifacts.
               uses: actions/upload-pages-artifact@v3
               with:
-                  path: build-with-OpenMP/docs/html
+                  path: build-with-gcc-OpenMP/docs/html
 
     # The deploy job is heavily inspired from https://github.com/actions/deploy-pages.
     deploy:
         # The deployment only happens if the library can be built and the documentation generated.
-        needs: [build-library, build-documentation]
+        needs: [build-library-and-test, build-documentation]
         runs-on: [ubuntu-latest]
 
         # The deployment only happens for 'main' or 'develop' branch.

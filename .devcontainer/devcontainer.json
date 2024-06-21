@@ -5,5 +5,8 @@
         "mhutchie.git-graph",
         "ms-azuretools.vscode-docker"
     ],
+    "runArgs": [
+        "--privileged",
+    ],
     "onCreateCommand": "git config --global --add safe.directory $PWD"
 }

@@ -3,6 +3,9 @@
         "value" : "0.0.1"
     },
     "dependencies" : {
+        "cmake" : {
+            "value" : "3.29.4"
+        },
         "doxygen" : {
             "value" : "1.10.0"
         },
