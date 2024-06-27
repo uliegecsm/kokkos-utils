@@ -60,6 +60,8 @@ target_sources(
         include/kokkos-utils/concepts/MemorySpace.hpp
         include/kokkos-utils/concepts/Space.hpp
         include/kokkos-utils/concepts/View.hpp
+
+        include/kokkos-utils/impl/type_traits.hpp
 )
 
 target_include_directories(

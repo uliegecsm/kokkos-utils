@@ -2,7 +2,7 @@
 
 #include "Kokkos_Core.hpp"
 
-//! Initialize Google Test and @c Kokkos.
+//! Initialize Google Test and @ref Kokkos.
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);

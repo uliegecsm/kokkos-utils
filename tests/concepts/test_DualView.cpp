@@ -21,22 +21,25 @@ namespace Kokkos::utils::tests::concepts
 //! @test Check that @ref Kokkos::utils::concepts::DualView works as expected.
 TEST(concepts, DualView)
 {
+    using Kokkos::utils::concepts::DualView;
+    using Kokkos::utils::concepts::View;
+
     using dual_view_1d_t = Kokkos::DualView<int[5]   , execution_space>;
     using      view_1d_t = Kokkos::    View<int[5]   , execution_space>;
     using dual_view_2d_t = Kokkos::DualView<int[5][5], execution_space>;
     using      view_2d_t = Kokkos::    View<int[5][5], execution_space>;
 
     //! A @c Kokkos::DualView fulfills the concept.
-    static_assert(Kokkos::utils::concepts::DualView<dual_view_1d_t>);
-    static_assert(Kokkos::utils::concepts::DualView<dual_view_2d_t>);
+    static_assert(DualView<dual_view_1d_t>);
+    static_assert(DualView<dual_view_2d_t>);
 
-    //! A @c Kokkos::View does not fulfill the concept.
-    static_assert(! Kokkos::utils::concepts::DualView<view_1d_t>);
-    static_assert(! Kokkos::utils::concepts::DualView<view_2d_t>);
+    //! A @ref Kokkos::View does not fulfill the concept.
+    static_assert(! DualView<view_1d_t>);
+    static_assert(! DualView<view_2d_t>);
 
     //! A @c Kokkos::DualView does not fulfill the @ref Kokkos::utils::concepts::View concept.
-    static_assert(! Kokkos::utils::concepts::View<dual_view_1d_t>);
-    static_assert(! Kokkos::utils::concepts::View<dual_view_2d_t>);
+    static_assert(! View<dual_view_1d_t>);
+    static_assert(! View<dual_view_2d_t>);
 }
 
 } // namespace Kokkos::utils::tests::concepts
