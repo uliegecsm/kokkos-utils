@@ -6,7 +6,7 @@
 namespace Kokkos::utils::concepts
 {
 
-//! Concept to specify that a type is a @c Kokkos::DualView.
+//! Specify that a type is a @c Kokkos::DualView.
 template <typename T>
 concept DualView = Kokkos::is_dual_view_v<T>;
 

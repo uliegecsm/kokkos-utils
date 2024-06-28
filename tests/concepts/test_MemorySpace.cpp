@@ -11,9 +11,9 @@ using execution_space = Kokkos::DefaultExecutionSpace;
  *
  * @addtogroup unittests
  *
- * **Concepts related to @c Kokkos memory space**
+ * **Concepts related to @ref Kokkos memory space**
  *
- * This group of tests check the behavior of our concepts related to @c Kokkos memory space.
+ * This group of tests check the behavior of our concepts related to @ref Kokkos memory space.
  */
 
 namespace Kokkos::utils::tests::concepts
@@ -22,9 +22,11 @@ namespace Kokkos::utils::tests::concepts
 //! @test Check that @ref Kokkos::utils::concepts::MemorySpace works as expected.
 TEST(concepts, MemorySpace)
 {
-    static_assert(! Kokkos::utils::concepts::MemorySpace<typename execution_space::execution_space>);
-    static_assert(  Kokkos::utils::concepts::MemorySpace<typename execution_space::memory_space>);
-    static_assert(! Kokkos::utils::concepts::MemorySpace<Kokkos::Device<typename execution_space::execution_space, typename execution_space::memory_space>>);
+    using Kokkos::utils::concepts::MemorySpace;
+
+    static_assert(! MemorySpace<typename execution_space::execution_space>);
+    static_assert(  MemorySpace<typename execution_space::memory_space>);
+    static_assert(! MemorySpace<Kokkos::Device<typename execution_space::execution_space, typename execution_space::memory_space>>);
 }
 
 } // namespace Kokkos::utils::tests::concepts
