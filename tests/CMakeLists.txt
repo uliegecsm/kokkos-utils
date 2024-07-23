@@ -85,3 +85,6 @@ add_subdirectory(concepts)
 
 ### TESTS : impl ###
 add_subdirectory(impl)
+
+### TESTS : view ###
+add_subdirectory(view)

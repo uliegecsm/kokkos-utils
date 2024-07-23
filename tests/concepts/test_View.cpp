@@ -13,9 +13,9 @@ using execution_space = Kokkos::DefaultExecutionSpace;
  *
  * @addtogroup unittests
  *
- * **Concepts related to @ref Kokkos::View**
+ * **Concepts related to @c Kokkos::View**
  *
- * This group of tests check the behavior of our concepts related to @ref Kokkos::View.
+ * This group of tests check the behavior of our concepts related to @c Kokkos::View.
  */
 
 namespace Kokkos::utils::tests::concepts

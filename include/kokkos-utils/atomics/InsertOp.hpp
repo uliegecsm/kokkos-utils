@@ -11,7 +11,7 @@ namespace Kokkos::utils::atomics
 /**
  * @brief Insert an element in a view at a specific index using @c Kokkos::atomic_min.
  *
- * To be used with *e.g.* @ref Kokkos::UnorderedMap::insert.
+ * To be used with *e.g.* @c Kokkos::UnorderedMap::insert.
  */
 struct InsertMin
 {

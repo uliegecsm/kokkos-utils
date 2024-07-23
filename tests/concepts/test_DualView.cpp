@@ -33,7 +33,7 @@ TEST(concepts, DualView)
     static_assert(DualView<dual_view_1d_t>);
     static_assert(DualView<dual_view_2d_t>);
 
-    //! A @ref Kokkos::View does not fulfill the concept.
+    //! A @c Kokkos::View does not fulfill the concept.
     static_assert(! DualView<view_1d_t>);
     static_assert(! DualView<view_2d_t>);
 
