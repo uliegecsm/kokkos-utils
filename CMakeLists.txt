@@ -52,6 +52,8 @@ add_library(Kokkos::utils ALIAS KokkosUtils)
 target_sources(
     KokkosUtils
     INTERFACE
+        include/kokkos-utils/array/compare.hpp
+
         include/kokkos-utils/atomics/InsertOp.hpp
 
         include/kokkos-utils/concepts/DualView.hpp
@@ -62,6 +64,8 @@ target_sources(
         include/kokkos-utils/concepts/View.hpp
 
         include/kokkos-utils/impl/type_traits.hpp
+
+        include/kokkos-utils/view/extents.hpp
 )
 
 target_include_directories(
