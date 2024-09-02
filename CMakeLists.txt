@@ -61,6 +61,7 @@ target_sources(
         include/kokkos-utils/concepts/Space.hpp
         include/kokkos-utils/concepts/View.hpp
 
+        include/kokkos-utils/impl/type_list.hpp
         include/kokkos-utils/impl/type_traits.hpp
 
         include/kokkos-utils/view/extents.hpp

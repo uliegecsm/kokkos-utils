@@ -6,8 +6,6 @@
 #include "kokkos-utils/impl/type_traits.hpp"
 
 /**
- * @file
- *
  * @addtogroup unittests
  *
  * **Type traits**

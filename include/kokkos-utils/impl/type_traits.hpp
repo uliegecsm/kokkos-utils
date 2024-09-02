@@ -4,11 +4,14 @@
 #include <type_traits>
 
 /**
- * @brief This namespace provides extensions to the @c type_traits standard header.
+ * @file
+ *
+ * This file provides extensions to the @c type_traits standard header.
  *
  * References:
  *      * https://en.cppreference.com/w/cpp/header/type_traits
  */
+
 namespace Kokkos::utils::impl
 {
 
