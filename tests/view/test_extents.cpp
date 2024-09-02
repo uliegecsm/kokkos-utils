@@ -3,7 +3,6 @@
 
 #include "Kokkos_Core.hpp"
 
-#include "kokkos-utils/array/compare.hpp"
 #include "kokkos-utils/view/extents.hpp"
 
 using execution_space = Kokkos::DefaultExecutionSpace;
