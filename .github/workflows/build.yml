@@ -42,7 +42,7 @@ jobs:
                 include:
                     - backend        : Cuda
                       compiler_family: nvidia
-                      base_image     : nvidia/cuda:12.3.2-devel-ubuntu22.04
+                      base_image     : nvidia/cuda:12.6.0-devel-ubuntu22.04
                       platforms      : linux/amd64
                       kokkos_arch    : VOLTA70
                     - backend        : OpenMP
