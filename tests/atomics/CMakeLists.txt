@@ -1,4 +1,2 @@
 ### TEST : InsertOp ###
-add_one_test(
-    TEST_NAME InsertOp
-)
+add_one_test(NAME InsertOp)

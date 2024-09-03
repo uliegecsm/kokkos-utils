@@ -1,4 +1,2 @@
 ### TEST : extents ###
-add_one_test(
-    TEST_NAME extents
-)
+add_one_test(NAME extents)

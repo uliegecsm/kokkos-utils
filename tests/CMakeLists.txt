@@ -14,15 +14,15 @@ function(add_one_test)
     cmake_parse_arguments(
         aot_args
         ""
-        "TEST_NAME"
+        "NAME"
         ""
         ${ARGN}
     )
 
     # Set the test name, executable name and primary source file.
-    set(TEST_NAME       "test_${aot_args_TEST_NAME}")
-    set(EXECUTABLE_NAME "test_${aot_args_TEST_NAME}")
-    cmake_path(SET SOURCE_FILE "test_${aot_args_TEST_NAME}.cpp")
+    set(NAME            "test_${aot_args_NAME}")
+    set(EXECUTABLE_NAME "test_${aot_args_NAME}")
+    cmake_path(SET SOURCE_FILE "test_${aot_args_NAME}.cpp")
     cmake_path(ABSOLUTE_PATH SOURCE_FILE)
 
     # Add source file to the documentation list.
