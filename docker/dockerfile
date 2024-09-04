@@ -64,6 +64,8 @@ RUN <<EOF
 
     cmake --build build --target install
 
+    apt clean && rm -rf /var/lib/apt/lists/*
+
 EOF
 
 # Compile Google Test.
