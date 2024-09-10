@@ -10,7 +10,8 @@ using execution_space = Kokkos::DefaultExecutionSpace;
  *
  * @addtogroup unittests
  *
- * **Concepts related to @c Kokkos::DualView**
+ * Concepts related to @c Kokkos::DualView
+ * ---------------------------------------
  *
  * This group of tests check the behavior of our concepts related to @c Kokkos::DualView.
  */

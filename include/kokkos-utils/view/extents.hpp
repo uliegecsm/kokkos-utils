@@ -18,7 +18,7 @@ namespace impl
 
 //! Implementation of @ref Kokkos::utils::view::extents.
 template <concepts::View ViewType, size_t... Ints>
-KOKKOS_INLINE_FUNCTION
+KOKKOS_FUNCTION
 constexpr auto extents(const ViewType& view, std::index_sequence<Ints...>)
 {
     Kokkos::Array<size_t, sizeof...(Ints)> extents {};
@@ -30,10 +30,10 @@ constexpr auto extents(const ViewType& view, std::index_sequence<Ints...>)
 
 //! Get all extents of @p view.
 template <concepts::View ViewType>
-KOKKOS_INLINE_FUNCTION
+KOKKOS_FUNCTION
 constexpr auto extents(const ViewType& view)
 {
-    constexpr auto rank = ViewType::rank;
+    constexpr auto rank = ViewType::rank();
     constexpr auto dims = std::make_index_sequence<rank>{};
     return impl::extents(view, dims);
 }

@@ -12,7 +12,8 @@ using execution_space = Kokkos::DefaultExecutionSpace;
  *
  * @addtogroup unittests
  *
- * **Atomic insertion**
+ * Atomic insertion
+ * ----------------
  *
  * This group of tests check the behavior of our atomic insert operators.
  */

@@ -8,7 +8,8 @@
 /**
  * @addtogroup unittests
  *
- * **Type traits**
+ * Type traits
+ * -----------
  *
  * This group of tests check the behavior of our utilities extending the standard @c type_traits.
  */

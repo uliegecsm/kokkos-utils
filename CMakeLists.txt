@@ -65,6 +65,7 @@ target_sources(
         include/kokkos-utils/impl/type_traits.hpp
 
         include/kokkos-utils/view/extents.hpp
+        include/kokkos-utils/view/slice.hpp
 )
 
 target_include_directories(

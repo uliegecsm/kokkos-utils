@@ -12,7 +12,8 @@ using execution_space = Kokkos::DefaultExecutionSpace;
  *
  * @addtogroup unittests
  *
- * **Get extents of a @c Kokkos::View**
+ * Get extents of a @c Kokkos::View
+ * --------------------------------
  *
  * This group of tests check the behavior of our helpers related to @c Kokkos::View that can be
  * found in @ref extents.hpp.
@@ -22,6 +23,14 @@ namespace Kokkos::utils::tests::view
 {
 
 constexpr size_t dim_1 = 5, dim_2 = 3, dim_3 = 6, dim_4 = 9;
+
+//! @test Check that @ref view::extents works as expected for a rank-0 @c Kokkos::View.
+TEST(view, extents_rank_0)
+{
+    const Kokkos::View<double, execution_space> view_0("rank-0 view");
+
+    static_assert(utils::view::extents(view_0) == Kokkos::Array<size_t, 0>{});
+}
 
 //! @test Check that @ref view::extents works as expected for a rank-1 @c Kokkos::View.
 TEST(view, extents_rank_1)
