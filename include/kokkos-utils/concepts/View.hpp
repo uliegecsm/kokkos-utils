@@ -16,7 +16,7 @@ concept View = Kokkos::is_view_v<T>;
 
 //! Specify that a type is a @c Kokkos::View of given rank @p Rank.
 template <typename T, std::size_t Rank>
-concept ViewOfRank = View<T> && T::rank == Rank;
+concept ViewOfRank = View<T> && T::rank() == Rank;
 
 //! Specify that a type is a modifiable @c Kokkos::View.
 template <typename T>

@@ -5,7 +5,8 @@
 /**
  * @addtogroup unittests
  *
- * **Type list**
+ * Type list
+ * ---------
  *
  * This group of tests check the behavior of our utilities extending @c Kokkos::Impl::type_list,
  * which are found in @ref kokkos-utils/impl/type_list.hpp.
