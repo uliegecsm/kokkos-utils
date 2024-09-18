@@ -86,6 +86,12 @@ target_compile_definitions(
         KOKKOS_IMPL_PUBLIC_INCLUDE
 )
 
+target_link_libraries(
+    KokkosUtils
+    INTERFACE
+        Kokkos::kokkoscore
+)
+
 #---- Testing.
 if(KokkosUtils_ENABLE_TESTS)
     enable_testing()
