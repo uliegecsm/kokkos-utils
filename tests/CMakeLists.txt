@@ -72,9 +72,10 @@ target_sources(
 )
 target_link_libraries(
     test_common
+    PRIVATE
+        Kokkos::kokkoscore
     PUBLIC
         GTest::gtest
-        Kokkos::kokkoscore
 )
 
 ### TESTS : atomics ###
