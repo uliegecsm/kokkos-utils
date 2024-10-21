@@ -28,6 +28,15 @@ TEST(impl, type_list_size_v)
     static_assert(type_list_size_v<type_list_t> == 3);
 }
 
+//! @test Check @ref Kokkos::utils::impl::type_list_contains_v.
+TEST(impl, type_list_contains_v)
+{
+    using Kokkos::utils::impl::type_list_contains_v;
+
+    static_assert(   type_list_contains_v<char,   type_list_t>);
+    static_assert( ! type_list_contains_v<double, type_list_t>);
+}
+
 //! @test Check @ref Kokkos::utils::impl::type_list_at_t.
 TEST(impl, type_list_at_t)
 {
