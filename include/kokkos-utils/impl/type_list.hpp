@@ -24,6 +24,18 @@ template <typename T>
 inline constexpr size_t type_list_size_v = TypeListSize<T>::value;
 ///@}
 
+//! @name Whether a type is contained in a @c Kokkos::Impl::type_list.
+///@{
+template <typename, typename>
+struct TypeListContains;
+
+template <typename T, typename... Ts>
+struct TypeListContains<T, Kokkos::Impl::type_list<Ts...>> : std::disjunction<std::is_same<T, Ts>...> {};
+
+template <typename T, typename S>
+inline constexpr bool type_list_contains_v = TypeListContains<T, S>::value;
+///@}
+
 //! @name Get the @p I th type in a @c Kokkos::Impl::type_list.
 ///@{
 template <size_t, typename>
