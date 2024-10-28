@@ -76,4 +76,14 @@ TEST(impl, type_list_to_tuple)
     static_assert(std::same_as<type_list_to_tuple_t<type_list_t>, expt_tuple_t>);
 }
 
+//! @test Check @ref Kokkos::utils::impl::type_list_index_v.
+TEST(impl, type_list_index_v)
+{
+    using Kokkos::utils::impl::type_list_index_v;
+
+    static_assert(type_list_index_v<char,  type_list_t> == 0);
+    static_assert(type_list_index_v<short, type_list_t> == 1);
+    static_assert(type_list_index_v<int,   type_list_t> == 2);
+}
+
 } // namespace Kokkos::utils::tests::impl

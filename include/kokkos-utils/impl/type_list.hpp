@@ -85,6 +85,23 @@ template <typename T>
 using type_list_to_tuple_t = typename TypeListToTuple<T>::type;
 ///@}
 
+//! @name Get the index of a type in a @c Kokkos::Impl::type_list.
+///@{
+template <typename, typename>
+struct TypeListIndex;
+
+template <typename T, typename... Ts>
+struct TypeListIndex<T, Kokkos::Impl::type_list<T, Ts...>>
+  : std::integral_constant<size_t, 0> {};
+
+template <typename T, typename Head, typename... Ts>
+struct TypeListIndex<T, Kokkos::Impl::type_list<Head, Ts...>>
+  : std::integral_constant<size_t, 1 + TypeListIndex<T, Kokkos::Impl::type_list<Ts...>>::value> {};
+
+template <typename T, typename S>
+inline constexpr size_t type_list_index_v = TypeListIndex<T, S>::value;
+///@}
+
 } // namespace Kokkos::utils::impl
 
 #endif // KOKKOS_UTILS_IMPL_TYPE_LIST_HPP
