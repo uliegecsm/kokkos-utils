@@ -1,10 +1,9 @@
 ARG BASE_IMAGE
 
-FROM ${BASE_IMAGE} as requirements
+FROM ${BASE_IMAGE} AS requirements
 
 # Install APT requirements.
 RUN --mount=target=/requirements,type=bind,source=requirements <<EOF
-
     set -ex
 
     apt update
@@ -12,13 +11,13 @@ RUN --mount=target=/requirements,type=bind,source=requirements <<EOF
     apt --yes --no-install-recommends install $(grep -vE "^\s*#" /requirements/requirements.system.txt  | tr "\n" " ")
 
     apt clean && rm -rf /var/lib/apt/lists/*
-
 EOF
 
 ARG CMAKE_VERSION
 ARG TARGETARCH
 
 RUN <<EOF
+    set -ex
 
     if [ "${TARGETARCH}" = "amd64" ];then
         SUFFIX=x86_64
@@ -42,12 +41,11 @@ EOF
 ENV PATH=/opt/cmake-${CMAKE_VERSION}/bin:${PATH}
 
 # Compile Doxygen.
-FROM requirements as doxygen-compile
+FROM requirements AS doxygen-compile
 
 ARG DOXYGEN_VERSION
 
 RUN <<EOF
-
     set -ex
 
     apt update
@@ -65,16 +63,14 @@ RUN <<EOF
     cmake --build build --target install
 
     apt clean && rm -rf /var/lib/apt/lists/*
-
 EOF
 
 # Compile Google Test.
-FROM requirements as google-test-compile
+FROM requirements AS google-test-compile
 
 ARG GOOGLETEST_VERSION
 
 RUN <<EOF
-
     set -ex
 
     git clone --depth=1 --branch=v${GOOGLETEST_VERSION} https://github.com/google/googletest googletest
@@ -86,18 +82,16 @@ RUN <<EOF
     cmake --build build -j4
 
     cmake --build build --target install
-
 EOF
 
 # Compile Kokkos.
-FROM requirements as kokkos-compile
+FROM requirements AS kokkos-compile
 
 ARG KOKKOS_ARCH
 ARG KOKKOS_PRESET
 ARG KOKKOS_VERSION
 
 RUN --mount=target=/cmake/presets,type=bind,source=cmake/presets <<EOF
-
     set -ex
 
     git clone --depth=1 --branch=${KOKKOS_VERSION} https://github.com/kokkos/kokkos kokkos
@@ -106,18 +100,23 @@ RUN --mount=target=/cmake/presets,type=bind,source=cmake/presets <<EOF
 
     cp /cmake/presets/kokkos.json CMakePresets.json
 
+    if [ ! -z "${KOKKOS_ARCH}" ];then
+        KOKKOS_ARCH_ARG="-DKokkos_ARCH_${KOKKOS_ARCH}:BOOL=ON"
+    else
+        KOKKOS_ARCH_ARG=""
+    fi
+
     cmake -S . --preset=${KOKKOS_PRESET} \
         -DCMAKE_INSTALL_PREFIX=/opt/kokkos-${KOKKOS_VERSION}/${KOKKOS_PRESET} \
-        -DKokkos_ARCH_${KOKKOS_ARCH}:BOOL=ON
+        ${KOKKOS_ARCH_ARG}
 
     cmake --build --preset=${KOKKOS_PRESET} -j4
 
     cmake --build --preset=${KOKKOS_PRESET} --target=install
-
 EOF
 
 # Build the final image from previous stages.
-FROM requirements as final
+FROM requirements AS final
 
 ARG DOXYGEN_VERSION
 ARG GOOGLETEST_VERSION

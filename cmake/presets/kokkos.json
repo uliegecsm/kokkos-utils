@@ -5,17 +5,17 @@
             "name"          : "default",
             "binaryDir"     : "${sourceDir}/build-with-${presetName}",
             "cacheVariables" : {
-                "CMAKE_BUILD_TYPE"              : "Release",
-                "CMAKE_CXX_STANDARD"            : "17",
-                "CMAKE_CXX_EXTENSIONS"          : "OFF",
-                "BUILD_SHARED_LIBS"             : "ON"
+                "CMAKE_BUILD_TYPE"     : "Release",
+                "CMAKE_CXX_STANDARD"   : "17",
+                "CMAKE_CXX_EXTENSIONS" : "OFF",
+                "BUILD_SHARED_LIBS"    : "ON",
+                "CMAKE_C_COMPILER"     : "should-not-be-needed"
             }
         },
         {
             "name"        : "gcc-OpenMP",
             "inherits"    : "default",
             "cacheVariables" : {
-                "CMAKE_C_COMPILER"     : "gcc",
                 "CMAKE_CXX_COMPILER"   : "g++",
                 "Kokkos_ENABLE_OPENMP" : "ON"
             }
@@ -24,7 +24,6 @@
             "name"           : "nvidia-Cuda",
             "inherits"       : "default",
             "cacheVariables" : {
-                "CMAKE_C_COMPILER"   : "${sourceDir}/bin/nvcc_wrapper",
                 "CMAKE_CXX_COMPILER" : "${sourceDir}/bin/nvcc_wrapper",
                 "Kokkos_ENABLE_CUDA" : "ON"
             }
