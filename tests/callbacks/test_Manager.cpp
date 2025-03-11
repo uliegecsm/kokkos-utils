@@ -5,9 +5,7 @@
 
 #include "kokkos-utils/impl/type_traits.hpp"
 
-#include "kokkos-utils/callbacks/Events.hpp"
-#include "kokkos-utils/callbacks/Manager.hpp"
-
+#include "tests/callbacks/Helpers.hpp"
 #include "tests/callbacks/TestWorkload.hpp"
 
 /**
@@ -26,23 +24,19 @@ namespace Kokkos::utils::tests::callbacks
 
 using namespace Kokkos::utils::callbacks;
 
-class ManagerTest : public ::testing::Test
+class ManagerTest : public ManagerTestFixture
 {
 public:
-    void SetUp() override
-    {
-        Manager::initialize();
+    void SetUp() override {
         this->exec = Kokkos::Experimental::partition_space(execution_space{}, 1)[0];
     }
-
-    void TearDown() override { Manager::finalize(); }
 
 protected:
     execution_space exec {};
 };
 
 //! @test Check properties of @ref Kokkos::utils::callbacks::Manager being a singleton class.
-TEST_F(ManagerTest, singleton_traits)
+TEST(Manager, singleton_traits)
 {
     static_assert( ! std::is_copy_constructible_v<Manager>);
     static_assert( ! std::is_copy_assignable_v   <Manager>);

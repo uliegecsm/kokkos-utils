@@ -63,6 +63,7 @@ target_sources(
         include/kokkos-utils/callbacks/Listener.hpp
         include/kokkos-utils/callbacks/Manager.hpp
         include/kokkos-utils/callbacks/Matcher.hpp
+        include/kokkos-utils/callbacks/RecorderListener.hpp
 
         include/kokkos-utils/concepts/DualView.hpp
 
