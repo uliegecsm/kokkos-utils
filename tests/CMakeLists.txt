@@ -76,16 +76,11 @@ target_link_libraries(
         Kokkos::kokkoscore
     PUBLIC
         GTest::gtest
+        GTest::gmock
 )
 
-### TESTS : atomics ###
 add_subdirectory(atomics)
-
-### TESTS : concepts ###
+add_subdirectory(callbacks)
 add_subdirectory(concepts)
-
-### TESTS : impl ###
 add_subdirectory(impl)
-
-### TESTS : view ###
 add_subdirectory(view)
