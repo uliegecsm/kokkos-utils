@@ -1,6 +1,6 @@
 ARG BASE_IMAGE
 
-FROM ${BASE_IMAGE} as requirements
+FROM ${BASE_IMAGE} AS requirements
 
 # Install APT requirements.
 RUN --mount=target=/requirements,type=bind,source=requirements <<EOF
@@ -42,7 +42,7 @@ EOF
 ENV PATH=/opt/cmake-${CMAKE_VERSION}/bin:${PATH}
 
 # Compile Doxygen.
-FROM requirements as doxygen-compile
+FROM requirements AS doxygen-compile
 
 ARG DOXYGEN_VERSION
 
@@ -69,7 +69,7 @@ RUN <<EOF
 EOF
 
 # Compile Google Test.
-FROM requirements as google-test-compile
+FROM requirements AS google-test-compile
 
 ARG GOOGLETEST_VERSION
 
@@ -90,7 +90,7 @@ RUN <<EOF
 EOF
 
 # Compile Kokkos.
-FROM requirements as kokkos-compile
+FROM requirements AS kokkos-compile
 
 ARG KOKKOS_ARCH
 ARG KOKKOS_PRESET
@@ -108,7 +108,7 @@ RUN --mount=target=/cmake/presets,type=bind,source=cmake/presets <<EOF
 
     cmake -S . --preset=${KOKKOS_PRESET} \
         -DCMAKE_INSTALL_PREFIX=/opt/kokkos-${KOKKOS_VERSION}/${KOKKOS_PRESET} \
-        -DKokkos_ARCH_${KOKKOS_ARCH}:BOOL=ON
+        $( if [ ! -z "${KOKKOS_ARCH}" ];then echo "-DKokkos_ARCH_${KOKKOS_ARCH}=ON";fi )
 
     cmake --build --preset=${KOKKOS_PRESET} -j4
 
@@ -117,7 +117,7 @@ RUN --mount=target=/cmake/presets,type=bind,source=cmake/presets <<EOF
 EOF
 
 # Build the final image from previous stages.
-FROM requirements as final
+FROM requirements AS final
 
 ARG DOXYGEN_VERSION
 ARG GOOGLETEST_VERSION

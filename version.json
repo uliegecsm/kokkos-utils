@@ -4,16 +4,16 @@
     },
     "dependencies" : {
         "cmake" : {
-            "value" : "3.29.4"
+            "value" : "3.31.5"
         },
         "doxygen" : {
-            "value" : "1.10.0"
+            "value" : "1.13.2"
         },
         "googletest" : {
-            "value" : "1.14.0"
+            "value" : "1.16.0"
         },
         "kokkos" : {
-            "value" : "4.4.00"
+            "value" : "4.5.01"
         }
     }
 }
