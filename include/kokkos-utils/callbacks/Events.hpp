@@ -13,8 +13,8 @@ namespace Kokkos::utils::callbacks
 /**
  * @name Event types.
  *
- * Each event is an aggregate holding the argument values of a corresponding @c Kokkos profiling function
- * associated with a @c Kokkos profiling callback.
+ * Each event is an aggregate holding the argument values of a corresponding @ref Kokkos profiling function
+ * associated with a @ref Kokkos profiling callback.
  *
  * See also:
  *     - https://github.com/kokkos/kokkos/blob/4c4fa17dccbd01106c0fa8e03fd23fe70896dc1c/core/src/impl/Kokkos_Profiling_C_Interface.h#L47-L113
@@ -313,7 +313,7 @@ GET_CALLBACK_FROM_EVENTSET(PushRegionEvent,            push_region)
 GET_CALLBACK_FROM_EVENTSET(PopRegionEvent,             pop_region)
 GET_CALLBACK_FROM_EVENTSET(ProfileEvent,               profile_event)
 
-//! Get the setter function of a @c Kokkos profiling callback corresponding to @p EventType.
+//! Get the setter function of a @ref Kokkos profiling callback corresponding to @p EventType.
 template <Event EventType>
 auto get_callback_setter();
 

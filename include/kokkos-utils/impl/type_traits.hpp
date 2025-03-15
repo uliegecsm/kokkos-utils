@@ -32,6 +32,10 @@ template <typename T, template <typename...> class U>
 concept InstanceOf = is_instance_of_v<T, U>;
 ///@}
 
+//! Check if @p T is the same as one of the types @p Ts.
+template <typename T, typename... Ts>
+concept IsTypeOneOf = std::disjunction_v<std::is_same<T, Ts>...>;
+
 } // namespace Kokkos::utils::impl
 
 #endif // KOKKOS_UTILS_IMPL_TYPE_TRAITS_HPP

@@ -47,6 +47,13 @@ function(add_one_test)
             -Werror
     )
 
+    # Tests must include any helper file under the 'tests' directory with the full relative path.
+    target_include_directories(
+        ${EXECUTABLE_NAME}
+        PRIVATE
+            ${CMAKE_SOURCE_DIR}
+    )
+
     # Link the executable to the library, GTest and Kokkos.
     target_link_libraries(
         ${EXECUTABLE_NAME}
