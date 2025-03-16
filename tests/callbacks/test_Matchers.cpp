@@ -1,0 +1,104 @@
+#include "gtest/gtest.h"
+
+#include "Kokkos_Core.hpp"
+
+#include "kokkos-utils/impl/type_traits.hpp"
+
+#include "kokkos-utils/callbacks/EventInProfileSectionRegexMatcher.hpp"
+#include "kokkos-utils/callbacks/EventRegexMatcher.hpp"
+#include "kokkos-utils/callbacks/Matcher.hpp"
+
+/**
+ * @addtogroup unittests
+ *
+ * @c Kokkos callback matchers
+ * ---------------------------
+ *
+ * This group of tests check the behavior of the matchers that can act as predicates
+ * for the events associated with @ref Kokkos profiling callbacks.
+ */
+
+using execution_space = Kokkos::DefaultExecutionSpace;
+
+namespace Kokkos::utils::tests::callbacks
+{
+using namespace Kokkos::utils::callbacks;
+
+//! @test Check traits of @ref Kokkos::utils::callbacks::EventRegexMatcher.
+TEST(EventRegexMatcher, traits)
+{
+    static_assert(Matcher<EventRegexMatcher, Kokkos::Impl::type_list<
+        BeginParallelForEvent,
+        BeginParallelReduceEvent,
+        BeginParallelScanEvent,
+        BeginFenceEvent,
+        AllocateDataEvent,
+        DeallocateDataEvent,
+        CreateProfileSectionEvent,
+        PushRegionEvent,
+        ProfileEvent
+    >>);
+    static_assert(std::movable<EventRegexMatcher>);
+
+    static_assert( ! Matcher<EventRegexMatcher, BeginDeepCopyEvent>);
+}
+
+//! @test Check that @ref Kokkos::utils::callbacks::EventRegexMatcher works as expected.
+TEST(EventRegexMatcher, regex_matcher)
+{
+    const EventRegexMatcher matcher{.regex = std::regex("buried-[a-z]+-to-time")};
+
+    ASSERT_TRUE( matcher(BeginParallelForEvent{.name = "buried-kernel-to-time", .event_id = 2}));
+    ASSERT_FALSE(matcher(BeginParallelForEvent{.name = "not-this-other-kernel", .event_id = 2}));
+
+    ASSERT_TRUE( matcher(AllocateDataEvent{.alloc = {.name = "buried-allocation-to-time"}}));
+    ASSERT_FALSE(matcher(AllocateDataEvent{.alloc = {.name = "not-this-other-allocation"}}));
+}
+
+//! @test Check traits of @ref Kokkos::utils::callbacks::EventInProfileSectionRegexMatcher.
+TEST(EventInProfileSectionRegexMatcher, traits)
+{
+    static_assert(Matcher<EventInProfileSectionRegexMatcher, EventTypeList>);
+    static_assert(std::movable<EventInProfileSectionRegexMatcher>);
+}
+
+//! @test Check the behavior of @ref Kokkos::utils::callbacks::EventInProfileSectionRegexMatcher.
+TEST(EventInProfileSectionRegexMatcher, in_profile_section_matcher)
+{
+    constexpr uint32_t section_id = 2;
+
+    EventInProfileSectionRegexMatcher matcher(std::regex("buried-profile-section"));
+
+    ASSERT_FALSE(matcher(CreateProfileSectionEvent{.name = "buried-profile-section", .section_id = section_id}));
+
+    ASSERT_FALSE(matcher(AllocateDataEvent{})) << "Expecting not to record the event before starting the region.";
+
+    ASSERT_FALSE(matcher(StartProfileSectionEvent{.section_id = section_id}));
+
+    ASSERT_TRUE(matcher(AllocateDataEvent{})) << "Expecting to record the event inside the region.";
+
+    ASSERT_FALSE(matcher(StopProfileSectionEvent{.section_id = section_id}));
+
+    ASSERT_FALSE(matcher(AllocateDataEvent{})) << "Expecting to record the event after stopping the region.";
+
+    ASSERT_FALSE(matcher(DestroyProfileSectionEvent{.section_id = section_id}));
+}
+
+//! @test Check traits of @ref Kokkos::utils::callbacks::AnyEventMatcher.
+TEST(AnyEventMatcher, traits)
+{
+    static_assert(Matcher<AnyEventMatcher, EventTypeList>);
+    static_assert(std::movable<AnyEventMatcher>);
+}
+
+//! @test Check the behavior of @ref Kokkos::utils::callbacks::AnyEventMatcher.
+TEST(AnyEventMatcher, operator_parentheses)
+{
+    AnyEventMatcher matcher;
+
+    Kokkos::utils::impl::for_each<EventTypeList>([&] <Event EventType>() {
+        static_assert(matcher(EventType{}));
+    });
+}
+
+} // namespace Kokkos::utils::tests::callbacks

@@ -2,3 +2,4 @@ set_property(GLOBAL APPEND PROPERTY KokkosUtils_FILES_FOR_DOC ${CMAKE_CURRENT_SO
 
 add_one_test(NAME Events)
 add_one_test(NAME Manager)
+add_one_test(NAME Matchers)
