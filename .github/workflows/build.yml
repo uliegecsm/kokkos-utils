@@ -1,4 +1,4 @@
-name: Build
+name: Build and test
 
 on:
     push:
@@ -42,7 +42,7 @@ jobs:
                 include:
                     - backend        : Cuda
                       compiler_family: nvidia
-                      base_image     : nvidia/cuda:12.6.3-devel-ubuntu24.04
+                      base_image     : nvidia/cuda:12.8.0-devel-ubuntu24.04
                       platforms      : linux/amd64
                       kokkos_arch    : VOLTA70
                     - backend        : OpenMP
