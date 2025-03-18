@@ -34,6 +34,10 @@ set(DOXYGEN_TAGFILES "${KOKKOS_TAG_FILE}")
 get_target_property(KokkosUtils_TARGET_FILES_FOR_DOC KokkosUtils INTERFACE_SOURCES)
 get_property(KokkosUtils_FILES_FOR_DOC GLOBAL PROPERTY KokkosUtils_FILES_FOR_DOC)
 
+include(${CMAKE_SOURCE_DIR}/cmake/functions/list.cmake)
+check_list_length(KokkosUtils_TARGET_FILES_FOR_DOC 10)
+check_list_length(KokkosUtils_FILES_FOR_DOC        10)
+
 #---- Add Doxygen as a target.
 #     See also https://cmake.org/cmake/help/latest/module/FindDoxygen.html.
 doxygen_add_docs(
