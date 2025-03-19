@@ -33,7 +33,9 @@ set(DOXYGEN_TAGFILES "${KOKKOS_TAG_FILE}")
 set(DOXYGEN_MACRO_EXPANSION YES)
 
 #---- Extract files for documentation.
-get_target_property(KokkosUtils_TARGET_FILES_FOR_DOC KokkosUtils INTERFACE_SOURCES)
+get_target_property(KokkosUtils_TARGET_FILES_FOR_DOC kokkosutils INTERFACE_HEADER_SETS)
+get_target_property(KokkosUtils_TARGET_FILES_FOR_DOC kokkosutils HEADER_SET_${KokkosUtils_TARGET_FILES_FOR_DOC})
+
 get_property(KokkosUtils_FILES_FOR_DOC GLOBAL PROPERTY KokkosUtils_FILES_FOR_DOC)
 
 include(${CMAKE_SOURCE_DIR}/cmake/functions/list.cmake)

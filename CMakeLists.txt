@@ -49,57 +49,62 @@ endif()
 kokkos_check(DEVICES "${EXPECTED_Kokkos_DEVICES}")
 
 #---- Build the Kokkos::utils library.
-add_library(KokkosUtils INTERFACE)
-add_library(Kokkos::utils ALIAS KokkosUtils)
+add_library(kokkosutils INTERFACE)
+add_library(Kokkos::utils ALIAS kokkosutils)
 
 target_sources(
-    KokkosUtils
+    kokkosutils
     INTERFACE
-        include/kokkos-utils/atomics/InsertOp.hpp
+        FILE_SET headers
+        TYPE HEADERS
+        BASE_DIRS include/kokkos-utils
+        FILES
+            include/kokkos-utils/atomics/InsertOp.hpp
 
-        include/kokkos-utils/callbacks/EventInProfileSectionRegexMatcher.hpp
-        include/kokkos-utils/callbacks/EventRegexMatcher.hpp
-        include/kokkos-utils/callbacks/Events.hpp
-        include/kokkos-utils/callbacks/Helpers.hpp
-        include/kokkos-utils/callbacks/Listener.hpp
-        include/kokkos-utils/callbacks/Manager.hpp
-        include/kokkos-utils/callbacks/Matcher.hpp
-        include/kokkos-utils/callbacks/RecorderListener.hpp
+            include/kokkos-utils/callbacks/EventInProfileSectionRegexMatcher.hpp
+            include/kokkos-utils/callbacks/EventRegexMatcher.hpp
+            include/kokkos-utils/callbacks/Events.hpp
+            include/kokkos-utils/callbacks/Helpers.hpp
+            include/kokkos-utils/callbacks/Listener.hpp
+            include/kokkos-utils/callbacks/Manager.hpp
+            include/kokkos-utils/callbacks/Matcher.hpp
+            include/kokkos-utils/callbacks/RecorderListener.hpp
 
-        include/kokkos-utils/concepts/DualView.hpp
+            include/kokkos-utils/concepts/DualView.hpp
 
-        include/kokkos-utils/concepts/ExecutionSpace.hpp
-        include/kokkos-utils/concepts/MemorySpace.hpp
-        include/kokkos-utils/concepts/Space.hpp
-        include/kokkos-utils/concepts/View.hpp
+            include/kokkos-utils/concepts/ExecutionSpace.hpp
+            include/kokkos-utils/concepts/MemorySpace.hpp
+            include/kokkos-utils/concepts/Space.hpp
+            include/kokkos-utils/concepts/View.hpp
 
-        include/kokkos-utils/impl/type_list.hpp
-        include/kokkos-utils/impl/type_traits.hpp
+            include/kokkos-utils/impl/type_list.hpp
+            include/kokkos-utils/impl/type_traits.hpp
 
-        include/kokkos-utils/view/extents.hpp
-        include/kokkos-utils/view/slice.hpp
+            include/kokkos-utils/view/extents.hpp
+            include/kokkos-utils/view/slice.hpp
 )
 
 target_include_directories(
-    KokkosUtils
+    kokkosutils
     INTERFACE
-        "include/"
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
+        $<INSTALL_INTERFACE:include/>
 )
 
 target_compile_features(
-    KokkosUtils
+    kokkosutils
     INTERFACE
         cxx_std_20
 )
 
 target_compile_definitions(
-    KokkosUtils
+    kokkosutils
     INTERFACE
         KOKKOS_IMPL_PUBLIC_INCLUDE
 )
 
 target_link_libraries(
-    KokkosUtils
+    kokkosutils
     INTERFACE
         Kokkos::kokkoscore
 )
@@ -109,6 +114,10 @@ if(KokkosUtils_ENABLE_CLANG_TIDY)
     configure_file(${CMAKE_SOURCE_DIR}/.clang-tidy ${CMAKE_BINARY_DIR}/.clang-tidy @ONLY)
     set(CMAKE_CXX_CLANG_TIDY "clang-tidy" "--config-file=${CMAKE_BINARY_DIR}/.clang-tidy")
 endif()
+
+#---- Install.
+install(TARGETS kokkosutils EXPORT KokkosUtilsConfig FILE_SET headers DESTINATION include/kokkos-utils)
+install(EXPORT KokkosUtilsConfig DESTINATION lib/cmake/KokkosUtils NAMESPACE Kokkos::)
 
 #---- Testing.
 if(KokkosUtils_ENABLE_TESTS)
