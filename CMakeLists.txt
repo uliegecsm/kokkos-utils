@@ -54,9 +54,12 @@ target_sources(
     INTERFACE
         include/kokkos-utils/atomics/InsertOp.hpp
 
+        include/kokkos-utils/callbacks/EventInProfileSectionRegexMatcher.hpp
+        include/kokkos-utils/callbacks/EventRegexMatcher.hpp
         include/kokkos-utils/callbacks/Events.hpp
         include/kokkos-utils/callbacks/Listener.hpp
         include/kokkos-utils/callbacks/Manager.hpp
+        include/kokkos-utils/callbacks/Matcher.hpp
 
         include/kokkos-utils/concepts/DualView.hpp
 
