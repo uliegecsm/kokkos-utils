@@ -102,6 +102,15 @@ template <typename T, typename S>
 inline constexpr size_t type_list_index_v = TypeListIndex<T, S>::value;
 ///@}
 
+//! Calls the instantiation of the call operator of a callable object for each type in a @c Kokkos::Impl::type_list.
+template <typename TypeList, typename Callable>
+constexpr void for_each(Callable callable)
+{
+    [&] <size_t... Is>(std::index_sequence<Is...>) constexpr {
+        (callable.template operator()<type_list_at_t<Is, TypeList>>(), ...);
+    }(std::make_index_sequence<type_list_size_v<TypeList>>{});
+}
+
 } // namespace Kokkos::utils::impl
 
 #endif // KOKKOS_UTILS_IMPL_TYPE_LIST_HPP

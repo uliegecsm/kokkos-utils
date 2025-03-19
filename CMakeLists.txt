@@ -55,6 +55,8 @@ target_sources(
         include/kokkos-utils/atomics/InsertOp.hpp
 
         include/kokkos-utils/callbacks/Events.hpp
+        include/kokkos-utils/callbacks/Listener.hpp
+        include/kokkos-utils/callbacks/Manager.hpp
 
         include/kokkos-utils/concepts/DualView.hpp
 

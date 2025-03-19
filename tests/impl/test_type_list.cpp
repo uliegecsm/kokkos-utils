@@ -86,4 +86,20 @@ TEST(impl, type_list_index_v)
     static_assert(type_list_index_v<int,   type_list_t> == 2);
 }
 
+//! @test Check @ref Kokkos::utils::impl::for_each.
+TEST(impl, for_each)
+{
+    using Kokkos::utils::impl::for_each;
+
+    static_assert([]() {
+        size_t sum_of_sizes = 0;
+
+        for_each<type_list_t>([&] <typename T>() constexpr {
+            sum_of_sizes += sizeof(T);
+        });
+
+        return sum_of_sizes == sizeof(char) + sizeof(short) + sizeof(int);
+    }());
+}
+
 } // namespace Kokkos::utils::tests::impl
