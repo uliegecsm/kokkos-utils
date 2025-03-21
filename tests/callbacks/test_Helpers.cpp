@@ -1,7 +1,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-#include "tests/callbacks/Helpers.hpp"
+#include "kokkos-utils/callbacks/Helpers.hpp"
 
 /**
  * @file
@@ -11,7 +11,7 @@
  * @c Kokkos callback tests helpers
  * --------------------------------
  *
- * This group of tests check the behavior of the tests helpers implemented in @ref tests/callbacks/Helpers.hpp.
+ * This group of tests check the behavior of the tests helpers implemented in @ref kokkos-utils/callbacks/Helpers.hpp.
  */
 
 using execution_space = Kokkos::DefaultExecutionSpace;
