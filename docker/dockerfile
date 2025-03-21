@@ -2,15 +2,41 @@ ARG BASE_IMAGE
 
 FROM ${BASE_IMAGE} AS requirements
 
+ARG PYTHON_VERSION=3.12
+ENV VIRTUAL_ENV=/opt/venv-${PYTHON_VERSION}
+ENV PATH=${VIRTUAL_ENV}/bin:${PATH}
+
+RUN <<EOF
+    set -ex
+    apt update
+    apt --yes --no-install-recommends install python3 python3-pip python3-venv git
+
+    printf "import re, sys\nif re.match(r'Python ${PYTHON_VERSION}.[0-9]+', '$(python3 --version)') is None: raise RuntimeError(f'Your Python version {sys.version} does not match ${PYTHON_VERSION}.')" | python3
+
+    python3 -m venv $VIRTUAL_ENV
+    apt clean && rm -rf /var/lib/apt/lists/*
+EOF
+
+ARG COMPILER_FAMILY
+
 # Install APT requirements.
 RUN --mount=target=/requirements,type=bind,source=requirements <<EOF
     set -ex
 
-    apt update
+    python3 -m pip install git+https://github.com/uliegecsm/system-helpers
 
-    apt --yes --no-install-recommends install $(grep -vE "^\s*#" /requirements/requirements.system.txt  | tr "\n" " ")
+    if [ "${COMPILER_FAMILY}" = "gcc" ];then
+        COMPILER_FAMILY_REQUIREMENTS=g++
+    elif [ "${COMPILER_FAMILY}" = "clang" ];then
+        COMPILER_FAMILY_REQUIREMENTS="clang clang-tidy libomp-dev"
+    else
+        echo "unsupported compiler family ${COMPILER_FAMILY}"
+        exit -1
+    fi
 
-    apt clean && rm -rf /var/lib/apt/lists/*
+    apt-helpers install-packages --clean --update  \
+        --packages ${COMPILER_FAMILY_REQUIREMENTS} \
+        --requirement /requirements/requirements.system.txt
 EOF
 
 ARG CMAKE_VERSION
@@ -48,9 +74,7 @@ ARG DOXYGEN_VERSION
 RUN <<EOF
     set -ex
 
-    apt update
-
-    apt --yes --no-install-recommends install flex bison python3
+    apt-helpers install-packages --clean --update --packages flex bison
 
     git clone --depth=1 --branch Release_$(echo ${DOXYGEN_VERSION} | tr . _) https://github.com/doxygen/doxygen doxygen
 
@@ -58,11 +82,7 @@ RUN <<EOF
 
     cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/opt/doxygen-${DOXYGEN_VERSION}
 
-    cmake --build build -j4
-
-    cmake --build build --target install
-
-    apt clean && rm -rf /var/lib/apt/lists/*
+    cmake --build build -j4 --target install
 EOF
 
 # Compile Google Test.
@@ -91,7 +111,7 @@ ARG KOKKOS_ARCH
 ARG KOKKOS_PRESET
 ARG KOKKOS_VERSION
 
-RUN --mount=target=/cmake/presets,type=bind,source=cmake/presets <<EOF
+RUN --mount=target=/cmake/presets/kokkos.json,type=bind,source=cmake/presets/kokkos.json <<EOF
     set -ex
 
     git clone --depth=1 --branch=${KOKKOS_VERSION} https://github.com/kokkos/kokkos kokkos
