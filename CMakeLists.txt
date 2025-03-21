@@ -14,8 +14,9 @@ project(
 )
 
 #---- Options.
-option(KokkosUtils_ENABLE_TESTS "Enable testing" ON)
-option(KokkosUtils_ENABLE_DOC   "Enable documentation" ON)
+option(KokkosUtils_ENABLE_TESTS      "Enable testing" ON)
+option(KokkosUtils_ENABLE_DOC        "Enable documentation" ON)
+option(KokkosUtils_ENABLE_CLANG_TIDY "Enable clang-tidy" OFF)
 
 #---- Global property that helps us keep track of files that will automatically be added
 #     to our Doxygen documentation.
@@ -100,6 +101,12 @@ target_link_libraries(
     INTERFACE
         Kokkos::kokkoscore
 )
+
+#---- Setup clang-tidy if needed.
+if(KokkosUtils_ENABLE_CLANG_TIDY)
+    configure_file(${CMAKE_SOURCE_DIR}/.clang-tidy ${CMAKE_BINARY_DIR}/.clang-tidy @ONLY)
+    set(CMAKE_CXX_CLANG_TIDY "clang-tidy" "--config-file=${CMAKE_BINARY_DIR}/.clang-tidy")
+endif()
 
 #---- Testing.
 if(KokkosUtils_ENABLE_TESTS)
