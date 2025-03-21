@@ -45,6 +45,8 @@ else()
     endif()
 endif()
 
+kokkos_check(DEVICES "${EXPECTED_Kokkos_DEVICES}")
+
 #---- Build the Kokkos::utils library.
 add_library(KokkosUtils INTERFACE)
 add_library(Kokkos::utils ALIAS KokkosUtils)

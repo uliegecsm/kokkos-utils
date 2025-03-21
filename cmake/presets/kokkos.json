@@ -2,41 +2,80 @@
     "version"   : 3,
     "configurePresets" : [
         {
+            // Configuration common to all available presets.
             "name"          : "default",
+            "hidden"        : true,
             "binaryDir"     : "${sourceDir}/build-with-${presetName}",
             "cacheVariables" : {
                 "CMAKE_BUILD_TYPE"     : "Release",
                 "CMAKE_CXX_STANDARD"   : "17",
                 "CMAKE_CXX_EXTENSIONS" : "OFF",
                 "BUILD_SHARED_LIBS"    : "ON",
-                "CMAKE_C_COMPILER"     : "should-not-be-needed"
+                "CMAKE_C_COMPILER"     : "should-not-be-needed",
+                "Kokkos_ENABLE_SERIAL" : "ON",
+                "Kokkos_ENABLE_TESTS"  : "OFF"
             }
         },
         {
-            "name"        : "gcc-OpenMP",
-            "inherits"    : "default",
-            "cacheVariables" : {
-                "CMAKE_CXX_COMPILER"   : "g++",
-                "Kokkos_ENABLE_OPENMP" : "ON"
-            }
+            // Inherit from this preset to use the gcc compiler family.
+            "name"           : "gcc",
+            "hidden"         : true,
+            "cacheVariables" : {"CMAKE_CXX_COMPILER" : "g++"}
         },
         {
-            "name"           : "nvidia-Cuda",
-            "inherits"       : "default",
+            // Inherit from this preset to use the clang compiler family.
+            "name"           : "clang",
+            "hidden"         : true,
+            "cacheVariables" : {"CMAKE_CXX_COMPILER" : "clang++"}
+        },
+        {
+            // Inherit from this preset to use the OpenMP backend.
+            "name"           : "OpenMP",
+            "hidden"         : true,
+            "cacheVariables" : {"Kokkos_ENABLE_OPENMP" : "ON"}
+        },
+        {
+            // Inherit from this preset to use the Cuda backend.
+            "name"           : "Cuda",
+            "hidden"         : true,
             "cacheVariables" : {
                 "CMAKE_CXX_COMPILER" : "${sourceDir}/bin/nvcc_wrapper",
                 "Kokkos_ENABLE_CUDA" : "ON"
             }
+        },
+        {
+            "name"     : "gcc-OpenMP",
+            "inherits" : ["default", "gcc", "OpenMP"]
+        },
+        {
+            "name"     : "clang-OpenMP",
+            "inherits" : ["default", "clang", "OpenMP"]
+        },
+        {
+            "name"     : "gcc-Cuda",
+            "inherits" : ["default", "gcc", "OpenMP", "Cuda"]
         }
     ],
     "buildPresets" : [
         {
-            "name"            : "gcc-OpenMP",
-            "configurePreset" : "gcc-OpenMP"
+            "name"            : "default",
+            "configurePreset" : "default",
+            "inheritConfigureEnvironment" : true
         },
         {
-            "name"            : "nvidia-Cuda",
-            "configurePreset" : "nvidia-Cuda"
+            "name"            : "gcc-OpenMP",
+            "configurePreset" : "gcc-OpenMP",
+            "inherits"        : "default"
+        },
+        {
+            "name"            : "clang-OpenMP",
+            "configurePreset" : "clang-OpenMP",
+            "inherits"        : "default"
+        },
+        {
+            "name"            : "gcc-Cuda",
+            "configurePreset" : "gcc-Cuda",
+            "inherits"        : "default"
         }
     ]
 }

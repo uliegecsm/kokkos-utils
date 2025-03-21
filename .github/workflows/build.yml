@@ -41,7 +41,7 @@ jobs:
             matrix:
                 include:
                     - backend        : Cuda
-                      compiler_family: nvidia
+                      compiler_family: gcc
                       base_image     : nvidia/cuda:12.8.1-devel-ubuntu24.04
                       platforms      : linux/amd64
                       kokkos_arch    : VOLTA70
@@ -49,9 +49,12 @@ jobs:
                       compiler_family: gcc
                       base_image     : ubuntu:24.04
                       platforms      : linux/amd64,linux/arm64
+                    - backend        : OpenMP
+                      compiler_family: clang
+                      base_image     : ubuntu:24.04
+                      platforms      : linux/amd64
         steps:
-            - name: Checkout code.
-              uses: actions/checkout@v4
+            - uses: actions/checkout@v4
 
             - name: Prepare.
               run: |
@@ -89,6 +92,7 @@ jobs:
                   build-args: |
                       BASE_IMAGE=${{ matrix.base_image }}
                       CMAKE_VERSION=${{ env.CMAKE_VERSION }}
+                      COMPILER_FAMILY=${{ matrix.compiler_family }}
                       DOXYGEN_VERSION=${{ env.DOXYGEN_VERSION }}
                       GOOGLETEST_VERSION=${{ env.GOOGLETEST_VERSION }}
                       KOKKOS_ARCH=${{ matrix.kokkos_arch }}
@@ -104,16 +108,18 @@ jobs:
             matrix:
                 include:
                     - backend        : Cuda
-                      compiler_family: nvidia
+                      compiler_family: gcc
                       run_tests      : false
                     - backend        : OpenMP
                       compiler_family: gcc
                       run_tests      : true
+                    - backend        : OpenMP
+                      compiler_family: clang
+                      run_tests      : true
         container:
             image: ${{ needs.set-vars.outputs.CI_IMAGE }}:${{ matrix.compiler_family }}-${{ matrix.backend }}
         steps:
-            - name: Checkout code.
-              uses: actions/checkout@v4
+            - uses: actions/checkout@v4
 
             - name: Configure and build.
               run : |
@@ -131,8 +137,7 @@ jobs:
         container:
             image: ${{ needs.set-vars.outputs.CI_IMAGE }}:gcc-OpenMP
         steps:
-            - name: Checkout code.
-              uses: actions/checkout@v4
+            - uses: actions/checkout@v4
 
             - name: Build Doxygen documentation.
               run : |

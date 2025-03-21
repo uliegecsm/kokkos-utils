@@ -2,7 +2,9 @@
     "version"   : 3,
     "configurePresets" : [
         {
+            // Configuration common to all available presets.
             "name"          : "default",
+            "hidden"        : true,
             "binaryDir"     : "${sourceDir}/build-with-${presetName}",
             "cacheVariables" : {
                 "CMAKE_BUILD_TYPE"     : "Release",
@@ -12,17 +14,42 @@
             }
         },
         {
+            // Inherit from this preset to use the gcc compiler family.
+            "name"           : "gcc",
+            "hidden"         : true,
+            "cacheVariables" : {"CMAKE_CXX_COMPILER" : "g++"}
+        },
+        {
+            // Inherit from this preset to use the clang compiler family.
+            "name"           : "clang",
+            "hidden"         : true,
+            "cacheVariables" : {"CMAKE_CXX_COMPILER" : "clang++"}
+        },
+        {
+            // Inherit from this preset to use the Cuda compiler family.
+            "name"           : "Cuda",
+            "hidden"         : true,
+            "cacheVariables" : {"CMAKE_CXX_COMPILER" : "$penv{Kokkos_ROOT}/bin/nvcc_wrapper"}
+        },
+        {
             "name"           : "gcc-OpenMP",
-            "inherits"       : "default",
+            "inherits"       : ["default", "gcc"],
             "cacheVariables" : {
-                "CMAKE_CXX_COMPILER" : "g++"
+                "EXPECTED_Kokkos_DEVICES" : "SERIAL;OPENMP"
             }
         },
         {
-            "name"           : "nvidia-Cuda",
-            "inherits"       : "default",
+            "name"           : "clang-OpenMP",
+            "inherits"       : ["default", "clang"],
             "cacheVariables" : {
-                "CMAKE_CXX_COMPILER" : "$penv{Kokkos_ROOT}/bin/nvcc_wrapper"
+                "EXPECTED_Kokkos_DEVICES" : "SERIAL;OPENMP"
+            }
+        },
+        {
+            "name"           : "gcc-Cuda",
+            "inherits"       : ["default", "Cuda"],
+            "cacheVariables" : {
+                "EXPECTED_Kokkos_DEVICES" : "SERIAL;OPENMP;CUDA"
             }
         }
     ],
@@ -38,8 +65,13 @@
             "inherits"        : "default"
         },
         {
-            "name"            : "nvidia-Cuda",
-            "configurePreset" : "nvidia-Cuda",
+            "name"            : "clang-OpenMP",
+            "configurePreset" : "clang-OpenMP",
+            "inherits"        : "default"
+        },
+        {
+            "name"            : "gcc-Cuda",
+            "configurePreset" : "gcc-Cuda",
             "inherits"        : "default"
         }
     ],
@@ -61,8 +93,8 @@
             "inherits"        : "default"
         },
         {
-            "name"            : "nvidia-Cuda",
-            "configurePreset" : "nvidia-Cuda",
+            "name"            : "clang-OpenMP",
+            "configurePreset" : "clang-OpenMP",
             "inherits"        : "default"
         }
     ]
