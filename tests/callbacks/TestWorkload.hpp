@@ -27,7 +27,7 @@ struct MyWorkload
         profile_section.start();
 
         {
-            Kokkos::Profiling::ScopedRegion guard_level_0("computation - level 0");
+            const Kokkos::Profiling::ScopedRegion guard_level_0("computation - level 0");
 
             Kokkos::parallel_for(
                 "computation - level 0 - pfor",
@@ -37,7 +37,7 @@ struct MyWorkload
             exec.fence("computation - level 0 - fence after pfor");
 
             {
-                Kokkos::Profiling::ScopedRegion guard_level_1("computation - level 1");
+                const Kokkos::Profiling::ScopedRegion guard_level_1("computation - level 1");
 
                 // Another kernel, a parallel reduce on the default execution space instance.
                 double my_result;
@@ -56,6 +56,6 @@ struct MyWorkload
     }
 };
 
-} // Kokkos::utils::tests::callbacks
+} // namespace Kokkos::utils::tests::callbacks
 
 #endif // KOKKOS_UTILS_TESTS_CALLBACKS_TESTWORKLOAD_HPP

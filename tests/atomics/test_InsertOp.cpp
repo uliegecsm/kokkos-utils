@@ -25,7 +25,7 @@ template <concepts::View view_t>
 struct InsertMinTest
 {
     view_t data;
-    int trials;
+    int trials = 0;
     utils::atomics::InsertMin inserter {};
 
     template <typename Exec>

@@ -32,6 +32,12 @@
             "cacheVariables" : {"CMAKE_CXX_COMPILER" : "$penv{Kokkos_ROOT}/bin/nvcc_wrapper"}
         },
         {
+            // Inherit from this preset to use clang-tidy.
+            "name"          : "clang-tidy",
+            "hidden"        : true,
+            "cacheVariables": {"KokkosUtils_ENABLE_CLANG_TIDY" : "ON"}
+        },
+        {
             "name"           : "gcc-OpenMP",
             "inherits"       : ["default", "gcc"],
             "cacheVariables" : {
@@ -40,7 +46,7 @@
         },
         {
             "name"           : "clang-OpenMP",
-            "inherits"       : ["default", "clang"],
+            "inherits"       : ["default", "clang", "clang-tidy"],
             "cacheVariables" : {
                 "EXPECTED_Kokkos_DEVICES" : "SERIAL;OPENMP"
             }

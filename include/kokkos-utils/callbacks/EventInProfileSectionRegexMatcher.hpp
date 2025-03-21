@@ -51,7 +51,6 @@ struct EventInProfileSectionRegexMatcher
     bool recording = false;
 };
 
-} // Kokkos::utils::callbacks
+} // namespace Kokkos::utils::callbacks
 
 #endif // KOKKOS_UTILS_CALLBACKS_EVENTINPROFILESECTIONREGEXMATCHER_HPP
-
