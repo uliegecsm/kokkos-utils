@@ -36,6 +36,8 @@ struct MyWorkload
             );
             exec.fence("computation - level 0 - fence after pfor");
 
+            Kokkos::Profiling::markEvent("buried marker");
+
             {
                 const Kokkos::Profiling::ScopedRegion guard_level_1("computation - level 1");
 
