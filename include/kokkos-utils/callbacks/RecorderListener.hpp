@@ -26,6 +26,7 @@ requires Matcher<MatcherType, Kokkos::Impl::type_list<EventTypes...>>
 class RecorderListener<MatcherType, EventTypes...>
 {
 public:
+    using matcher_t         = MatcherType;
     using event_type_list_t = Kokkos::Impl::type_list<EventTypes...>;
 
 public:

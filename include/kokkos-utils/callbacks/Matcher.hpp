@@ -13,7 +13,7 @@ namespace impl
 template <typename, typename>
 struct IsMatcherFor;
 
-template <typename Callable, typename... Events>
+template <typename Callable, typename... Events> requires (sizeof...(Events) > 0)
 struct IsMatcherFor<Callable, Kokkos::Impl::type_list<Events...>>
 {
     static constexpr bool value = std::conjunction_v<std::is_invocable_r<bool, Callable, const Events&>...>;
@@ -23,7 +23,7 @@ struct IsMatcherFor<Callable, Kokkos::Impl::type_list<Events...>>
 
 /**
  * @brief Concept that models that a callable object is a matcher for the event types in @p EventTypeSubList
- *        if it is invocable with each event type passed by const ref and returns a boolean.
+ *        if it is invocable with each event type passed by @c const reference and returns a @c bool.
  */
 template <typename Callable, typename EventTypeSubList>
 concept Matcher = impl::IsMatcherFor<Callable, EventTypeSubList>::value;
