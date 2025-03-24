@@ -131,6 +131,16 @@ jobs:
               run : |
                   ctest --preset=${{ matrix.compiler_family }}-${{ matrix.backend }}
 
+            - name: Install.
+              run : |
+                  bash tests/install.sh ${{ matrix.compiler_family }}-${{ matrix.backend }}
+
+            - name: Find package against install.
+              run : |
+                  test -d include/
+                  rm -rf include/
+                  bash tests/find_package.sh
+
     build-documentation:
         needs: [set-vars, build-image]
         runs-on: [ubuntu-latest]
