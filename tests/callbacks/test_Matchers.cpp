@@ -41,6 +41,8 @@ TEST(EventRegexMatcher, traits)
     static_assert(std::movable<EventRegexMatcher>);
 
     static_assert( ! Matcher<EventRegexMatcher, BeginDeepCopyEvent>);
+
+    static_assert( ! Matcher<EventRegexMatcher, Kokkos::Impl::type_list<>>);
 }
 
 //! @test Check that @ref Kokkos::utils::callbacks::EventRegexMatcher works as expected.

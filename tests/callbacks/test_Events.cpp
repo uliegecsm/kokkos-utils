@@ -3,7 +3,7 @@
 
 #include "kokkos-utils/callbacks/Events.hpp"
 
-using execution_space = Kokkos::DefaultExecutionSpace;
+#include "tests/callbacks/Helpers.hpp"
 
 /**
  * @file
@@ -16,6 +16,8 @@ using execution_space = Kokkos::DefaultExecutionSpace;
  * This group of tests check the behavior of the event types defined in @ref Events.hpp
  * associated with @ref Kokkos profiling callbacks.
  */
+
+using execution_space = Kokkos::DefaultExecutionSpace;
 
 namespace Kokkos::utils::tests::callbacks
 {
@@ -179,17 +181,6 @@ struct EventTest<ProfileEvent> : public ::testing::Test
     ProfileEvent event {.name = "my profile event"};
     std::string expt_descr {"{name = \"my profile event\"}"};
 };
-
-template <typename>
-struct ImplEventTestTypes;
-
-template <typename... EventTypes>
-struct ImplEventTestTypes<Kokkos::Impl::type_list<EventTypes...>>
-{
-    using type = ::testing::Types<EventTypes...>;
-};
-
-using EventTestTypes = typename ImplEventTestTypes<EventTypeList>::type;
 
 TYPED_TEST_SUITE(EventTest, EventTestTypes);
 

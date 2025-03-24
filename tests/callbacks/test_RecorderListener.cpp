@@ -10,6 +10,7 @@
 #include "kokkos-utils/callbacks/Helpers.hpp"
 #include "kokkos-utils/callbacks/RecorderListener.hpp"
 
+#include "tests/callbacks/Helpers.hpp"
 #include "tests/callbacks/TestWorkload.hpp"
 
 /**
@@ -52,6 +53,26 @@ TEST(RecorderListener, traits)
     >);
 
     static_assert(Listener<event_in_profile_section_recorder_t>);
+}
+
+template <Event EvenType>
+class RecorderListenerSingleEventTypeTest : public ManagerTestFixture {};
+
+TYPED_TEST_SUITE(RecorderListenerSingleEventTypeTest, EventTestTypes);
+
+//! @test Ensure that @ref Kokkos::utils::callbacks::RecorderListener can be used with any event type from @ref Kokkos::utils::callbacks::EventTypeList.
+TYPED_TEST(RecorderListenerSingleEventTypeTest, record)
+{
+    using recorder_listener_t = RecorderListener<TypeParam>;
+    static_assert(std::same_as<typename recorder_listener_t::event_type_list_t, Kokkos::Impl::type_list<TypeParam>>);
+    static_assert(std::same_as<typename recorder_listener_t::matcher_t, AnyEventMatcher>);
+
+    const auto recorder = std::make_shared<recorder_listener_t>();
+
+    Manager::  register_listener(recorder);
+    Manager::unregister_listener(recorder.get());
+
+    ASSERT_EQ(recorder->recorded_events.size(), 0);
 }
 
 //! @test Check the behavior of @ref Kokkos::utils::callbacks::RecorderListener.
