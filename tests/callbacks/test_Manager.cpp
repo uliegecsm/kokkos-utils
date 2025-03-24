@@ -3,9 +3,9 @@
 
 #include "Kokkos_Core.hpp"
 
+#include "kokkos-utils/callbacks/Helpers.hpp"
 #include "kokkos-utils/impl/type_traits.hpp"
 
-#include "tests/callbacks/Helpers.hpp"
 #include "tests/callbacks/TestWorkload.hpp"
 
 /**

@@ -7,9 +7,9 @@
 
 #include "kokkos-utils/callbacks/EventInProfileSectionRegexMatcher.hpp"
 #include "kokkos-utils/callbacks/EventRegexMatcher.hpp"
+#include "kokkos-utils/callbacks/Helpers.hpp"
 #include "kokkos-utils/callbacks/RecorderListener.hpp"
 
-#include "tests/callbacks/Helpers.hpp"
 #include "tests/callbacks/TestWorkload.hpp"
 
 /**

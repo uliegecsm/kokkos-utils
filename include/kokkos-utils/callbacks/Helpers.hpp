@@ -1,11 +1,11 @@
-#ifndef KOKKOS_UTILS_TESTS_HELPERS_HPP
-#define KOKKOS_UTILS_TESTS_HELPERS_HPP
+#ifndef KOKKOS_UTILS_CALLBACKS_HELPERS_HPP
+#define KOKKOS_UTILS_CALLBACKS_HELPERS_HPP
 
 #include "gmock/gmock.h"
 
 #include "kokkos-utils/callbacks/Manager.hpp"
 
-namespace Kokkos::utils::tests::callbacks
+namespace Kokkos::utils::callbacks
 {
 
 class ManagerTestFixture : public ::testing::Test
@@ -143,6 +143,6 @@ auto ContainsInOrder(Matchers&&... matchers) {
     return ::testing::MakePolymorphicMatcher(impl::ContainsInOrderMatcher<T, std::remove_cvref_t<Matchers>...>(std::forward<Matchers>(matchers)...));
 }
 
-} // namespace Kokkos::utils::tests::callbacks
+} // namespace Kokkos::utils::callbacks
 
-#endif // KOKKOS_UTILS_TESTS_HELPERS_HPP
+#endif // KOKKOS_UTILS_CALLBACKS_HELPERS_HPP

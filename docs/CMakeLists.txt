@@ -37,8 +37,8 @@ get_target_property(KokkosUtils_TARGET_FILES_FOR_DOC KokkosUtils INTERFACE_SOURC
 get_property(KokkosUtils_FILES_FOR_DOC GLOBAL PROPERTY KokkosUtils_FILES_FOR_DOC)
 
 include(${CMAKE_SOURCE_DIR}/cmake/functions/list.cmake)
-check_list_length(KokkosUtils_TARGET_FILES_FOR_DOC 17)
-check_list_length(KokkosUtils_FILES_FOR_DOC        17)
+check_list_length(KokkosUtils_TARGET_FILES_FOR_DOC 18)
+check_list_length(KokkosUtils_FILES_FOR_DOC        16)
 
 #---- Add Doxygen as a target.
 #     See also https://cmake.org/cmake/help/latest/module/FindDoxygen.html.
