@@ -8,7 +8,7 @@
 namespace Kokkos::utils::callbacks
 {
 
-class ManagerTestFixture : public ::testing::Test
+class ManagerTestFixture : public virtual ::testing::Test
 {
 public:
     ManagerTestFixture()  { Kokkos::utils::callbacks::Manager::initialize(); }
