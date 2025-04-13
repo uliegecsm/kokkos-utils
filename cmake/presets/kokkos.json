@@ -29,6 +29,12 @@
             "cacheVariables" : {"CMAKE_CXX_COMPILER" : "clang++"}
         },
         {
+            // Inherit from this preset to use the rocm compiler family.
+            "name"           : "rocm",
+            "hidden"         : true,
+            "cacheVariables" : {"CMAKE_CXX_COMPILER" : "hipcc"}
+        },
+        {
             // Inherit from this preset to use the OpenMP backend.
             "name"           : "OpenMP",
             "hidden"         : true,
@@ -44,6 +50,15 @@
             }
         },
         {
+            // Inherit from this preset to use the HIP backend.
+            "name"           : "HIP",
+            "hidden"         : true,
+            "cacheVariables" : {
+                "Kokkos_ENABLE_ROCTHRUST" : "OFF",
+                "Kokkos_ENABLE_HIP" : "ON"
+            }
+        },
+        {
             "name"     : "gcc-OpenMP",
             "inherits" : ["default", "gcc", "OpenMP"]
         },
@@ -54,6 +69,10 @@
         {
             "name"     : "gcc-Cuda",
             "inherits" : ["default", "gcc", "OpenMP", "Cuda"]
+        },
+        {
+            "name"     : "rocm-HIP",
+            "inherits" : ["default", "rocm", "OpenMP", "HIP"]
         }
     ],
     "buildPresets" : [
@@ -75,6 +94,11 @@
         {
             "name"            : "gcc-Cuda",
             "configurePreset" : "gcc-Cuda",
+            "inherits"        : "default"
+        },
+        {
+            "name"            : "rocm-HIP",
+            "configurePreset" : "rocm-HIP",
             "inherits"        : "default"
         }
     ]

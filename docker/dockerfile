@@ -29,6 +29,8 @@ RUN --mount=target=/requirements,type=bind,source=requirements <<EOF
         COMPILER_FAMILY_REQUIREMENTS=g++
     elif [ "${COMPILER_FAMILY}" = "clang" ];then
         COMPILER_FAMILY_REQUIREMENTS="clang clang-tidy libomp-dev"
+    elif [ "${COMPILER_FAMILY}" = "rocm" ];then
+        COMPILER_FAMILY_REQUIREMENTS=""
     else
         echo "unsupported compiler family ${COMPILER_FAMILY}"
         exit -1

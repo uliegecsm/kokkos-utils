@@ -26,7 +26,13 @@
             "cacheVariables" : {"CMAKE_CXX_COMPILER" : "clang++"}
         },
         {
-            // Inherit from this preset to use the Cuda compiler family.
+            // Inherit from this preset to use the rocm compiler family.
+            "name"           : "rocm",
+            "hidden"         : true,
+            "cacheVariables" : {"CMAKE_CXX_COMPILER" : "hipcc"}
+        },
+        {
+            // Inherit from this preset to use the Cuda backend.
             "name"           : "Cuda",
             "hidden"         : true,
             "cacheVariables" : {"CMAKE_CXX_COMPILER" : "$penv{Kokkos_ROOT}/bin/nvcc_wrapper"}
@@ -57,6 +63,13 @@
             "cacheVariables" : {
                 "EXPECTED_Kokkos_DEVICES" : "SERIAL;OPENMP;CUDA"
             }
+        },
+        {
+            "name"           : "rocm-HIP",
+            "inherits"       : ["default", "rocm"],
+            "cacheVariables" : {
+                "EXPECTED_Kokkos_DEVICES" : "SERIAL;OPENMP;HIP"
+            }
         }
     ],
     "buildPresets" : [
@@ -78,6 +91,11 @@
         {
             "name"            : "gcc-Cuda",
             "configurePreset" : "gcc-Cuda",
+            "inherits"        : "default"
+        },
+        {
+            "name"            : "rocm-HIP",
+            "configurePreset" : "rocm-HIP",
             "inherits"        : "default"
         }
     ],
