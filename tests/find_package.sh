@@ -35,8 +35,14 @@ EOF
 cd $WORK_DIR
 
 export KokkosUtils_ROOT=${CMAKE_INSTALL_PREFIX}
-
 echo ${KokkosUtils_ROOT}
+
+COMPILER_FAMILY=$1
+if [ "${COMPILER_FAMILY}" = "clang" ];then
+    export CXX=clang++
+elif [ "${COMPILER_FAMILY}" = "rocm" ];then
+    export CXX=hipcc
+fi
 
 cmake -S . -B build --warn-uninitialized -Werror=dev
 

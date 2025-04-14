@@ -45,6 +45,11 @@ jobs:
                       base_image     : nvidia/cuda:12.8.1-devel-ubuntu24.04
                       platforms      : linux/amd64
                       kokkos_arch    : VOLTA70
+                    - backend        : HIP
+                      compiler_family: rocm
+                      base_image     : rocm/dev-ubuntu-24.04:6.4
+                      platforms      : linux/amd64
+                      kokkos_arch    : AMD_GFX906
                     - backend        : OpenMP
                       compiler_family: gcc
                       base_image     : ubuntu:24.04
@@ -110,6 +115,9 @@ jobs:
                     - backend        : Cuda
                       compiler_family: gcc
                       run_tests      : false
+                    - backend        : HIP
+                      compiler_family: rocm
+                      run_tests      : false
                     - backend        : OpenMP
                       compiler_family: gcc
                       run_tests      : true
@@ -131,15 +139,16 @@ jobs:
               run : |
                   ctest --preset=${{ matrix.compiler_family }}-${{ matrix.backend }}
 
-            - name: Install.
+            - name: Test install.
               run : |
                   bash tests/install.sh ${{ matrix.compiler_family }}-${{ matrix.backend }}
 
-            - name: Find package against install.
+            - name: Test find package after install.
               run : |
                   test -d include/
                   rm -rf include/
-                  bash tests/find_package.sh
+
+                  bash tests/find_package.sh ${{ matrix.compiler_family }}
 
     build-documentation:
         needs: [set-vars, build-image]
