@@ -71,7 +71,6 @@ target_sources(
             include/kokkos-utils/callbacks/RecorderListener.hpp
 
             include/kokkos-utils/concepts/DualView.hpp
-
             include/kokkos-utils/concepts/ExecutionSpace.hpp
             include/kokkos-utils/concepts/MemorySpace.hpp
             include/kokkos-utils/concepts/Space.hpp
@@ -79,6 +78,12 @@ target_sources(
 
             include/kokkos-utils/impl/type_list.hpp
             include/kokkos-utils/impl/type_traits.hpp
+
+            include/kokkos-utils/timer/Duration.hpp
+            include/kokkos-utils/timer/Event.hpp
+            include/kokkos-utils/timer/Timer.hpp
+            include/kokkos-utils/timer/Cuda/Event.hpp
+            include/kokkos-utils/timer/HIP/Event.hpp
 
             include/kokkos-utils/view/extents.hpp
             include/kokkos-utils/view/slice.hpp
