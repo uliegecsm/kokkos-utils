@@ -2,6 +2,7 @@
 #define KOKKOS_UTILS_CALLBACKS_RECORDERLISTENER_HPP
 
 #include <deque>
+#include <functional>
 #include <variant>
 
 #include "kokkos-utils/callbacks/Listener.hpp"
@@ -49,7 +50,7 @@ public:
      *     - <Name of event type 1>: {<Description of event type 1>}
      *     - ...
      */
-    void report(std::ostream& out = std::cout) const
+    void report(std::ostream& out) const
     {
         out << "Number of events recorded: " << recorded_events.size() << std::endl;
         for (const auto& recorded_event : recorded_events) {
