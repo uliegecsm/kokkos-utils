@@ -46,7 +46,8 @@
             "hidden"         : true,
             "cacheVariables" : {
                 "CMAKE_CXX_COMPILER" : "${sourceDir}/bin/nvcc_wrapper",
-                "Kokkos_ENABLE_CUDA" : "ON"
+                "Kokkos_ENABLE_CUDA" : "ON",
+                "Kokkos_ENABLE_CUDA_CONSTEXPR" : "ON"
             }
         },
         {
