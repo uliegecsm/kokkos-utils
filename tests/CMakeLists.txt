@@ -45,6 +45,7 @@ function(add_one_test)
             -Wall
             -Wextra
             -Werror
+            "$<$<IN_LIST:CUDA,${Kokkos_DEVICES}>:--Werror=cross-execution-space-call,all-warnings>"
     )
 
     # Tests must include any helper file under the 'tests' directory with the full relative path.
