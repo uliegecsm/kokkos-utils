@@ -133,7 +133,7 @@ jobs:
             - name: Configure and build.
               run : |
                   cmake -S .    --preset=${{ matrix.compiler_family }}-${{ matrix.backend }} --warn-uninitialized -Werror=dev
-                  cmake --build --preset=${{ matrix.compiler_family }}-${{ matrix.backend }}
+                  cmake --build --preset=${{ matrix.compiler_family }}-${{ matrix.backend }} -j$(($(nproc) > 4 ? 4 : $(nproc)))
 
             - name: Test.
               if  : ${{ matrix.run_tests }}
