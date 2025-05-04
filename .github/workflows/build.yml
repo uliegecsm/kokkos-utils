@@ -9,6 +9,7 @@ on:
         branches:
             - main
             - develop
+    workflow_dispatch:
     schedule:
         # As advised by https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule,
         # let's start the scheduled action at a somewhat random time to avoid periods of high load.
