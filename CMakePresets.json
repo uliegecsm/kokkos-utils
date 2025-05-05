@@ -120,6 +120,11 @@
             "name"            : "clang-OpenMP",
             "configurePreset" : "clang-OpenMP",
             "inherits"        : "default"
+        },
+        {
+            "name"            : "gcc-Cuda",
+            "configurePreset" : "gcc-Cuda",
+            "inherits"        : "default"
         }
     ]
 }
