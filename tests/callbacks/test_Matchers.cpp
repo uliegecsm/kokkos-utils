@@ -5,6 +5,7 @@
 #include "kokkos-utils/impl/type_traits.hpp"
 
 #include "kokkos-utils/callbacks/EventInProfileSectionRegexMatcher.hpp"
+#include "kokkos-utils/callbacks/EventInRegionMatcher.hpp"
 #include "kokkos-utils/callbacks/EventRegexMatcher.hpp"
 #include "kokkos-utils/callbacks/Matcher.hpp"
 
@@ -73,17 +74,47 @@ TEST(EventInProfileSectionRegexMatcher, in_profile_section_matcher)
 
     ASSERT_FALSE(matcher(CreateProfileSectionEvent{.name = "buried-profile-section", .section_id = section_id}));
 
-    ASSERT_FALSE(matcher(AllocateDataEvent{})) << "Expecting not to record the event before starting the region.";
+    ASSERT_FALSE(matcher(AllocateDataEvent{})) << "Expecting not to record the event before starting the section.";
 
     ASSERT_FALSE(matcher(StartProfileSectionEvent{.section_id = section_id}));
 
-    ASSERT_TRUE(matcher(AllocateDataEvent{})) << "Expecting to record the event inside the region.";
+    ASSERT_TRUE(matcher(AllocateDataEvent{})) << "Expecting to record the event inside the section.";
 
     ASSERT_FALSE(matcher(StopProfileSectionEvent{.section_id = section_id}));
 
-    ASSERT_FALSE(matcher(AllocateDataEvent{})) << "Expecting to record the event after stopping the region.";
+    ASSERT_FALSE(matcher(AllocateDataEvent{})) << "Expecting to record the event after stopping the section.";
 
     ASSERT_FALSE(matcher(DestroyProfileSectionEvent{.section_id = section_id}));
+}
+//! @test Check traits of @ref Kokkos::utils::callbacks::EventInRegionMatcher.
+TEST(EventInRegionMatcher, traits)
+{
+    using matcher_t = EventInRegionMatcher<EventRegexMatcher>;
+
+    static_assert(Matcher<matcher_t, EventTypeList>);
+    static_assert(std::movable<matcher_t>);
+}
+
+//! @test Check the behavior of @ref Kokkos::utils::callbacks::EventInRegionMatcher.
+TEST(EventInRegionMatcher, in_region_matcher)
+{
+    EventInRegionMatcher matcher(EventRegexMatcher{.regex = std::regex("buried-profile-region")});
+
+    ASSERT_FALSE(matcher(PushRegionEvent{.name = "not-the-one-we-want"}));
+
+    ASSERT_FALSE(matcher(AllocateDataEvent{}));
+
+    ASSERT_FALSE(matcher(PushRegionEvent{.name = "buried-profile-region"}));
+
+    ASSERT_TRUE(matcher(AllocateDataEvent{}));
+
+    ASSERT_TRUE(matcher(PushRegionEvent{.name = "nested-profile-region"}));
+
+    ASSERT_TRUE(matcher(AllocateDataEvent{}));
+
+    ASSERT_TRUE(matcher(PopRegionEvent{}));
+
+    ASSERT_FALSE(matcher(PopRegionEvent{}));
 }
 
 //! @test Check traits of @ref Kokkos::utils::callbacks::AnyEventMatcher.
