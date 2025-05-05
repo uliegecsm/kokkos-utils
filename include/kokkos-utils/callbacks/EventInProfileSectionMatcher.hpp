@@ -1,11 +1,10 @@
-#ifndef KOKKOS_UTILS_CALLBACKS_EVENTINPROFILESECTIONREGEXMATCHER_HPP
-#define KOKKOS_UTILS_CALLBACKS_EVENTINPROFILESECTIONREGEXMATCHER_HPP
-
-#include <regex>
+#ifndef KOKKOS_UTILS_CALLBACKS_EVENTINPROFILESECTIONMATCHER_HPP
+#define KOKKOS_UTILS_CALLBACKS_EVENTINPROFILESECTIONMATCHER_HPP
 
 #include "Kokkos_NumericTraits.hpp"
 
 #include "kokkos-utils/callbacks/Events.hpp"
+#include "kokkos-utils/callbacks/Matcher.hpp"
 
 namespace Kokkos::utils::callbacks
 {
@@ -13,17 +12,18 @@ namespace Kokkos::utils::callbacks
 /**
  * @brief Matcher to select events that occur within a profile section.
  *
- * The profile section is selected by matching its name to a regular expression.
+ * The profile section is selected by @ref matcher.
  */
-struct EventInProfileSectionRegexMatcher
+template <typename MatcherType> requires Matcher<MatcherType, Kokkos::Impl::type_list<CreateProfileSectionEvent>>
+struct EventInProfileSectionMatcher
 {
     static constexpr uint32_t invalid_section_id = Kokkos::Experimental::finite_max_v<uint32_t>;
 
     bool operator()(const CreateProfileSectionEvent& event)
     {
-        if (std::regex_search(event.name, this->regex))
+        if (matcher(event))
         {
-            if (section_id != invalid_section_id) Kokkos::abort("EventInProfileSectionRegexMatcher cannot match a create event twice.");
+            if (section_id != invalid_section_id) Kokkos::abort("EventInProfileSectionMatcher cannot match a create event twice.");
             section_id = event.section_id;
         }
         return false;
@@ -46,11 +46,11 @@ struct EventInProfileSectionRegexMatcher
         return recording;
     }
 
-    std::regex regex;
+    MatcherType matcher {};
     uint32_t section_id = invalid_section_id;
     bool recording = false;
 };
 
 } // namespace Kokkos::utils::callbacks
 
-#endif // KOKKOS_UTILS_CALLBACKS_EVENTINPROFILESECTIONREGEXMATCHER_HPP
+#endif // KOKKOS_UTILS_CALLBACKS_EVENTINPROFILESECTIONMATCHER_HPP
