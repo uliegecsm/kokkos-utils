@@ -4,7 +4,7 @@
 
 #include "kokkos-utils/impl/type_traits.hpp"
 
-#include "kokkos-utils/callbacks/EventInProfileSectionRegexMatcher.hpp"
+#include "kokkos-utils/callbacks/EventInProfileSectionMatcher.hpp"
 #include "kokkos-utils/callbacks/EventInRegionMatcher.hpp"
 #include "kokkos-utils/callbacks/EventRegexMatcher.hpp"
 #include "kokkos-utils/callbacks/Matcher.hpp"
@@ -58,19 +58,21 @@ TEST(EventRegexMatcher, regex_matcher)
     ASSERT_FALSE(matcher(AllocateDataEvent{.alloc = {.name = "not-this-other-allocation"}}));
 }
 
-//! @test Check traits of @ref Kokkos::utils::callbacks::EventInProfileSectionRegexMatcher.
-TEST(EventInProfileSectionRegexMatcher, traits)
+//! @test Check traits of @ref Kokkos::utils::callbacks::EventInProfileSectionMatcher.
+TEST(EventInProfileSectionMatcher, traits)
 {
-    static_assert(Matcher<EventInProfileSectionRegexMatcher, EventTypeList>);
-    static_assert(std::movable<EventInProfileSectionRegexMatcher>);
+    using matcher_t = EventInProfileSectionMatcher<EventRegexMatcher>;
+
+    static_assert(Matcher<matcher_t, EventTypeList>);
+    static_assert(std::movable<matcher_t>);
 }
 
-//! @test Check the behavior of @ref Kokkos::utils::callbacks::EventInProfileSectionRegexMatcher.
-TEST(EventInProfileSectionRegexMatcher, in_profile_section_matcher)
+//! @test Check the behavior of @ref Kokkos::utils::callbacks::EventInProfileSectionMatcher.
+TEST(EventInProfileSectionMatcher, in_profile_section_matcher)
 {
     constexpr uint32_t section_id = 2;
 
-    EventInProfileSectionRegexMatcher matcher(std::regex("buried-profile-section"));
+    EventInProfileSectionMatcher matcher{.matcher = EventRegexMatcher{.regex = std::regex("buried-profile-section")}};
 
     ASSERT_FALSE(matcher(CreateProfileSectionEvent{.name = "buried-profile-section", .section_id = section_id}));
 

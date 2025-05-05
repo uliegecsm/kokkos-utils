@@ -5,7 +5,7 @@
 
 #include "kokkos-utils/impl/type_traits.hpp"
 
-#include "kokkos-utils/callbacks/EventInProfileSectionRegexMatcher.hpp"
+#include "kokkos-utils/callbacks/EventInProfileSectionMatcher.hpp"
 #include "kokkos-utils/callbacks/EventRegexMatcher.hpp"
 #include "kokkos-utils/callbacks/Helpers.hpp"
 #include "kokkos-utils/callbacks/RecorderListener.hpp"
@@ -30,7 +30,7 @@ namespace Kokkos::utils::tests::callbacks
 using namespace Kokkos::utils::callbacks;
 
 //! Listener to record events that occur in a profile section.
-using event_in_profile_section_recorder_t = RecorderListener<EventInProfileSectionRegexMatcher, EventTypeList>;
+using event_in_profile_section_recorder_t = RecorderListener<EventInProfileSectionMatcher<EventRegexMatcher>, EventTypeList>;
 
 class RecorderListenerTest : public ManagerTestFixture
 {
@@ -78,7 +78,7 @@ TYPED_TEST(RecorderListenerSingleEventTypeTest, record)
 //! @test Check the behavior of @ref Kokkos::utils::callbacks::RecorderListener.
 TEST_F(RecorderListenerTest, recorded_events)
 {
-    EventInProfileSectionRegexMatcher matcher(std::regex("profile section"));
+    EventInProfileSectionMatcher matcher{.matcher = EventRegexMatcher{.regex = std::regex("profile section")}};
     const auto recorder = std::make_shared<event_in_profile_section_recorder_t>(std::move(matcher));
 
     const auto any_event_recorder = std::make_shared<RecorderListener<EventTypeList>>();
