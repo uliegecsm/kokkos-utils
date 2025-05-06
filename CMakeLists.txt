@@ -64,6 +64,7 @@ target_sources(
         FILES
             include/kokkos-utils/atomics/InsertOp.hpp
 
+            include/kokkos-utils/callbacks/ConjunctionMatcher.hpp
             include/kokkos-utils/callbacks/EventBeginEndEventIdMatcher.hpp
             include/kokkos-utils/callbacks/EventIdMatcher.hpp
             include/kokkos-utils/callbacks/EventInProfileSectionMatcher.hpp
