@@ -28,7 +28,8 @@ using namespace Kokkos::utils::callbacks;
 //! @test Check traits of @ref Kokkos::utils::callbacks::EventRegexMatcher.
 TEST(EventRegexMatcher, traits)
 {
-    static_assert(Matcher<EventRegexMatcher, Kokkos::Impl::type_list<
+    static_assert(Matcher   <EventRegexMatcher>);
+    static_assert(MatcherFor<EventRegexMatcher,
         BeginParallelForEvent,
         BeginParallelReduceEvent,
         BeginParallelScanEvent,
@@ -38,12 +39,10 @@ TEST(EventRegexMatcher, traits)
         CreateProfileSectionEvent,
         PushRegionEvent,
         ProfileEvent
-    >>);
+    >);
     static_assert(std::movable<EventRegexMatcher>);
 
-    static_assert( ! Matcher<EventRegexMatcher, BeginDeepCopyEvent>);
-
-    static_assert( ! Matcher<EventRegexMatcher, Kokkos::Impl::type_list<>>);
+    static_assert( ! MatcherFor<EventRegexMatcher, BeginDeepCopyEvent>);
 }
 
 //! @test Check that @ref Kokkos::utils::callbacks::EventRegexMatcher works as expected.
@@ -63,7 +62,8 @@ TEST(EventInProfileSectionMatcher, traits)
 {
     using matcher_t = EventInProfileSectionMatcher<EventRegexMatcher>;
 
-    static_assert(Matcher<matcher_t, EventTypeList>);
+    static_assert(Matcher     <matcher_t>);
+    static_assert(MatcherFor  <matcher_t, EventTypeList>);
     static_assert(std::movable<matcher_t>);
 }
 
@@ -93,7 +93,8 @@ TEST(EventInRegionMatcher, traits)
 {
     using matcher_t = EventInRegionMatcher<EventRegexMatcher>;
 
-    static_assert(Matcher<matcher_t, EventTypeList>);
+    static_assert(Matcher     <matcher_t>);
+    static_assert(MatcherFor  <matcher_t, EventTypeList>);
     static_assert(std::movable<matcher_t>);
 }
 
@@ -122,7 +123,8 @@ TEST(EventInRegionMatcher, in_region_matcher)
 //! @test Check traits of @ref Kokkos::utils::callbacks::AnyEventMatcher.
 TEST(AnyEventMatcher, traits)
 {
-    static_assert(Matcher<AnyEventMatcher, EventTypeList>);
+    static_assert(Matcher     <AnyEventMatcher>);
+    static_assert(MatcherFor  <AnyEventMatcher, EventTypeList>);
     static_assert(std::movable<AnyEventMatcher>);
 }
 

@@ -14,7 +14,7 @@ namespace Kokkos::utils::callbacks
  *
  * The profile section is selected by @ref matcher.
  */
-template <typename MatcherType> requires Matcher<MatcherType, Kokkos::Impl::type_list<CreateProfileSectionEvent>>
+template <typename MatcherType> requires MatcherFor<MatcherType, CreateProfileSectionEvent>
 struct EventInProfileSectionMatcher
 {
     static constexpr uint32_t invalid_section_id = Kokkos::Experimental::finite_max_v<uint32_t>;

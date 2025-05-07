@@ -15,7 +15,7 @@ namespace Kokkos::utils::callbacks
  * Any event occuring between the matching @ref PushRegionEvent and its
  * corresponding @ref PopRegionEvent will match.
  */
-template <typename MatcherType> requires Matcher<MatcherType, Kokkos::Impl::type_list<PushRegionEvent>>
+template <typename MatcherType> requires MatcherFor<MatcherType, PushRegionEvent>
 struct EventInRegionMatcher
 {
     static constexpr uint32_t invalid_nested_level = Kokkos::Experimental::finite_max_v<uint32_t>;
