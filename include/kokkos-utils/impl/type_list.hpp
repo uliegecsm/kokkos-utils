@@ -141,7 +141,7 @@ struct type_list_all;
 
 template <template <typename> class UnaryPred, class... Ts>
 struct type_list_all<UnaryPred, Kokkos::Impl::type_list<Ts...>>
-  : std::conjunction<UnaryPred<Ts>...> {};
+  : public std::conjunction<UnaryPred<Ts>...> {};
 
 template <template <typename> class UnaryPred, typename TypeList>
 inline constexpr bool type_list_all_v = type_list_all<UnaryPred, TypeList>::value;
@@ -157,9 +157,20 @@ inline constexpr bool type_list_all_v = type_list_all<UnaryPred, TypeList>::valu
 template <template <typename> class UnaryPred, class List>
 struct type_list_any;
 
+/// As of @c Cuda 12.8, using @c std::disjunction sometimes ends up erroring out with
+/// @code
+/// 'Kokkos::utils::impl::type_list_any<...>' has a base 'std::disjunction<...>' which has internal linkage [-Werror=subobject-linkage]
+/// @endcode
+/// It is the case if evaluating @ref Kokkos::utils::callbacks::Listener for a lambda.
+#if defined(__NVCC__)
 template <template <typename> class UnaryPred, class... Ts>
 struct type_list_any<UnaryPred, Kokkos::Impl::type_list<Ts...>>
-  : std::disjunction<UnaryPred<Ts>...> {};
+  : public std::bool_constant<(UnaryPred<Ts>::value || ...)> {};
+#else
+template <template <typename> class UnaryPred, class... Ts>
+struct type_list_any<UnaryPred, Kokkos::Impl::type_list<Ts...>>
+  : public std::disjunction<UnaryPred<Ts>...> {};
+#endif
 
 template <template <typename> class UnaryPred, typename TypeList>
 inline constexpr bool type_list_any_v = type_list_any<UnaryPred, TypeList>::value;

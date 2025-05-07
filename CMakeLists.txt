@@ -18,6 +18,9 @@ option(KokkosUtils_ENABLE_TESTS      "Enable testing" ON)
 option(KokkosUtils_ENABLE_DOC        "Enable documentation" ON)
 option(KokkosUtils_ENABLE_CLANG_TIDY "Enable clang-tidy" OFF)
 
+#---- Enable further debugging by exporting compile commands.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 #---- Global property that helps us keep track of files that will automatically be added
 #     to our Doxygen documentation.
 define_property(GLOBAL PROPERTY KokkosUtils_FILES_FOR_DOC

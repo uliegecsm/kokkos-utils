@@ -9,7 +9,11 @@ namespace Kokkos::utils::callbacks
 namespace impl
 {
 
-//! Helper struct needed for the implementation of @ref Kokkos::utils::callbacks::listener_event_type_list_t.
+/**
+ * Helper struct needed for the implementation of concepts and type traits such as:
+ *  - @ref Kokkos::utils::callbacks::listener_event_type_list_t
+ *  - @ref Kokkos::utils::callbacks::ListenerFor
+ */
 template <typename Callable>
 struct IsListenerFor
 {
@@ -19,16 +23,20 @@ struct IsListenerFor
 
 } // namespace impl
 
-//! Type list holding the event types that a callable object can be a listener for.
-template <typename Callable>
-using listener_event_type_list_t = Kokkos::Impl::filter_type_list_t<impl::IsListenerFor<Callable>::template type, EventTypeList>;
-
 /**
- * @brief Concept that models that a callable object to be registered as a listener by @ref Kokkos::utils::callbacks::Manager must
- *        have a non-empty list of event types that it can be a listener for.
+ * @brief @p Callable is a listener if it is invocable with at least one event type
+ *        from @ref Kokkos::utils::callbacks::EventTypeList passed by @c const reference and returns @c void.
  */
 template <typename Callable>
-concept Listener = ( ! std::same_as<listener_event_type_list_t<Callable>, Kokkos::Impl::type_list<>>);
+concept Listener = Kokkos::utils::impl::type_list_any_v<impl::IsListenerFor<Callable>::template type, EventTypeList>;
+
+//! Check that @p Callable is a listener for each event in @p EventTypes.
+template <typename Callable, typename... EventTypes>
+concept ListenerFor = Kokkos::utils::impl::type_list_all_v<impl::IsListenerFor<Callable>::template type, Kokkos::utils::impl::make_type_list_t<EventTypes...>>;
+
+//! Type list holding the event types that @p Callable can be a listener for.
+template <typename Callable>
+using listener_event_type_list_t = Kokkos::Impl::filter_type_list_t<impl::IsListenerFor<Callable>::template type, EventTypeList>;
 
 } // namespace Kokkos::utils::callbacks
 
