@@ -61,6 +61,10 @@ jobs:
                       platforms      : linux/amd64
         steps:
             - uses: actions/checkout@v4
+              with:
+                  set-safe-directory: true
+
+            - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
             - id: changed-files
               uses: tj-actions/changed-files@v46.0.5
