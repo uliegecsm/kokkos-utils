@@ -22,8 +22,7 @@ class RecorderListener;
  * of the types @p EventTypes... and satisfy @p Matcher. The recorded events
  * are pushed back into a container in the order they are received.
  */
-template <typename MatcherType, Event... EventTypes>
-requires Matcher<MatcherType, Kokkos::Impl::type_list<EventTypes...>>
+template <typename MatcherType, Event... EventTypes> requires MatcherFor<MatcherType, EventTypes...>
 class RecorderListener<MatcherType, EventTypes...>
 {
 public:
