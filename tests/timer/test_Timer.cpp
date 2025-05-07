@@ -36,31 +36,31 @@ protected:
 };
 
 /**
- * @test Check that @ref Kokkos::utils::timer::Timer reports it's invalid when neither @ref Kokkos::utils::timer::Timer::reset
+ * @test Check that @ref Kokkos::utils::timer::Timer reports it's invalid when neither @ref Kokkos::utils::timer::Timer::start
  *       nor @ref Kokkos::utils::timer::Timer::stop has been called.
  */
-TEST_F(TimerTest, invalid_if_not_reset_and_not_stopped)
+TEST_F(TimerTest, invalid_if_not_started_and_not_stopped)
 {
     const timer_t timer;
     ASSERT_FALSE(timer.is_valid());
 }
 
 /**
- * @test Check that @ref Kokkos::utils::timer::Timer reports it's invalid when @ref Kokkos::utils::timer::Timer::reset has been called,
+ * @test Check that @ref Kokkos::utils::timer::Timer reports it's invalid when @ref Kokkos::utils::timer::Timer::start has been called,
  *       but @ref Kokkos::utils::timer::Timer::stop has not.
  */
 TEST_F(TimerTest, invalid_if_not_stopped)
 {
     timer_t timer;
-    timer.reset(this->exec);
+    timer.start(this->exec);
     ASSERT_FALSE(timer.is_valid());
 }
 
 /**
- * @test Check that @ref Kokkos::utils::timer::Timer reports it's invalid when @ref Kokkos::utils::timer::Timer::reset has not been called,
+ * @test Check that @ref Kokkos::utils::timer::Timer reports it's invalid when @ref Kokkos::utils::timer::Timer::start has not been called,
  *       but @ref Kokkos::utils::timer::Timer::stop has.
  */
-TEST_F(TimerTest, invalid_if_not_reset)
+TEST_F(TimerTest, invalid_if_not_started)
 {
     timer_t timer;
     timer.stop(this->exec);
@@ -68,13 +68,13 @@ TEST_F(TimerTest, invalid_if_not_reset)
 }
 
 /**
- * @test Check that @ref Kokkos::utils::timer::Timer reports it's valid when @ref Kokkos::utils::timer::Timer::reset and
+ * @test Check that @ref Kokkos::utils::timer::Timer reports it's valid when @ref Kokkos::utils::timer::Timer::start and
  *       @ref Kokkos::utils::timer::Timer::stop have been called.
  */
-TEST_F(TimerTest, valid_if_reset_and_stopped)
+TEST_F(TimerTest, valid_if_started_and_stopped)
 {
     timer_t timer;
-    timer.reset(this->exec);
+    timer.start(this->exec);
     timer.stop (this->exec);
     ASSERT_TRUE(timer.is_valid());
 }
@@ -91,7 +91,7 @@ TEST_F(TimerTest, start_stop_elapsed)
     timer_t timer;
 
     timer_external.reset();
-    timer.reset(this->exec);
+    timer.start(this->exec);
 
     const view_t my_view(Kokkos::view_alloc(Kokkos::WithoutInitializing, this->exec, "my view"), 10);
     Kokkos::deep_copy(exec, my_view, 1.0);
@@ -117,7 +117,7 @@ TEST_F(TimerTest, duration)
 {
     timer_t timer;
 
-    timer.reset(this->exec);
+    timer.start(this->exec);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
@@ -164,7 +164,7 @@ TEST_F(TimerTest, duration)
  * It also warns that:
  *      If this function is called on an event that is currently being recorded, results are undefined.
  *
- * This test helps us ensure that for a "reset -> stop -> reset -> stop -> ..." sequence, our timer is fine.
+ * This test helps us ensure that for a "start -> stop -> start -> stop -> ..." sequence, our timer is fine.
  */
  TEST_F(TimerTest, reuse)
 {
@@ -178,7 +178,7 @@ TEST_F(TimerTest, duration)
     {
         const Kokkos::Timer timer_external;
 
-        timer.reset(this->exec);
+        timer.start(this->exec);
 
         this->exec.fence("ensure that the event 'started'");
 
