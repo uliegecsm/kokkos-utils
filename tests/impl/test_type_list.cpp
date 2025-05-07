@@ -17,6 +17,26 @@ namespace Kokkos::utils::tests::impl
 
 using type_list_t = Kokkos::Impl::type_list<char, short, int>;
 
+//! @test Check @ref Kokkos::utils::impl::is_type_list_v.
+TEST(impl, is_type_list_v)
+{
+    static_assert(! Kokkos::utils::impl::is_type_list_v<int>);
+    static_assert(! Kokkos::utils::impl::is_type_list_v<std::tuple<int, int>>);
+    static_assert(  Kokkos::utils::impl::is_type_list_v<type_list_t>);
+    static_assert(  Kokkos::utils::impl::is_type_list_v<Kokkos::Impl::type_list<>>);
+    static_assert(  Kokkos::utils::impl::is_type_list_v<Kokkos::Impl::type_list<int>>);
+    static_assert(  Kokkos::utils::impl::is_type_list_v<Kokkos::Impl::type_list<int, double>>);
+}
+
+//! @test Check @ref Kokkos::utils::impl::make_type_list_t.
+TEST(impl, make_type_list_t)
+{
+    static_assert(std::same_as<Kokkos::utils::impl::make_type_list_t<int        >, Kokkos::Impl::type_list<int        >>);
+    static_assert(std::same_as<Kokkos::utils::impl::make_type_list_t<int, double>, Kokkos::Impl::type_list<int, double>>);
+
+    static_assert(std::same_as<Kokkos::utils::impl::make_type_list_t<type_list_t>, type_list_t>);
+}
+
 //! @test Check @ref Kokkos::utils::impl::type_list_size_v.
 TEST(impl, type_list_size_v)
 {
@@ -84,6 +104,21 @@ TEST(impl, type_list_index_v)
     static_assert(type_list_index_v<char,  type_list_t> == 0);
     static_assert(type_list_index_v<short, type_list_t> == 1);
     static_assert(type_list_index_v<int,   type_list_t> == 2);
+}
+
+//! @test Check @ref Kokkos::utils::impl::type_list_all_v.
+TEST(impl, type_list_all_v)
+{
+    static_assert(  Kokkos::utils::impl::type_list_all_v<std::is_floating_point, Kokkos::Impl::type_list<float, double>>);
+    static_assert(! Kokkos::utils::impl::type_list_all_v<std::is_floating_point, Kokkos::Impl::type_list<float, double, int>>);
+}
+
+//! @test Check @ref Kokkos::utils::impl::type_list_any_v.
+TEST(impl, type_list_any_v)
+{
+    static_assert(  Kokkos::utils::impl::type_list_any_v<std::is_floating_point, Kokkos::Impl::type_list<float, std::string, int>>);
+    static_assert(  Kokkos::utils::impl::type_list_any_v<std::is_integral,       Kokkos::Impl::type_list<float, std::string, int>>);
+    static_assert(! Kokkos::utils::impl::type_list_any_v<std::is_enum,           Kokkos::Impl::type_list<float, std::string, int>>);
 }
 
 //! @test Check @ref Kokkos::utils::impl::for_each.
