@@ -139,7 +139,7 @@ inline constexpr size_t type_list_index_v = TypeListIndex<T, S>::value;
 template <template <typename> typename UnaryPred, typename...>
 struct type_list_all;
 
-//! Specialization for a "direct" list of types.
+//! Specialization for a pack of types.
 template <template <typename> typename UnaryPred, typename T, typename... Ts>
 struct type_list_all<UnaryPred, T, Ts...>
   : public std::conjunction<UnaryPred<T>, UnaryPred<Ts>...> {};
@@ -163,7 +163,7 @@ inline constexpr bool type_list_all_v = type_list_all<UnaryPred, TypeList...>::v
 template <template <typename> typename UnaryPred, typename...>
 struct type_list_any;
 
-/// @name Specialization for a "direct" list of types.
+/// @name Specialization for a pack of types.
 /// As of @c Cuda 12.8, using @c std::disjunction sometimes ends up erroring out with
 /// @code
 /// 'Kokkos::utils::impl::type_list_any<...>' has a base 'std::disjunction<...>' which has internal linkage [-Werror=subobject-linkage]
