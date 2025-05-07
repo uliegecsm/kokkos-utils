@@ -190,6 +190,12 @@ TYPED_TEST(EventTest, concept)
     static_assert(Event<TypeParam>);
 }
 
+//! @test Check that an event is equal to itself.
+TYPED_TEST(EventTest, comparison)
+{
+    ASSERT_EQ(this->event, this->event);
+}
+
 //! @test Check that each event type is an aggregate, default constructible, and movable.
 TYPED_TEST(EventTest, traits)
 {
