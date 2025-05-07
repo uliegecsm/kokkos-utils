@@ -101,17 +101,17 @@ TEST(EventInRegionMatcher, traits)
 //! @test Check the behavior of @ref Kokkos::utils::callbacks::EventInRegionMatcher.
 TEST(EventInRegionMatcher, in_region_matcher)
 {
-    EventInRegionMatcher matcher(EventRegexMatcher{.regex = std::regex("buried-profile-region")});
+    EventInRegionMatcher matcher(EventRegexMatcher{.regex = std::regex("buried-region")});
 
     ASSERT_FALSE(matcher(PushRegionEvent{.name = "not-the-one-we-want"}));
 
     ASSERT_FALSE(matcher(AllocateDataEvent{}));
 
-    ASSERT_FALSE(matcher(PushRegionEvent{.name = "buried-profile-region"}));
+    ASSERT_FALSE(matcher(PushRegionEvent{.name = "buried-region"}));
 
     ASSERT_TRUE(matcher(AllocateDataEvent{}));
 
-    ASSERT_TRUE(matcher(PushRegionEvent{.name = "nested-profile-region"}));
+    ASSERT_TRUE(matcher(PushRegionEvent{.name = "nested-region"}));
 
     ASSERT_TRUE(matcher(AllocateDataEvent{}));
 
