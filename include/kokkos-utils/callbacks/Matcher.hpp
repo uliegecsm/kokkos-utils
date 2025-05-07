@@ -12,7 +12,7 @@ namespace impl
 /**
  * Helper struct needed for the implementation of concepts and type traits such as:
  *  - @ref Kokkos::utils::callbacks::matcher_event_type_list_t
- *  - @ref ListenerFor
+ *  - @ref Kokkos::utils::callbacks::Matcher
  */
 template <typename Callable>
 struct IsMatcherFor
@@ -32,7 +32,7 @@ concept Matcher = Kokkos::utils::impl::type_list_any_v<impl::IsMatcherFor<Callab
 
 //! Check that @p Callable is a matcher for each event in @p EventTypes.
 template <typename Callable, typename... EventTypes>
-concept MatcherFor = Kokkos::utils::impl::type_list_all_v<impl::IsMatcherFor<Callable>::template type, Kokkos::utils::impl::make_type_list_t<EventTypes...>>;
+concept MatcherFor = Kokkos::utils::impl::type_list_all_v<impl::IsMatcherFor<Callable>::template type, EventTypes...>;
 
 //! Type list holding the event types that @p Callable can be a matcher for.
 template <typename Callable>

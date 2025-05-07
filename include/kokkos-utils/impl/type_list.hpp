@@ -136,15 +136,21 @@ inline constexpr size_t type_list_index_v = TypeListIndex<T, S>::value;
 
 //! @name Check that a predicate is @c true for all types in a type list.
 ///@{
-template <template <typename> class UnaryPred, class List>
+template <template <typename> typename UnaryPred, typename...>
 struct type_list_all;
 
-template <template <typename> class UnaryPred, class... Ts>
+//! Specialization for a "direct" list of types.
+template <template <typename> typename UnaryPred, typename T, typename... Ts>
+struct type_list_all<UnaryPred, T, Ts...>
+  : public std::conjunction<UnaryPred<T>, UnaryPred<Ts>...> {};
+
+//! Specialization for a list of types given as @c Kokkos::Impl::type_list.
+template <template <typename> typename UnaryPred, typename... Ts>
 struct type_list_all<UnaryPred, Kokkos::Impl::type_list<Ts...>>
   : public std::conjunction<UnaryPred<Ts>...> {};
 
-template <template <typename> class UnaryPred, typename TypeList>
-inline constexpr bool type_list_all_v = type_list_all<UnaryPred, TypeList>::value;
+template <template <typename> typename UnaryPred, typename... TypeList>
+inline constexpr bool type_list_all_v = type_list_all<UnaryPred, TypeList...>::value;
 ///@}
 
 /**
@@ -154,26 +160,47 @@ inline constexpr bool type_list_all_v = type_list_all<UnaryPred, TypeList>::valu
  *       See also https://github.com/kokkos/kokkos/blob/db736f280b09ae5acaedab3b3ad6bc7d741e92bc/core/src/impl/Kokkos_Utilities.hpp#L171-L176.
  */
 ///@{
-template <template <typename> class UnaryPred, class List>
+template <template <typename> typename UnaryPred, typename...>
 struct type_list_any;
 
+/// @name Specialization for a "direct" list of types.
 /// As of @c Cuda 12.8, using @c std::disjunction sometimes ends up erroring out with
 /// @code
 /// 'Kokkos::utils::impl::type_list_any<...>' has a base 'std::disjunction<...>' which has internal linkage [-Werror=subobject-linkage]
 /// @endcode
 /// It is the case if evaluating @ref Kokkos::utils::callbacks::Listener for a lambda.
+///@{
 #if defined(__NVCC__)
-template <template <typename> class UnaryPred, class... Ts>
+template <template <typename> typename UnaryPred, typename T, typename... Ts>
+struct type_list_any<UnaryPred, T, Ts...>
+  : public std::bool_constant<UnaryPred<T>::value || (UnaryPred<Ts>::value || ...)> {};
+#else
+template <template <typename> typename UnaryPred, typename T, typename... Ts>
+struct type_list_any<UnaryPred, T, Ts...>
+  : public std::disjunction<UnaryPred<T>, UnaryPred<Ts>...> {};
+#endif
+///@}
+
+/// @name Specialization for a list of types given as @c Kokkos::Impl::type_list.
+/// As of @c Cuda 12.8, using @c std::disjunction sometimes ends up erroring out with
+/// @code
+/// 'Kokkos::utils::impl::type_list_any<...>' has a base 'std::disjunction<...>' which has internal linkage [-Werror=subobject-linkage]
+/// @endcode
+/// It is the case if evaluating @ref Kokkos::utils::callbacks::Listener for a lambda.
+///@{
+#if defined(__NVCC__)
+template <template <typename> typename UnaryPred, typename... Ts>
 struct type_list_any<UnaryPred, Kokkos::Impl::type_list<Ts...>>
   : public std::bool_constant<(UnaryPred<Ts>::value || ...)> {};
 #else
-template <template <typename> class UnaryPred, class... Ts>
+template <template <typename> typename UnaryPred, typename... Ts>
 struct type_list_any<UnaryPred, Kokkos::Impl::type_list<Ts...>>
   : public std::disjunction<UnaryPred<Ts>...> {};
 #endif
+///@}
 
-template <template <typename> class UnaryPred, typename TypeList>
-inline constexpr bool type_list_any_v = type_list_any<UnaryPred, TypeList>::value;
+template <template <typename> typename UnaryPred, typename... TypeList>
+inline constexpr bool type_list_any_v = type_list_any<UnaryPred, TypeList...>::value;
 ///@}
 
 //! Calls the instantiation of the call operator of a callable object for each type in a @c Kokkos::Impl::type_list.

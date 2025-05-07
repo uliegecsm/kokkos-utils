@@ -32,7 +32,7 @@ concept Listener = Kokkos::utils::impl::type_list_any_v<impl::IsListenerFor<Call
 
 //! Check that @p Callable is a listener for each event in @p EventTypes.
 template <typename Callable, typename... EventTypes>
-concept ListenerFor = Kokkos::utils::impl::type_list_all_v<impl::IsListenerFor<Callable>::template type, Kokkos::utils::impl::make_type_list_t<EventTypes...>>;
+concept ListenerFor = Kokkos::utils::impl::type_list_all_v<impl::IsListenerFor<Callable>::template type, EventTypes...>;
 
 //! Type list holding the event types that @p Callable can be a listener for.
 template <typename Callable>
