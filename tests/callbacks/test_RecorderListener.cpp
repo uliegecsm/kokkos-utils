@@ -52,7 +52,9 @@ TEST(RecorderListener, traits)
         EventTypeList
     >);
 
-    static_assert(Listener<event_in_profile_section_recorder_t>);
+    static_assert(Listener   <event_in_profile_section_recorder_t>);
+    static_assert(ListenerFor<event_in_profile_section_recorder_t, EventTypeList>);
+    static_assert(ListenerFor<event_in_profile_section_recorder_t, PushRegionEvent, PopRegionEvent>);
 }
 
 template <Event EvenType>
