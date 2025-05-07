@@ -19,8 +19,8 @@ public:
     using event_t = Event<Exec>;
 
 public:
-    //! Reset the timer.
-    void reset(const Exec& exec)
+    //! Start the timer.
+    void start(const Exec& exec)
     {
         tick.record(exec);
         started = true;
@@ -33,7 +33,7 @@ public:
         stopped = true;
     }
 
-    //! Returns @c true if @ref reset and @ref stop have been called.
+    //! Returns @c true if @ref start and @ref stop have been called.
     bool is_valid() const { return started && stopped; }
 
     /**
