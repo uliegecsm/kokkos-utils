@@ -10,6 +10,11 @@
 namespace Kokkos::utils::callbacks
 {
 
+//! Equality comparison for @c Kokkos_Profiling_SpaceHandle.
+bool operator==(const Kokkos_Profiling_SpaceHandle& fst, const Kokkos_Profiling_SpaceHandle& snd) {
+    return strcmp(fst.name, snd.name) == 0;
+};
+
 /**
  * @name Event types.
  *
@@ -26,12 +31,16 @@ struct BeginParallelForEvent
     std::string name {};
     uint32_t dev_id = 0;
     uint64_t event_id = 0;
+
+    bool operator==(const BeginParallelForEvent&) const = default;
 };
 
 //! End-parallel-for event associated with @c Kokkos::Tools::Experimental::EventSet::end_parallel_for.
 struct EndParallelForEvent
 {
     uint64_t event_id = 0;
+
+    bool operator==(const EndParallelForEvent&) const = default;
 };
 
 //! Begin-parallel-reduce event associated with @c Kokkos::Tools::Experimental::EventSet::begin_parallel_reduce.
@@ -40,12 +49,16 @@ struct BeginParallelReduceEvent
     std::string name {};
     uint32_t dev_id = 0;
     uint64_t event_id = 0;
+
+    bool operator==(const BeginParallelReduceEvent&) const = default;
 };
 
 //! End-parallel-reduce event associated with @c Kokkos::Tools::Experimental::EventSet::end_parallel_reduce.
 struct EndParallelReduceEvent
 {
     uint64_t event_id = 0;
+
+    bool operator==(const EndParallelReduceEvent&) const = default;
 };
 
 //! Begin-parallel-scan event associated with @c Kokkos::Tools::Experimental::EventSet::begin_parallel_scan.
@@ -54,12 +67,16 @@ struct BeginParallelScanEvent
     std::string name {};
     uint32_t dev_id = 0;
     uint64_t event_id = 0;
+
+    bool operator==(const BeginParallelScanEvent&) const = default;
 };
 
 //! End-parallel-scan event associated with @c Kokkos::Tools::Experimental::EventSet::end_parallel_scan.
 struct EndParallelScanEvent
 {
     uint64_t event_id = 0;
+
+    bool operator==(const EndParallelScanEvent&) const = default;
 };
 
 //! Begin-fence event associated with @c Kokkos::Tools::Experimental::EventSet::begin_fence.
@@ -68,12 +85,16 @@ struct BeginFenceEvent
     std::string name {};
     uint32_t dev_id = 0;
     uint64_t event_id = 0;
+
+    bool operator==(const BeginFenceEvent&) const = default;
 };
 
 //! End-fence event associated with @c Kokkos::Tools::Experimental::EventSet::end_fence.
 struct EndFenceEvent
 {
     uint64_t event_id = 0;
+
+    bool operator==(const EndFenceEvent&) const = default;
 };
 
 //! Helper struct to hold descriptors of a data allocation.
@@ -83,18 +104,24 @@ struct AllocDescriptor
     std::string name {};
     const void* ptr = nullptr;
     uint64_t size = 0;
+
+    bool operator==(const AllocDescriptor&) const = default;
 };
 
 //! Allocate-data event associated with @c Kokkos::Tools::Experimental::EventSet::allocate_data.
 struct AllocateDataEvent
 {
     AllocDescriptor alloc {};
+
+    bool operator==(const AllocateDataEvent&) const = default;
 };
 
 //! Deallocate-data event associated with @c Kokkos::Tools::Experimental::EventSet::deallocate_data.
 struct DeallocateDataEvent
 {
     AllocDescriptor alloc {};
+
+    bool operator==(const DeallocateDataEvent&) const = default;
 };
 
 //! Begin-deep-copy event associated with @c Kokkos::Tools::Experimental::EventSet::begin_deep_copy.
@@ -102,49 +129,69 @@ struct BeginDeepCopyEvent
 {
     AllocDescriptor dst {};
     AllocDescriptor src {};
+
+    bool operator==(const BeginDeepCopyEvent&) const = default;
 };
 
 //! End-deep-copy event associated with @c Kokkos::Tools::Experimental::EventSet::end_deep_copy.
-struct EndDeepCopyEvent {};
+struct EndDeepCopyEvent
+{
+    bool operator==(const EndDeepCopyEvent&) const = default;
+};
 
 //! Create-profile-section event associated with @c Kokkos::Tools::Experimental::EventSet::create_profile_section.
 struct CreateProfileSectionEvent
 {
     std::string name {};
     uint32_t section_id = 0;
+
+    bool operator==(const CreateProfileSectionEvent&) const = default;
 };
 
 //! Start-profile-section event associated with @c Kokkos::Tools::Experimental::EventSet::start_profile_section.
 struct StartProfileSectionEvent
 {
     uint32_t section_id = 0;
+
+    bool operator==(const StartProfileSectionEvent&) const = default;
 };
 
 //! Stop-profile-section event associated with @c Kokkos::Tools::Experimental::EventSet::stop_profile_section.
 struct StopProfileSectionEvent
 {
     uint32_t section_id = 0;
+
+    bool operator==(const StopProfileSectionEvent&) const = default;
 };
 
 //! Destroy-profile-section event associated with @c Kokkos::Tools::Experimental::EventSet::destroy_profile_section.
 struct DestroyProfileSectionEvent
 {
     uint32_t section_id = 0;
+
+    bool operator==(const DestroyProfileSectionEvent&) const = default;
 };
 
 //! Push-region event associated with @c Kokkos::Tools::Experimental::EventSet::push_region.
 struct PushRegionEvent
 {
     std::string name {};
+
+    bool operator==(const PushRegionEvent&) const = default;
 };
 
 //! Pop-region event associated with @c Kokkos::Tools::Experimental::EventSet::pop_region.
-struct PopRegionEvent {};
+struct PopRegionEvent
+{
+    bool operator==(const PopRegionEvent&) const = default;
+};
 
 //! Profile event associated with @c Kokkos::Tools::Experimental::EventSet::profile_event.
 struct ProfileEvent
 {
     std::string name {};
+
+    bool operator==(const ProfileEvent&) const = default;
 };
 ///@}
 
