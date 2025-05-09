@@ -55,6 +55,9 @@ TEST(impl, type_list_contains_v)
 
     static_assert(   type_list_contains_v<char,   type_list_t>);
     static_assert( ! type_list_contains_v<double, type_list_t>);
+
+    static_assert(   type_list_contains_v<char, int, double, char>);
+    static_assert( ! type_list_contains_v<char, int, double, const char>);
 }
 
 //! @test Check @ref Kokkos::utils::impl::type_list_at_t.

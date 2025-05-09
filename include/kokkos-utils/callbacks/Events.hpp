@@ -262,8 +262,8 @@ concept NamedEvent =
     };
 
 //! Concept to constrain any event type that is one of the given event types.
-template <typename T, typename EventTypeListType>
-concept EventOneOf = impl::type_list_contains_v<T, EventTypeListType>;
+template <typename T, typename... EventTypes>
+concept EventOneOf = impl::type_list_contains_v<T, EventTypes...>;
 ///@}
 
 //! @name Stream operators.
