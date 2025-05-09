@@ -1,11 +1,16 @@
 {
     "dockerFile": "dockerfile",
-    "extensions" : [
-        "ms-vscode.cmake-tools",
-        "eamodio.gitlens",
-        "mhutchie.git-graph",
-        "ms-azuretools.vscode-docker"
-    ],
+    "customizations": {
+        "vscode" :{
+            "extensions" : [
+                "ms-vscode.cmake-tools",
+                "ms-vscode.cpptools",
+                "eamodio.gitlens",
+                "mhutchie.git-graph",
+                "ms-azuretools.vscode-docker"
+            ],
+        }
+    },
     "runArgs": [
         "--privileged",
     ],
