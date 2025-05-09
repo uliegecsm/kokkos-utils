@@ -39,7 +39,7 @@ get_target_property(KokkosUtils_TARGET_FILES_FOR_DOC kokkosutils HEADER_SET_${Ko
 get_property(KokkosUtils_FILES_FOR_DOC GLOBAL PROPERTY KokkosUtils_FILES_FOR_DOC)
 
 include(${CMAKE_SOURCE_DIR}/cmake/functions/list.cmake)
-check_list_length(KokkosUtils_TARGET_FILES_FOR_DOC 27)
+check_list_length(KokkosUtils_TARGET_FILES_FOR_DOC 28)
 check_list_length(KokkosUtils_FILES_FOR_DOC        19)
 
 #---- Add Doxygen as a target.

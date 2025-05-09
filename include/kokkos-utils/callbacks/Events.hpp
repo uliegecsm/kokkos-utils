@@ -264,6 +264,12 @@ concept NamedEvent =
 //! Concept to constrain any event type that is one of the given event types.
 template <typename T, typename... EventTypes>
 concept EventOneOf = impl::type_list_contains_v<T, EventTypes...>;
+
+//! Concept to constraint any event that can happens on a given @c dev_id.
+template <typename EventType>
+concept OnDeviceEvent = Event<EventType> && requires (EventType& event) {
+    {event.dev_id} -> std::same_as<uint32_t&>;
+};
 ///@}
 
 //! @name Stream operators.
