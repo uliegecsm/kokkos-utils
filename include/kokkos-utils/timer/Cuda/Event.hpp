@@ -6,18 +6,36 @@
 namespace Kokkos::utils::timer
 {
 
+/**
+ * @brief Specialization for @c Kokkos::Cuda that uses @c cudaEvent_t.
+ *
+ * @note It must properly manage @ref event.
+ */
 template <>
 struct Event<Kokkos::Cuda>
 {
-    using impl_event_t = cudaEvent_t;
+    //! To be used for the custom deletor of @ref event.
+    struct Deletor
+    {
+        void operator()(CUevent_st* ptr) const {
+            KOKKOS_IMPL_CUDA_SAFE_CALL(cudaEventDestroy(ptr));
+        }
+    };
 
-    impl_event_t event = nullptr;
+    using impl_event_t    = cudaEvent_t;
+    using event_storage_t = std::unique_ptr<CUevent_st, Deletor>;
 
-    Event() { KOKKOS_IMPL_CUDA_SAFE_CALL(cudaEventCreate(&event)); }
+    static_assert(std::same_as<typename event_storage_t::pointer, impl_event_t>);
 
-    ~Event() { KOKKOS_IMPL_CUDA_SAFE_CALL(cudaEventDestroy(event)); }
+    event_storage_t event = nullptr;
 
-    void record(const Kokkos::Cuda& space) { KOKKOS_IMPL_CUDA_SAFE_CALL(cudaEventRecord(event, space.cuda_stream())); }
+    Event() {
+        impl_event_t tmp = nullptr;
+        KOKKOS_IMPL_CUDA_SAFE_CALL(cudaEventCreate(&tmp));
+        event.reset(tmp);
+    }
+
+    void record(const Kokkos::Cuda& space) { KOKKOS_IMPL_CUDA_SAFE_CALL(cudaEventRecord(event.get(), space.cuda_stream())); }
 
     template <typename Duration = milliseconds>
     Duration duration(Event& other) {
@@ -32,11 +50,11 @@ private:
      */
     float elapsed(Event& other)
     {
-        KOKKOS_IMPL_CUDA_SAFE_CALL(cudaEventSynchronize(other.event));
-        KOKKOS_IMPL_CUDA_SAFE_CALL(cudaEventSynchronize(event));
+        KOKKOS_IMPL_CUDA_SAFE_CALL(cudaEventSynchronize(other.event.get()));
+        KOKKOS_IMPL_CUDA_SAFE_CALL(cudaEventSynchronize(event.get()));
 
         float elapsed_time;
-        KOKKOS_IMPL_CUDA_SAFE_CALL(cudaEventElapsedTime(&elapsed_time, event, other.event));
+        KOKKOS_IMPL_CUDA_SAFE_CALL(cudaEventElapsedTime(&elapsed_time, event.get(), other.event.get()));
 
         return elapsed_time;
     }
