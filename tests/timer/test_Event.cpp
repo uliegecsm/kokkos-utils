@@ -70,4 +70,39 @@ TEST(Event, duration)
     ASSERT_GE(begin.duration<milliseconds>(end).count(), 0.);
 }
 
+//! @test Ensure that @ref Kokkos::utils::timer::Event can be destroyed while recording.
+TEST(Event, destroyed_while_recording)
+{
+    const execution_space exec {};
+
+    std::optional<event_t> event(std::in_place);
+
+    event->record(exec);
+
+    event.reset();
+}
+
+/**
+ * @test Ensure that @ref Kokkos::utils::timer::Event is properly movable.
+ *
+ * This is particularly critical for specializations for @c Kokkos::Cuda and @c Kokkos::HIP
+ * that need to properly deal with the management of @c cudaEvent_t and @c hipEvent_t, respectively.
+ */
+TEST(Event, movable)
+{
+    static_assert(std::movable<event_t>);
+
+    const execution_space exec {};
+
+    event_t begin, end;
+
+    begin.record(exec);
+
+    end.record(exec);
+
+    event_t moved(std::move(end)); // NOLINT(misc-const-correctness,performance-move-const-arg)
+
+    ASSERT_GE(begin.duration<milliseconds>(moved).count(), 0.);
+}
+
 } // namespace Kokkos::utils::tests::timer

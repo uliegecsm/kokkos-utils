@@ -6,18 +6,36 @@
 namespace Kokkos::utils::timer
 {
 
+/**
+ * @brief Specialization for @c Kokkos::HIP that uses @c hipEvent_t.
+ *
+ * @note It must properly manage @ref event.
+ */
 template <>
 struct Event<Kokkos::HIP>
 {
-    using impl_event_t = hipEvent_t;
+    //! To be used for the custom deletor of @ref event.
+    struct Deletor
+    {
+        void operator()(ihipEvent_t* ptr) const {
+            KOKKOS_IMPL_HIP_SAFE_CALL(hipEventDestroy(ptr));
+        }
+    };
 
-    impl_event_t event = nullptr;
+    using impl_event_t    = hipEvent_t;
+    using event_storage_t = std::unique_ptr<ihipEvent_t, Deletor>;
 
-    Event() { KOKKOS_IMPL_HIP_SAFE_CALL(hipEventCreate(&event)); }
+    static_assert(std::same_as<typename event_storage_t::pointer, impl_event_t>);
 
-    ~Event() { KOKKOS_IMPL_HIP_SAFE_CALL(hipEventDestroy(event)); }
+    event_storage_t event = nullptr;
 
-    void record(const Kokkos::HIP& space) { KOKKOS_IMPL_HIP_SAFE_CALL(hipEventRecord(event, space.hip_stream())); }
+    Event() {
+        impl_event_t tmp = nullptr;
+        KOKKOS_IMPL_HIP_SAFE_CALL(hipEventCreate(&tmp));
+        event.reset(tmp);
+    }
+
+    void record(const Kokkos::HIP& space) { KOKKOS_IMPL_HIP_SAFE_CALL(hipEventRecord(event.get(), space.hip_stream())); }
 
     template <typename Duration = milliseconds>
     Duration duration(Event& other) {
@@ -32,11 +50,11 @@ private:
      */
     float elapsed(Event& other)
     {
-        KOKKOS_IMPL_HIP_SAFE_CALL(hipEventSynchronize(other.event));
-        KOKKOS_IMPL_HIP_SAFE_CALL(hipEventSynchronize(event));
+        KOKKOS_IMPL_HIP_SAFE_CALL(hipEventSynchronize(other.event.get()));
+        KOKKOS_IMPL_HIP_SAFE_CALL(hipEventSynchronize(event.get()));
 
         float elapsed_time;
-        KOKKOS_IMPL_HIP_SAFE_CALL(hipEventElapsedTime(&elapsed_time, event, other.event));
+        KOKKOS_IMPL_HIP_SAFE_CALL(hipEventElapsedTime(&elapsed_time, event.get(), other.event.get()));
 
         return elapsed_time;
     }
