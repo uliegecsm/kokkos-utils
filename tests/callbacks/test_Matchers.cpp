@@ -6,6 +6,7 @@
 
 #include "kokkos-utils/callbacks/EventInProfileSectionMatcher.hpp"
 #include "kokkos-utils/callbacks/EventInRegionMatcher.hpp"
+#include "kokkos-utils/callbacks/EventNameMatcher.hpp"
 #include "kokkos-utils/callbacks/EventRegexMatcher.hpp"
 #include "kokkos-utils/callbacks/Matcher.hpp"
 
@@ -23,23 +24,27 @@ using execution_space = Kokkos::DefaultExecutionSpace;
 
 namespace Kokkos::utils::tests::callbacks
 {
+
 using namespace Kokkos::utils::callbacks;
+
+//! List of event types that have a name.
+using named_event_type_list_t = Kokkos::Impl::type_list<
+    BeginParallelForEvent,
+    BeginParallelReduceEvent,
+    BeginParallelScanEvent,
+    BeginFenceEvent,
+    AllocateDataEvent,
+    DeallocateDataEvent,
+    CreateProfileSectionEvent,
+    PushRegionEvent,
+    ProfileEvent
+>;
 
 //! @test Check traits of @ref Kokkos::utils::callbacks::EventRegexMatcher.
 TEST(EventRegexMatcher, traits)
 {
     static_assert(Matcher   <EventRegexMatcher>);
-    static_assert(MatcherFor<EventRegexMatcher,
-        BeginParallelForEvent,
-        BeginParallelReduceEvent,
-        BeginParallelScanEvent,
-        BeginFenceEvent,
-        AllocateDataEvent,
-        DeallocateDataEvent,
-        CreateProfileSectionEvent,
-        PushRegionEvent,
-        ProfileEvent
-    >);
+    static_assert(MatcherFor<EventRegexMatcher, named_event_type_list_t>);
     static_assert(std::movable<EventRegexMatcher>);
 
     static_assert( ! MatcherFor<EventRegexMatcher, BeginDeepCopyEvent>);
@@ -55,6 +60,23 @@ TEST(EventRegexMatcher, regex_matcher)
 
     ASSERT_TRUE( matcher(AllocateDataEvent{.alloc = {.name = "buried-allocation-to-time"}}));
     ASSERT_FALSE(matcher(AllocateDataEvent{.alloc = {.name = "not-this-other-allocation"}}));
+}
+
+//! @test Check traits of @ref Kokkos::utils::callbacks::EventNameMatcher.
+TEST(EventNameMatcher, traits)
+{
+    static_assert(Matcher     <EventNameMatcher>);
+    static_assert(MatcherFor  <EventNameMatcher, named_event_type_list_t>);
+    static_assert(std::movable<EventNameMatcher>);
+}
+
+//! @test Check that @ref Kokkos::utils::callbacks::EventNameMatcher
+TEST(EventNameMatcher, by_name)
+{
+    const EventNameMatcher matcher{.name = "named-as-I-like-it"};
+
+    ASSERT_FALSE(matcher(AllocateDataEvent{.alloc = {.name = "named-deep-copy"}}));
+    ASSERT_TRUE (matcher(AllocateDataEvent{.alloc = {.name = "named-as-I-like-it"}}));
 }
 
 //! @test Check traits of @ref Kokkos::utils::callbacks::EventInProfileSectionMatcher.

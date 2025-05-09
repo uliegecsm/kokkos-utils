@@ -66,6 +66,7 @@ target_sources(
 
             include/kokkos-utils/callbacks/EventInProfileSectionMatcher.hpp
             include/kokkos-utils/callbacks/EventInRegionMatcher.hpp
+            include/kokkos-utils/callbacks/EventNameMatcher.hpp
             include/kokkos-utils/callbacks/EventRegexMatcher.hpp
             include/kokkos-utils/callbacks/Events.hpp
             include/kokkos-utils/callbacks/Helpers.hpp
