@@ -8,6 +8,7 @@
 #include "kokkos-utils/callbacks/EventInRegionMatcher.hpp"
 #include "kokkos-utils/callbacks/EventNameMatcher.hpp"
 #include "kokkos-utils/callbacks/EventRegexMatcher.hpp"
+#include "kokkos-utils/callbacks/EventTypeMatcher.hpp"
 #include "kokkos-utils/callbacks/Matcher.hpp"
 
 /**
@@ -158,6 +159,26 @@ TEST(AnyEventMatcher, operator_parentheses)
     Kokkos::utils::impl::for_each<EventTypeList>([&] <Event EventType>() {
         static_assert(matcher(EventType{}));
     });
+}
+
+//! @test Check traits of @ref Kokkos::utils::callbacks::EventTypeMatcher.
+TEST(EventTypeMatcher, traits)
+{
+    using matcher_t = EventTypeMatcher<AnyEventMatcher, BeginFenceEvent, PushRegionEvent>;
+
+    static_assert(Matcher     <matcher_t>);
+    static_assert(MatcherFor  <matcher_t, BeginFenceEvent, PushRegionEvent>);
+    static_assert(std::same_as<matcher_event_type_list_t<matcher_t>, Kokkos::Impl::type_list<BeginFenceEvent, PushRegionEvent>>);
+    static_assert(std::movable<matcher_t>);
+}
+
+//! @test Check the behavior of @ref Kokkos::utils::callbacks::EventTypeMatcher.
+TEST(EventTypeMatcher, operator_parentheses)
+{
+    EventTypeMatcher<AnyEventMatcher, BeginFenceEvent, PushRegionEvent> matcher {};
+
+    ASSERT_TRUE(matcher(PushRegionEvent{}));
+    ASSERT_TRUE(matcher(BeginFenceEvent{}));
 }
 
 } // namespace Kokkos::utils::tests::callbacks
