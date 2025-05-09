@@ -1,5 +1,5 @@
-#ifndef KOKKOS_UTILS_CALLBACKS_EVENTINREGIONMATCHER_HPP
-#define KOKKOS_UTILS_CALLBACKS_EVENTINREGIONMATCHER_HPP
+#ifndef KOKKOS_UTILS_CALLBACKS_EVENTREGIONMATCHER_HPP
+#define KOKKOS_UTILS_CALLBACKS_EVENTREGIONMATCHER_HPP
 
 #include "kokkos-utils/callbacks/Events.hpp"
 #include "kokkos-utils/callbacks/Matcher.hpp"
@@ -14,9 +14,12 @@ namespace Kokkos::utils::callbacks
  *
  * Any event occuring between the matching @ref PushRegionEvent and its
  * corresponding @ref PopRegionEvent will match.
+ *
+ * Set @p TrueOnBoundary to @c true if it must return @c true for the opening @ref PushRegionEvent and
+ * closing @ref PopRegionEvent and @c false otherwise.
  */
-template <typename MatcherType> requires MatcherFor<MatcherType, PushRegionEvent>
-struct EventInRegionMatcher
+template <typename MatcherType, bool TrueOnBoundary = false> requires MatcherFor<MatcherType, PushRegionEvent>
+struct EventRegionMatcher
 {
     static constexpr uint32_t invalid_nested_level = Kokkos::Experimental::finite_max_v<uint32_t>;
 
@@ -26,15 +29,16 @@ struct EventInRegionMatcher
         if (this->matching)
         {
             ++this->nested_level;
-            return true;
+            return ! TrueOnBoundary;
         }
         else if (matcher(event))
         {
             this->nested_level = 1;
             this->matching     = true;
+            return TrueOnBoundary;
         }
 
-        return false;
+        return TrueOnBoundary ? false : this->matching;
     }
 
     //! Decrement @ref nested_level if we are still matching.
@@ -45,15 +49,18 @@ struct EventInRegionMatcher
             --this->nested_level;
 
             if (this->nested_level == 0)
+            {
                 this->matching = false;
+                return TrueOnBoundary;
+            }
         }
 
-        return this->matching;
+        return TrueOnBoundary ? false : this->matching;
     }
 
     template <Event EventType>
     bool operator()(const EventType&) const {
-        return matching;
+        return TrueOnBoundary ? false : this->matching;
     }
 
     MatcherType matcher {};
@@ -63,4 +70,4 @@ struct EventInRegionMatcher
 
 } // namespace Kokkos::utils::callbacks
 
-#endif // KOKKOS_UTILS_CALLBACKS_EVENTINREGIONMATCHER_HPP
+#endif // KOKKOS_UTILS_CALLBACKS_EVENTREGIONMATCHER_HPP
