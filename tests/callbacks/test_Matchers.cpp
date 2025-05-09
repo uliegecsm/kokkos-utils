@@ -6,9 +6,9 @@
 
 #include "kokkos-utils/callbacks/EventBeginEndEventIdMatcher.hpp"
 #include "kokkos-utils/callbacks/EventInProfileSectionMatcher.hpp"
-#include "kokkos-utils/callbacks/EventInRegionMatcher.hpp"
 #include "kokkos-utils/callbacks/EventNameMatcher.hpp"
 #include "kokkos-utils/callbacks/EventRegexMatcher.hpp"
+#include "kokkos-utils/callbacks/EventRegionMatcher.hpp"
 #include "kokkos-utils/callbacks/EventTypeMatcher.hpp"
 #include "kokkos-utils/callbacks/Matcher.hpp"
 
@@ -112,20 +112,20 @@ TEST(EventInProfileSectionMatcher, in_profile_section_matcher)
 
     ASSERT_FALSE(matcher(DestroyProfileSectionEvent{.section_id = section_id}));
 }
-//! @test Check traits of @ref Kokkos::utils::callbacks::EventInRegionMatcher.
-TEST(EventInRegionMatcher, traits)
+//! @test Check traits of @ref Kokkos::utils::callbacks::EventRegionMatcher.
+TEST(EventRegionMatcher, traits)
 {
-    using matcher_t = EventInRegionMatcher<EventRegexMatcher>;
+    using matcher_t = EventRegionMatcher<EventRegexMatcher>;
 
     static_assert(Matcher     <matcher_t>);
     static_assert(MatcherFor  <matcher_t, EventTypeList>);
     static_assert(std::movable<matcher_t>);
 }
 
-//! @test Check the behavior of @ref Kokkos::utils::callbacks::EventInRegionMatcher.
-TEST(EventInRegionMatcher, in_region_matcher)
+//! @test Check the behavior of @ref Kokkos::utils::callbacks::EventRegionMatcher when we want to match events within a region.
+TEST(EventRegionMatcher, within_region_matcher)
 {
-    EventInRegionMatcher matcher(EventRegexMatcher{.regex = std::regex("buried-region")});
+    EventRegionMatcher matcher(EventRegexMatcher{.regex = std::regex("buried-region")});
 
     ASSERT_FALSE(matcher(PushRegionEvent{.name = "not-the-one-we-want"}));
 
@@ -142,6 +142,30 @@ TEST(EventInRegionMatcher, in_region_matcher)
     ASSERT_TRUE(matcher(PopRegionEvent{}));
 
     ASSERT_FALSE(matcher(PopRegionEvent{}));
+}
+
+//! @test Check the behavior of @ref Kokkos::utils::callbacks::EventRegionMatcher when we want to match the opening and closing events.
+TEST(EventRegionMatcher, boundary_region_matcher)
+{
+    EventRegionMatcher<EventNameMatcher, true> matcher{{"buried-region"}};
+
+    ASSERT_FALSE(matcher(PushRegionEvent{.name = "not-the-one-we-want"}));
+
+    ASSERT_FALSE(matcher(AllocateDataEvent{}));
+
+    ASSERT_TRUE(matcher(PushRegionEvent{.name = "buried-region"}));
+
+    ASSERT_FALSE(matcher(AllocateDataEvent{}));
+
+    ASSERT_FALSE(matcher(PushRegionEvent{.name = "nested-region"}));
+
+    ASSERT_FALSE(matcher(AllocateDataEvent{}));
+
+    ASSERT_FALSE(matcher(PopRegionEvent{}));
+
+    ASSERT_TRUE(matcher(PopRegionEvent{}));
+
+    ASSERT_FALSE(matcher(BeginFenceEvent{}));
 }
 
 //! @test Check traits of @ref Kokkos::utils::callbacks::AnyEventMatcher.
