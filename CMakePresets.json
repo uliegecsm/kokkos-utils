@@ -125,6 +125,11 @@
             "name"            : "gcc-Cuda",
             "configurePreset" : "gcc-Cuda",
             "inherits"        : "default"
+        },
+        {
+            "name"            : "rocm-HIP",
+            "configurePreset" : "rocm-HIP",
+            "inherits"        : "default"
         }
     ]
 }
