@@ -36,7 +36,7 @@ public:
     explicit RecorderListener(T&& matcher_)
       : matcher(std::forward<T>(matcher_)) {}
 
-    template <EventOneOf<event_type_list_t> EventType>
+    template <EventOneOf<EventTypes...> EventType>
     void operator()(const EventType& event) {
         if (matcher(event)) this->recorded_events.push_back(event);
     }
