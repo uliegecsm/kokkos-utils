@@ -14,8 +14,8 @@ namespace Kokkos::utils::timer
 template <>
 struct Event<Kokkos::Cuda>
 {
-    //! To be used for the custom deletor of @ref event.
-    struct Deletor
+    //! To be used for the custom deleter of @ref event.
+    struct EventDeleter
     {
         void operator()(CUevent_st* ptr) const {
             KOKKOS_IMPL_CUDA_SAFE_CALL(cudaEventDestroy(ptr));
@@ -23,7 +23,7 @@ struct Event<Kokkos::Cuda>
     };
 
     using impl_event_t    = cudaEvent_t;
-    using event_storage_t = std::unique_ptr<CUevent_st, Deletor>;
+    using event_storage_t = std::unique_ptr<CUevent_st, EventDeleter>;
 
     static_assert(std::same_as<typename event_storage_t::pointer, impl_event_t>);
 
