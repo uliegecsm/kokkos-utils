@@ -186,8 +186,11 @@ jobs:
                   cmake -S .    --preset=gcc-OpenMP --warn-uninitialized -Werror=dev
                   cmake --build --preset=gcc-OpenMP --target=docs
 
-            - name: Upload Pages artifacts.
-              uses: actions/upload-pages-artifact@v3
+            - name: Check tag file.
+              run : |
+                  python3 tests/check_tag_file.py --tag-file=$PWD/build-with-gcc-OpenMP/docs/html/kokkos-utils.tag
+
+            - uses: actions/upload-pages-artifact@v3
               with:
                   path: build-with-gcc-OpenMP/docs/html
 

@@ -14,8 +14,8 @@ namespace Kokkos::utils::timer
 template <>
 struct Event<Kokkos::HIP>
 {
-    //! To be used for the custom deletor of @ref event.
-    struct Deletor
+    //! To be used for the custom deleter of @ref event.
+    struct EventDeleter
     {
         void operator()(ihipEvent_t* ptr) const {
             KOKKOS_IMPL_HIP_SAFE_CALL(hipEventDestroy(ptr));
@@ -23,7 +23,7 @@ struct Event<Kokkos::HIP>
     };
 
     using impl_event_t    = hipEvent_t;
-    using event_storage_t = std::unique_ptr<ihipEvent_t, Deletor>;
+    using event_storage_t = std::unique_ptr<ihipEvent_t, EventDeleter>;
 
     static_assert(std::same_as<typename event_storage_t::pointer, impl_event_t>);
 
