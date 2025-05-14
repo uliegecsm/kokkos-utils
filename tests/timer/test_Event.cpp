@@ -23,21 +23,41 @@ namespace Kokkos::utils::tests::timer
 
 using namespace Kokkos::utils::timer;
 
-using event_t = Event<execution_space>;
+template <typename T>
+struct EventTest : public ::testing::Test
+{
+public:
+    void SetUp() override {
+        this->exec = Kokkos::Experimental::partition_space(execution_space{}, 1)[0];
+    }
+
+protected:
+    execution_space exec {};
+};
+
+using EventTypes = ::testing::Types<
+    Event<void>,
+    Event<execution_space>
+>;
+
+TYPED_TEST_SUITE(EventTest, EventTypes);
 
 //! @test Check the type of the event used by the primary template and the device specializations.
-TEST(Event, impl_event_type)
+TYPED_TEST(EventTest, impl_event_type)
 {
-    using expt_impl_event_t =
+    using expt_impl_event_t = std::conditional_t<
+        std::same_as<TypeParam, Event<void>>,
+        std::chrono::steady_clock::time_point,
 #if defined(KOKKOS_ENABLE_CUDA)
-    cudaEvent_t;
+        cudaEvent_t
 #elif defined(KOKKOS_ENABLE_HIP)
-    hipEvent_t;
+        hipEvent_t
 #else
-    std::chrono::steady_clock::time_point;
+    std::chrono::steady_clock::time_point
 #endif
+    >;
 
-    static_assert(std::same_as<typename event_t::impl_event_t, expt_impl_event_t>);
+    static_assert(std::same_as<typename TypeParam::impl_event_t, expt_impl_event_t>);
 }
 
 //! @test Check the traits of the helper types @ref Kokkos::utils::timer::milliseconds and @ref Kokkos::utils::timer::seconds.
@@ -57,27 +77,34 @@ TEST(Event, duration_instances)
 }
 
 //! @test Basic test of @ref Kokkos::utils::timer::Event::duration.
-TEST(Event, duration)
+TYPED_TEST(EventTest, duration)
 {
-    const execution_space exec {};
+    TypeParam begin, end;
 
-    event_t begin, end;
+    if constexpr (std::same_as<TypeParam, void>)
+    {
+        begin.record();
+        end.record();
+    }
+    else
+    {
+        begin.record(this->exec);
+        end.record(this->exec);
+    }
 
-    begin.record(exec);
-
-    end.record(exec);
-
-    ASSERT_GE(begin.duration<milliseconds>(end).count(), 0.);
+    ASSERT_GE(begin.template duration<milliseconds>(end).count(), 0.);
 }
 
 //! @test Ensure that @ref Kokkos::utils::timer::Event can be destroyed while recording.
-TEST(Event, destroyed_while_recording)
+TYPED_TEST(EventTest, destroyed_while_recording)
 {
-    const execution_space exec {};
+    std::optional<TypeParam> event(std::in_place);
 
-    std::optional<event_t> event(std::in_place);
-
-    event->record(exec);
+    if constexpr (std::same_as<TypeParam, void>) {
+        event->record();
+    } else {
+        event->record(this->exec);
+    }
 
     event.reset();
 }
@@ -88,21 +115,26 @@ TEST(Event, destroyed_while_recording)
  * This is particularly critical for specializations for @c Kokkos::Cuda and @c Kokkos::HIP
  * that need to properly deal with the management of @c cudaEvent_t and @c hipEvent_t, respectively.
  */
-TEST(Event, movable)
+TYPED_TEST(EventTest, movable)
 {
-    static_assert(std::movable<event_t>);
+    static_assert(std::movable<TypeParam>);
 
-    const execution_space exec {};
+    TypeParam begin, end;
 
-    event_t begin, end;
+    if constexpr (std::same_as<TypeParam, void>)
+    {
+        begin.record();
+        end.record();
+    }
+    else
+    {
+        begin.record(this->exec);
+        end.record(this->exec);
+    }
 
-    begin.record(exec);
+    TypeParam moved(std::move(end)); // NOLINT(misc-const-correctness,performance-move-const-arg)
 
-    end.record(exec);
-
-    event_t moved(std::move(end)); // NOLINT(misc-const-correctness,performance-move-const-arg)
-
-    ASSERT_GE(begin.duration<milliseconds>(moved).count(), 0.);
+    ASSERT_GE(begin.template duration<milliseconds>(moved).count(), 0.);
 }
 
 } // namespace Kokkos::utils::tests::timer

@@ -12,29 +12,16 @@ namespace Kokkos::utils::timer
  * This class uses @ref Event to create, destroy, record, and compute
  * the elapsed time between events.
  */
-template <Kokkos::utils::concepts::ExecutionSpace Exec>
+template <typename T>
+requires Kokkos::utils::concepts::ExecutionSpace<T> || std::is_void_v<T>
 class Timer
 {
 public:
-    using event_t = Event<Exec>;
+    using event_t = Event<T>;
 
 public:
-    //! Start the timer.
-    void start(const Exec& exec)
-    {
-        tick.record(exec);
-        started = true;
-    }
-
-    //! Stop the timer.
-    void stop(const Exec& exec)
-    {
-        tock.record(exec);
-        stopped = true;
-    }
-
     //! Returns @c true if @ref start and @ref stop have been called.
-    bool is_valid() const { return started && stopped; }
+    bool is_valid() const { return tick.has_value() && tock.has_value(); }
 
     /**
      * Get a @c std::chrono::duration object representing the elapsed time.
@@ -43,11 +30,44 @@ public:
      *       whose device specializations are not @c const.
      */
     template <typename Duration = milliseconds>
-    Duration duration() { return tick.template duration<Duration>(tock); }
+    Duration duration() { return tick->template duration<Duration>(*tock); }
+
+    //! Start the timer.
+    template <typename U = T>
+    requires std::is_void_v<U>
+    void start()
+    {
+        if(! tick.has_value()) tick.emplace();
+        tick->record();
+    }
+
+    template <typename Exec = T>
+    requires Kokkos::utils::concepts::ExecutionSpace<Exec>
+    void start(const Exec& exec)
+    {
+        if(! tick.has_value()) tick.emplace();
+        tick->record(exec);
+    }
+
+    //! Stop the timer.
+    template <typename U = T>
+    requires std::is_void_v<U>
+    void stop()
+    {
+        if(! tock.has_value()) tock.emplace();
+        tock->record();
+    }
+
+    template <typename Exec = T>
+    requires Kokkos::utils::concepts::ExecutionSpace<Exec>
+    void stop(const Exec& exec)
+    {
+        if(! tock.has_value()) tock.emplace();
+        tock->record(exec);
+    }
 
 private:
-    event_t tick {},         tock {};
-    bool    started = false, stopped = false;
+    std::optional<event_t> tick = std::nullopt, tock = std::nullopt;
 };
 
 } // namespace Kokkos::utils::timer

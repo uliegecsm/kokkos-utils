@@ -35,7 +35,8 @@ struct Event<Kokkos::Cuda>
         event.reset(tmp);
     }
 
-    void record(const Kokkos::Cuda& space) { KOKKOS_IMPL_CUDA_SAFE_CALL(cudaEventRecord(event.get(), space.cuda_stream())); }
+    //! Record this event in the execution space instance @p exec.
+    void record(const Kokkos::Cuda& exec) { KOKKOS_IMPL_CUDA_SAFE_CALL(cudaEventRecord(event.get(), exec.cuda_stream())); }
 
     template <typename Duration = milliseconds>
     Duration duration(Event& other) {
