@@ -22,9 +22,8 @@ namespace Kokkos::utils::tests::timer
 
 using namespace Kokkos::utils::timer;
 
-using timer_t = Timer<execution_space>;
-
-class TimerTest : public ::testing::Test
+template <typename T>
+struct TimerTest : public ::testing::Test
 {
 public:
     void SetUp() override {
@@ -35,13 +34,20 @@ protected:
     execution_space exec {};
 };
 
+using TimerTypes = ::testing::Types<
+    Timer<void>,
+    Timer<execution_space>
+>;
+
+TYPED_TEST_SUITE(TimerTest, TimerTypes);
+
 /**
  * @test Check that @ref Kokkos::utils::timer::Timer reports it's invalid when neither @ref Kokkos::utils::timer::Timer::start
  *       nor @ref Kokkos::utils::timer::Timer::stop has been called.
  */
-TEST_F(TimerTest, invalid_if_not_started_and_not_stopped)
+TYPED_TEST(TimerTest, invalid_if_not_started_and_not_stopped)
 {
-    const timer_t timer;
+    const TypeParam timer;
     ASSERT_FALSE(timer.is_valid());
 }
 
@@ -49,10 +55,16 @@ TEST_F(TimerTest, invalid_if_not_started_and_not_stopped)
  * @test Check that @ref Kokkos::utils::timer::Timer reports it's invalid when @ref Kokkos::utils::timer::Timer::start has been called,
  *       but @ref Kokkos::utils::timer::Timer::stop has not.
  */
-TEST_F(TimerTest, invalid_if_not_stopped)
+TYPED_TEST(TimerTest, invalid_if_not_stopped)
 {
-    timer_t timer;
-    timer.start(this->exec);
+    TypeParam timer;
+
+    if constexpr (std::same_as<TypeParam, void>) {
+        timer.start();
+    } else {
+        timer.start(this->exec);
+    }
+
     ASSERT_FALSE(timer.is_valid());
 }
 
@@ -60,10 +72,16 @@ TEST_F(TimerTest, invalid_if_not_stopped)
  * @test Check that @ref Kokkos::utils::timer::Timer reports it's invalid when @ref Kokkos::utils::timer::Timer::start has not been called,
  *       but @ref Kokkos::utils::timer::Timer::stop has.
  */
-TEST_F(TimerTest, invalid_if_not_started)
+TYPED_TEST(TimerTest, invalid_if_not_started)
 {
-    timer_t timer;
-    timer.stop(this->exec);
+    TypeParam timer;
+
+    if constexpr (std::same_as<TypeParam, void>) {
+        timer.stop();
+    } else {
+        timer.stop(this->exec);
+    }
+
     ASSERT_FALSE(timer.is_valid());
 }
 
@@ -71,19 +89,33 @@ TEST_F(TimerTest, invalid_if_not_started)
  * @test Check that @ref Kokkos::utils::timer::Timer reports it's valid when @ref Kokkos::utils::timer::Timer::start and
  *       @ref Kokkos::utils::timer::Timer::stop have been called.
  */
-TEST_F(TimerTest, valid_if_started_and_stopped)
+TYPED_TEST(TimerTest, valid_if_started_and_stopped)
 {
-    timer_t timer;
-    timer.start(this->exec);
-    timer.stop (this->exec);
+    TypeParam timer;
+
+    if constexpr (std::same_as<TypeParam, void>)
+    {
+        timer.start();
+        timer.stop();
+    }
+    else
+    {
+        timer.start(this->exec);
+        timer.stop(this->exec);
+    }
+
     ASSERT_TRUE(timer.is_valid());
 }
+
+struct TimerExecutionSpaceTest : public TimerTest<execution_space> {
+    using timer_t = Timer<execution_space>;
+};
 
 /**
  * @test Check @ref Kokkos::utils::timer::Timer by verifying that the elapsed time is less
  *       than the time measured by a @c Kokkos::Timer wrapped outside of it.
  */
-TEST_F(TimerTest, start_stop_elapsed)
+TEST_F(TimerExecutionSpaceTest, start_stop_elapsed)
 {
     using view_t = Kokkos::View<double*, execution_space>;
 
@@ -113,31 +145,39 @@ TEST_F(TimerTest, start_stop_elapsed)
 }
 
 //! @test Check @ref Kokkos::utils::timer::Timer::duration.
-TEST_F(TimerTest, duration)
+TYPED_TEST(TimerTest, duration)
 {
-    timer_t timer;
+    TypeParam timer;
 
-    timer.start(this->exec);
+    if constexpr (std::same_as<TypeParam, void>) {
+        timer.start();
+    } else {
+        timer.start(this->exec);
+    }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    timer.stop(this->exec);
+    if constexpr (std::same_as<TypeParam, void>) {
+        timer.stop();
+    } else {
+        timer.stop(this->exec);
+    }
 
-    const double elapsed = timer.duration<milliseconds>().count();
+    const double elapsed = timer.template duration<milliseconds>().count();
 
     //! Check that the elapsed time is greater than the waiting time of 100 ms.
     ASSERT_GE(elapsed, 100.);
 
     //! Check the elapsed time in milliseconds.
-    const auto duration_ms = timer.duration<milliseconds>();
+    const auto duration_ms = timer.template duration<milliseconds>();
     ASSERT_NEAR(duration_ms.count(), elapsed, /* abs_error */ 1e-3);
 
     //! Check the elapsed time in microseconds.
-    const auto duration_us = timer.duration<microseconds>();
+    const auto duration_us = timer.template duration<microseconds>();
     ASSERT_NEAR(duration_us.count(), elapsed * 1e3, /* abs_error */ 1.);
 
     //! Check the elapsed time in seconds.
-    const auto duration_se = timer.duration<seconds>();
+    const auto duration_se = timer.template duration<seconds>();
     ASSERT_NEAR(duration_se.count(), elapsed / 1e3, /* abs_error */ 1e-6);
 
     //! Check consistency.
@@ -145,7 +185,7 @@ TEST_F(TimerTest, duration)
     ASSERT_LE(abs(duration_ms - duration_se), std::chrono::microseconds(1));
 
     //! Ensure the timer is effectively stopped.
-    ASSERT_EQ(duration_ms, (timer.duration<milliseconds>()));
+    ASSERT_EQ(duration_ms, (timer.template duration<milliseconds>()));
 }
 
 /**
@@ -166,7 +206,7 @@ TEST_F(TimerTest, duration)
  *
  * This test helps us ensure that for a "start -> stop -> start -> stop -> ..." sequence, our timer is fine.
  */
- TEST_F(TimerTest, reuse)
+TEST_F(TimerExecutionSpaceTest, reuse)
 {
     constexpr size_t nreps = 10;
 

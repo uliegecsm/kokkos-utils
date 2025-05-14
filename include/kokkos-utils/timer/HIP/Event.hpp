@@ -35,7 +35,8 @@ struct Event<Kokkos::HIP>
         event.reset(tmp);
     }
 
-    void record(const Kokkos::HIP& space) { KOKKOS_IMPL_HIP_SAFE_CALL(hipEventRecord(event.get(), space.hip_stream())); }
+    //! Record this event in the execution space instance @p exec.
+    void record(const Kokkos::HIP& exec) { KOKKOS_IMPL_HIP_SAFE_CALL(hipEventRecord(event.get(), exec.hip_stream())); }
 
     template <typename Duration = milliseconds>
     Duration duration(Event& other) {
