@@ -261,15 +261,22 @@ concept NamedEvent =
         { event.name } -> std::same_as<std::string&>;
     };
 
-//! Concept to constrain any event type that is one of the given event types.
-template <typename T, typename... EventTypes>
-concept EventOneOf = impl::type_list_contains_v<T, EventTypes...>;
+//! Concept to constrain any event type that has a member variable @c event_id.
+template <typename EventType>
+concept IndexedEvent = Event<EventType> && requires (EventType event) {
+    { event.event_id } -> std::same_as<uint64_t&>;
+};
 
 //! Concept to constrain any event type that has a member variable @c dev_id.
 template <typename EventType>
 concept EnqueuedEvent = Event<EventType> && requires (EventType event) {
     { event.dev_id } -> std::same_as<uint32_t&>;
 };
+
+//! Concept to constrain any event type that is one of the given event types.
+template <typename T, typename... EventTypes>
+concept EventOneOf = impl::type_list_contains_v<T, EventTypes...>;
+
 ///@}
 
 //! @name Stream operators.
