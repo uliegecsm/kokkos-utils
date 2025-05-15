@@ -7,7 +7,7 @@
 #include "kokkos-utils/callbacks/EventBeginEndEventIdMatcher.hpp"
 #include "kokkos-utils/callbacks/EventInProfileSectionMatcher.hpp"
 #include "kokkos-utils/callbacks/EventNameMatcher.hpp"
-#include "kokkos-utils/callbacks/EventOnExecMatcher.hpp"
+#include "kokkos-utils/callbacks/EventQueueMatcher.hpp"
 #include "kokkos-utils/callbacks/EventRegexMatcher.hpp"
 #include "kokkos-utils/callbacks/EventRegionMatcher.hpp"
 #include "kokkos-utils/callbacks/EventTypeMatcher.hpp"
@@ -230,12 +230,12 @@ TEST(EventBeginEndEventIdMatcher, operator_parentheses)
     ASSERT_TRUE (matcher(EndParallelForEvent  {.event_id = 666}));
 }
 
-//! @test Check traits of @ref Kokkos::utils::callbacks::EventOnExecMatcher.
-TEST(EventOnExecMatcher, traits)
+//! @test Check traits of @ref Kokkos::utils::callbacks::EventQueueMatcher.
+TEST(EventQueueMatcher, traits)
 {
-    using matcher_t = EventOnExecMatcher<EventRegexMatcher, execution_space>;
+    using matcher_t = EventQueueMatcher<EventRegexMatcher, execution_space>;
 
-    using on_device_event_type_list_t = Kokkos::Impl::type_list<
+    using enqueued_event_type_list_t = Kokkos::Impl::type_list<
         BeginParallelForEvent,
         BeginParallelReduceEvent,
         BeginParallelScanEvent,
@@ -243,19 +243,19 @@ TEST(EventOnExecMatcher, traits)
     >;
 
     static_assert(Matcher     <matcher_t>);
-    static_assert(std::same_as<matcher_event_type_list_t<matcher_t>, on_device_event_type_list_t>);
+    static_assert(std::same_as<matcher_event_type_list_t<matcher_t>, enqueued_event_type_list_t>);
     static_assert(std::movable<matcher_t>);
 }
 
-//! @test Check the behavior of @ref Kokkos::utils::callbacks::EventOnExecMatcher.
-TEST(EventOnExecMatcher, operator_parentheses)
+//! @test Check the behavior of @ref Kokkos::utils::callbacks::EventQueueMatcher.
+TEST(EventQueueMatcher, operator_parentheses)
 {
     const auto execs = Kokkos::Experimental::partition_space(execution_space{}, 1,1);
 
     const auto dev_id_0 = Kokkos::Tools::Experimental::device_id(execs.at(0));
     const auto dev_id_1 = Kokkos::Tools::Experimental::device_id(execs.at(1));
 
-    EventOnExecMatcher<EventNameMatcher, execution_space> matcher {.matcher = EventNameMatcher("runs-on-device"), .exec = execs.at(0)};
+    EventQueueMatcher<EventNameMatcher, execution_space> matcher {.matcher = EventNameMatcher("runs-on-device"), .exec = execs.at(0)};
 
     ASSERT_EQ   (matcher(BeginParallelForEvent{.name = "runs-on-device", .dev_id = dev_id_1}), dev_id_0 == dev_id_1);
     ASSERT_FALSE(matcher(BeginParallelForEvent{.name = "does-not-match", .dev_id = dev_id_0}));
