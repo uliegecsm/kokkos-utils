@@ -1,5 +1,5 @@
-#ifndef KOKKOS_UTILS_CALLBACKS_EVENTONEXECMATCHER_HPP
-#define KOKKOS_UTILS_CALLBACKS_EVENTONEXECMATCHER_HPP
+#ifndef KOKKOS_UTILS_CALLBACKS_EVENTQUEUEMATCHER_HPP
+#define KOKKOS_UTILS_CALLBACKS_EVENTQUEUEMATCHER_HPP
 
 #include "kokkos-utils/callbacks/Events.hpp"
 #include "kokkos-utils/concepts/ExecutionSpace.hpp"
@@ -9,9 +9,9 @@ namespace Kokkos::utils::callbacks
 
 //! Match an event whose @c dev_id is the same as the one of @ref exec.
 template <Matcher MatcherType, Kokkos::utils::concepts::ExecutionSpace Exec>
-struct EventOnExecMatcher
+struct EventQueueMatcher
 {
-    template <OnDeviceEvent EventType>
+    template <EnqueuedEvent EventType>
     bool operator()(const EventType& event)
     {
         if(event.dev_id == dev_id)
@@ -27,4 +27,4 @@ struct EventOnExecMatcher
 
 } // namespace Kokkos::utils::callbacks
 
-#endif // KOKKOS_UTILS_CALLBACKS_EVENTONEXECMATCHER_HPP
+#endif // KOKKOS_UTILS_CALLBACKS_EVENTQUEUEMATCHER_HPP

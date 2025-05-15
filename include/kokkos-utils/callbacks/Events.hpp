@@ -265,10 +265,10 @@ concept NamedEvent =
 template <typename T, typename... EventTypes>
 concept EventOneOf = impl::type_list_contains_v<T, EventTypes...>;
 
-//! Concept to constraint any event that can happens on a given @c dev_id.
+//! Concept to constrain any event type that has a member variable @c dev_id.
 template <typename EventType>
-concept OnDeviceEvent = Event<EventType> && requires (EventType& event) {
-    {event.dev_id} -> std::same_as<uint32_t&>;
+concept EnqueuedEvent = Event<EventType> && requires (EventType event) {
+    { event.dev_id } -> std::same_as<uint32_t&>;
 };
 ///@}
 
