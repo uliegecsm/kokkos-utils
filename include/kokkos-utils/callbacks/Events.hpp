@@ -276,7 +276,29 @@ concept EnqueuedEvent = Event<EventType> && requires (EventType event) {
 //! Concept to constrain any event type that is one of the given event types.
 template <typename T, typename... EventTypes>
 concept EventOneOf = impl::type_list_contains_v<T, EventTypes...>;
+///@}
 
+//! @name Get the paired event.
+///@{
+template <Event EventType>
+struct PairedEventType;
+
+#define PAIRED_EVENT_TYPE(__begin_eventtype__, __end_eventtype__) \
+    template <> \
+    struct PairedEventType<__begin_eventtype__> { using type = __end_eventtype__; };
+
+PAIRED_EVENT_TYPE(BeginParallelForEvent,     EndParallelForEvent)
+PAIRED_EVENT_TYPE(BeginParallelReduceEvent,  EndParallelReduceEvent)
+PAIRED_EVENT_TYPE(BeginParallelScanEvent,    EndParallelScanEvent)
+PAIRED_EVENT_TYPE(BeginFenceEvent,           EndFenceEvent)
+PAIRED_EVENT_TYPE(AllocateDataEvent,         DeallocateDataEvent)
+PAIRED_EVENT_TYPE(BeginDeepCopyEvent,        EndDeepCopyEvent)
+PAIRED_EVENT_TYPE(CreateProfileSectionEvent, DestroyProfileSectionEvent)
+PAIRED_EVENT_TYPE(StartProfileSectionEvent,  StopProfileSectionEvent)
+PAIRED_EVENT_TYPE(PushRegionEvent,           PopRegionEvent)
+
+template <Event EventType>
+using paired_event_t = typename PairedEventType<EventType>::type;
 ///@}
 
 //! @name Stream operators.
