@@ -1,9 +1,11 @@
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
 #include "Kokkos_Core.hpp"
 
 #include "kokkos-utils/impl/type_traits.hpp"
 
+#include "kokkos-utils/callbacks/ConjunctionMatcher.hpp"
 #include "kokkos-utils/callbacks/EventBeginEndEventIdMatcher.hpp"
 #include "kokkos-utils/callbacks/EventIdMatcher.hpp"
 #include "kokkos-utils/callbacks/EventInProfileSectionMatcher.hpp"
@@ -114,6 +116,7 @@ TEST(EventInProfileSectionMatcher, in_profile_section_matcher)
 
     ASSERT_FALSE(matcher(DestroyProfileSectionEvent{.section_id = section_id}));
 }
+
 //! @test Check traits of @ref Kokkos::utils::callbacks::EventRegionMatcher.
 TEST(EventRegionMatcher, traits)
 {
@@ -287,6 +290,120 @@ TEST(EventIdMatcher, operator_parentheses)
 
     ASSERT_TRUE (matcher(BeginParallelForEvent{.event_id =  42}));
     ASSERT_FALSE(matcher(BeginParallelForEvent{.event_id = 666}));
+}
+
+//! @test Check traits of @ref Kokkos::utils::callbacks::ConjunctionMatcher.
+TEST(ConjunctionMatcher, traits)
+{
+    using matcher_t = ConjunctionMatcher<
+        EventRegionMatcher<EventRegexMatcher>,
+        EventRegionMatcher<AnyEventMatcher>
+    >;
+
+    static_assert(Matcher     <matcher_t>);
+    static_assert(MatcherFor  <matcher_t, EventTypeList>);
+    static_assert(std::movable<matcher_t>);
+}
+
+//! @test Check the behavior of @ref Kokkos::utils::callbacks::ConjunctionMatcher.
+TEST(ConjunctionMatcher, everyone_agrees)
+{
+    ConjunctionMatcher matcher{
+        EventRegionMatcher{.matcher = EventRegexMatcher{.regex = std::regex("buried-region-one")}},
+        EventRegionMatcher{.matcher = EventRegexMatcher{.regex = std::regex("buried-region-two")}}
+    };
+
+    ASSERT_FALSE(matcher(PushRegionEvent{.name = "not-the-one-we-want"}));
+
+    ASSERT_FALSE(matcher(AllocateDataEvent{}));
+
+    ASSERT_FALSE(matcher(PushRegionEvent{.name = "buried-region-one"}));
+
+    ASSERT_FALSE(matcher(AllocateDataEvent{}));
+
+    ASSERT_FALSE(matcher(PushRegionEvent{.name = "buried-region-two"}));
+
+    ASSERT_TRUE(matcher(AllocateDataEvent{}));
+
+    ASSERT_FALSE(matcher(PopRegionEvent{}));
+}
+
+/**
+ * @test Check that @ref Kokkos::utils::callbacks::ConjunctionMatcher will only match for the subset of events that
+ *       are common to all its sub-matchers.
+ */
+TEST(ConjunctionMatcher, different_event_type_sets)
+{
+    ConjunctionMatcher matcher{
+        EventRegexMatcher{.regex = std::regex("my-triggering-event")},
+        AnyEventMatcher{}
+    };
+
+    static_assert(std::same_as<
+        matcher_event_type_list_t<EventRegexMatcher>,
+        matcher_event_type_list_t<decltype(matcher)>
+    >);
+
+    ASSERT_FALSE(matcher(BeginFenceEvent{.name = "not-this-one"}));
+    ASSERT_TRUE (matcher(BeginFenceEvent{.name = "my-triggering-event"}));
+}
+
+//! Helper matcher that records in @ref encountered all the events passed to it.
+template <Matcher MatcherType>
+struct RecordingMatcher
+{
+    bool operator()(const BeginFenceEvent& event)
+    {
+        encountered.push_back(event);
+        return matcher(event);
+    }
+
+    MatcherType matcher;
+    std::vector<BeginFenceEvent> encountered {};
+};
+
+/**
+ * @test Check that @ref Kokkos::utils::callbacks::ConjunctionMatcher is short-circuiting, *i.e.* it will stop evaluating
+ *       the sub-matchers as soon as one returns @c false.
+ */
+TEST(ConjunctionMatcher, order_of_evaluation)
+{
+    using matcher_t = RecordingMatcher<EventNameMatcher>;
+
+    ConjunctionMatcher matcher{
+        matcher_t{.matcher = {"matcher-a"}},
+        matcher_t{.matcher = {"matcher-a"}},
+        matcher_t{.matcher = {"matcher-b"}},
+        matcher_t{.matcher = {"matcher-c"}}
+    };
+
+    ASSERT_FALSE(matcher(BeginFenceEvent{.name = "matcher-a", .event_id = 0}));
+    ASSERT_FALSE(matcher(BeginFenceEvent{.name = "matcher-a", .event_id = 1}));
+    ASSERT_FALSE(matcher(BeginFenceEvent{.name = "matcher-b", .event_id = 2}));
+    ASSERT_FALSE(matcher(BeginFenceEvent{.name = "matcher-c", .event_id = 3}));
+
+    //! The first matcher will be evaluated for all events.
+    ASSERT_THAT(std::get<0>(matcher.matchers).encountered, ::testing::ElementsAre(
+        BeginFenceEvent{.name = "matcher-a", .event_id = 0},
+        BeginFenceEvent{.name = "matcher-a", .event_id = 1},
+        BeginFenceEvent{.name = "matcher-b", .event_id = 2},
+        BeginFenceEvent{.name = "matcher-c", .event_id = 3}
+    ));
+
+    //! The second matcher will be evaluated for all events for which the first matcher evaluated to @c true.
+    ASSERT_THAT(std::get<1>(matcher.matchers).encountered, ::testing::ElementsAre(
+        BeginFenceEvent{.name = "matcher-a", .event_id = 0},
+        BeginFenceEvent{.name = "matcher-a", .event_id = 1}
+    ));
+
+    //! The third matcher will be evaluated for all events for which the first and the second matcher evaluated to @c true.
+    ASSERT_THAT(std::get<2>(matcher.matchers).encountered, ::testing::ElementsAre(
+        BeginFenceEvent{.name = "matcher-a", .event_id = 0},
+        BeginFenceEvent{.name = "matcher-a", .event_id = 1}
+    ));
+    
+    //! The forth matcher will be evaluated for all events for which the third matcher evaluated to @c true.
+    ASSERT_THAT(std::get<3>(matcher.matchers).encountered, ::testing::IsEmpty());
 }
 
 } // namespace Kokkos::utils::tests::callbacks
