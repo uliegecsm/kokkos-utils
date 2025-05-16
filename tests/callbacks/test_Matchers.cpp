@@ -6,7 +6,7 @@
 #include "kokkos-utils/impl/type_traits.hpp"
 
 #include "kokkos-utils/callbacks/ConjunctionMatcher.hpp"
-#include "kokkos-utils/callbacks/EventBeginEndEventIdMatcher.hpp"
+#include "kokkos-utils/callbacks/EventBeginEndIdMatcher.hpp"
 #include "kokkos-utils/callbacks/EventIdMatcher.hpp"
 #include "kokkos-utils/callbacks/EventInProfileSectionMatcher.hpp"
 #include "kokkos-utils/callbacks/EventNameMatcher.hpp"
@@ -211,10 +211,10 @@ TEST(EventTypeMatcher, operator_parentheses)
     ASSERT_TRUE(matcher(BeginFenceEvent{}));
 }
 
-//! @test Check traits of @ref Kokkos::utils::callbacks::EventBeginEndEventIdMatcher.
-TEST(EventBeginEndEventIdMatcher, traits)
+//! @test Check traits of @ref Kokkos::utils::callbacks::EventBeginEndIdMatcher.
+TEST(EventBeginEndIdMatcher, traits)
 {
-    using matcher_t = EventBeginEndEventIdMatcher<EventRegexMatcher, BeginParallelForEvent, EndParallelForEvent>;
+    using matcher_t = EventBeginEndIdMatcher<EventRegexMatcher, BeginParallelForEvent>;
 
     static_assert(Matcher     <matcher_t>);
     static_assert(MatcherFor  <matcher_t, BeginParallelForEvent, EndParallelForEvent>);
@@ -222,16 +222,16 @@ TEST(EventBeginEndEventIdMatcher, traits)
     static_assert(std::movable<matcher_t>);
 }
 
-//! @test Check the behavior of @ref Kokkos::utils::callbacks::EventBeginEndEventIdMatcher.
-TEST(EventBeginEndEventIdMatcher, operator_parentheses)
+//! @test Check the behavior of @ref Kokkos::utils::callbacks::EventBeginEndIdMatcher.
+TEST(EventBeginEndIdMatcher, operator_parentheses)
 {
-    EventBeginEndEventIdMatcher<EventNameMatcher, BeginParallelForEvent, EndParallelForEvent> matcher {.matcher = EventNameMatcher("example-pfor")};
+    EventBeginEndIdMatcher<EventNameMatcher, BeginParallelForEvent> matcher {.matcher = EventNameMatcher("example-pfor")};
 
-    ASSERT_FALSE(matcher(BeginParallelForEvent{.name = "does-not-match"}));
-    ASSERT_FALSE(matcher(EndParallelForEvent  {.event_id = 42}));
-    ASSERT_TRUE (matcher(BeginParallelForEvent{.name = "example-pfor", .event_id = 666}));
-    ASSERT_FALSE(matcher(EndParallelForEvent  {.event_id = 42}));
-    ASSERT_TRUE (matcher(EndParallelForEvent  {.event_id = 666}));
+    ASSERT_FALSE(matcher(BeginParallelForEvent {.name = "does-not-match"}));
+    ASSERT_FALSE(matcher(EndParallelForEvent   {.event_id = 42}));
+    ASSERT_TRUE (matcher(BeginParallelForEvent {.name = "example-pfor", .event_id = 666}));
+    ASSERT_FALSE(matcher(EndParallelForEvent   {.event_id = 42}));
+    ASSERT_TRUE (matcher(EndParallelForEvent   {.event_id = 666}));
 }
 
 //! @test Check traits of @ref Kokkos::utils::callbacks::EventQueueMatcher.

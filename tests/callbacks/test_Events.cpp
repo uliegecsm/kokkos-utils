@@ -106,6 +106,20 @@ TEST(EventTest, name)
     CHECK_GET_NAME(DestroyProfileSectionEvent)
 }
 
+//! @test Check @ref Kokkos::utils::callbacks::paired_event_t.
+TEST(EventTest, paired_event)
+{
+    static_assert(std::same_as<paired_event_t<BeginParallelForEvent>   ,  EndParallelForEvent>);
+    static_assert(std::same_as<paired_event_t<BeginParallelReduceEvent>,  EndParallelReduceEvent>);
+    static_assert(std::same_as<paired_event_t<BeginParallelScanEvent>,    EndParallelScanEvent>);
+    static_assert(std::same_as<paired_event_t<BeginFenceEvent>,           EndFenceEvent>);
+    static_assert(std::same_as<paired_event_t<AllocateDataEvent>,         DeallocateDataEvent>);
+    static_assert(std::same_as<paired_event_t<BeginDeepCopyEvent>,        EndDeepCopyEvent>);
+    static_assert(std::same_as<paired_event_t<CreateProfileSectionEvent>, DestroyProfileSectionEvent>);
+    static_assert(std::same_as<paired_event_t<StartProfileSectionEvent>,  StopProfileSectionEvent>);
+    static_assert(std::same_as<paired_event_t<PushRegionEvent>,           PopRegionEvent>);
+}
+
 template <Event>
 struct EventTest;
 
