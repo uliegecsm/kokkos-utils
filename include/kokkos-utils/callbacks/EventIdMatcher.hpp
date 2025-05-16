@@ -2,7 +2,6 @@
 #define KOKKOS_UTILS_CALLBACKS_EVENTIDMATCHER_HPP
 
 #include "kokkos-utils/callbacks/Events.hpp"
-#include "kokkos-utils/concepts/ExecutionSpace.hpp"
 
 namespace Kokkos::utils::callbacks
 {
