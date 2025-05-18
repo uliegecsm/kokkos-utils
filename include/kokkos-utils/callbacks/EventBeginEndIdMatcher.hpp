@@ -28,17 +28,17 @@ struct EventBeginEndIdMatcher
         const bool matching = matcher(event);
 
         if(matching)
-            matcher_stop.event_id = event.event_id;
+            matcher_end.event_id = event.event_id;
 
         return matching;
     }
 
     bool operator()(const end_event_t& event) const {
-        return matcher_stop(event);
+        return matcher_end(event);
     }
 
     BeginMatcherType matcher;
-    EventIdMatcher   matcher_stop {};
+    EventIdMatcher   matcher_end {};
 };
 
 } // namespace Kokkos::utils::callbacks

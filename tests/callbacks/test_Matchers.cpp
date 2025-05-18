@@ -237,7 +237,7 @@ TEST(EventBeginEndIdMatcher, operator_parentheses)
 //! @test Check traits of @ref Kokkos::utils::callbacks::EventQueueMatcher.
 TEST(EventQueueMatcher, traits)
 {
-    using matcher_t = EventQueueMatcher<EventRegexMatcher, execution_space>;
+    using matcher_t = EventQueueMatcher<execution_space>;
 
     using enqueued_event_type_list_t = Kokkos::Impl::type_list<
         BeginParallelForEvent,
@@ -259,11 +259,10 @@ TEST(EventQueueMatcher, operator_parentheses)
     const auto dev_id_0 = Kokkos::Tools::Experimental::device_id(execs.at(0));
     const auto dev_id_1 = Kokkos::Tools::Experimental::device_id(execs.at(1));
 
-    EventQueueMatcher<EventNameMatcher, execution_space> matcher {.matcher = EventNameMatcher("runs-on-device"), .exec = execs.at(0)};
+    const EventQueueMatcher<execution_space> matcher {.exec = execs.at(0)};
 
-    ASSERT_EQ   (matcher(BeginParallelForEvent{.name = "runs-on-device", .dev_id = dev_id_1}), dev_id_0 == dev_id_1);
-    ASSERT_FALSE(matcher(BeginParallelForEvent{.name = "does-not-match", .dev_id = dev_id_0}));
-    ASSERT_TRUE (matcher(BeginParallelForEvent{.name = "runs-on-device", .dev_id = dev_id_0}));
+    ASSERT_EQ  (matcher(BeginParallelForEvent{.name = "", .dev_id = dev_id_1}), dev_id_0 == dev_id_1);
+    ASSERT_TRUE(matcher(BeginParallelForEvent{.name = "", .dev_id = dev_id_0}));
 }
 
 //! @test Check traits of @ref Kokkos::utils::callbacks::EventIdMatcher.
