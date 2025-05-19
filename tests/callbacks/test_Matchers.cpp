@@ -59,7 +59,7 @@ TEST(EventRegexMatcher, traits)
 //! @test Check that @ref Kokkos::utils::callbacks::EventRegexMatcher works as expected.
 TEST(EventRegexMatcher, regex_matcher)
 {
-    const EventRegexMatcher matcher{.regex = std::regex("buried-[a-z]+-to-time")};
+    const EventRegexMatcher matcher{{std::regex("buried-[a-z]+-to-time")}};
 
     ASSERT_TRUE( matcher(BeginParallelForEvent{.name = "buried-kernel-to-time", .event_id = 2}));
     ASSERT_FALSE(matcher(BeginParallelForEvent{.name = "not-this-other-kernel", .event_id = 2}));
@@ -100,7 +100,7 @@ TEST(EventInProfileSectionMatcher, in_profile_section_matcher)
 {
     constexpr uint32_t section_id = 2;
 
-    EventInProfileSectionMatcher matcher{.matcher = EventRegexMatcher{.regex = std::regex("buried-profile-section")}};
+    EventInProfileSectionMatcher<EventRegexMatcher> matcher{{{std::regex("buried-profile-section")}}};
 
     ASSERT_FALSE(matcher(CreateProfileSectionEvent{.name = "buried-profile-section", .section_id = section_id}));
 
@@ -130,7 +130,7 @@ TEST(EventRegionMatcher, traits)
 //! @test Check the behavior of @ref Kokkos::utils::callbacks::EventRegionMatcher when we want to match events within a region.
 TEST(EventRegionMatcher, within_region_matcher)
 {
-    EventRegionMatcher matcher(EventRegexMatcher{.regex = std::regex("buried-region")});
+    EventRegionMatcher<EventRegexMatcher> matcher{{{std::regex("buried-region")}}};
 
     ASSERT_FALSE(matcher(PushRegionEvent{.name = "not-the-one-we-want"}));
 
@@ -214,7 +214,7 @@ TEST(EventTypeMatcher, operator_parentheses)
 //! @test Check traits of @ref Kokkos::utils::callbacks::EventBeginEndIdMatcher.
 TEST(EventBeginEndIdMatcher, traits)
 {
-    using matcher_t = EventBeginEndIdMatcher<EventRegexMatcher, BeginParallelForEvent>;
+    using matcher_t = EventBeginEndIdMatcher<BeginParallelForEvent, EventNameMatcher>;
 
     static_assert(Matcher     <matcher_t>);
     static_assert(MatcherFor  <matcher_t, BeginParallelForEvent, EndParallelForEvent>);
@@ -225,7 +225,7 @@ TEST(EventBeginEndIdMatcher, traits)
 //! @test Check the behavior of @ref Kokkos::utils::callbacks::EventBeginEndIdMatcher.
 TEST(EventBeginEndIdMatcher, operator_parentheses)
 {
-    EventBeginEndIdMatcher<EventNameMatcher, BeginParallelForEvent> matcher {.matcher = EventNameMatcher("example-pfor")};
+    EventBeginEndIdMatcher<BeginParallelForEvent, EventNameMatcher> matcher {{"example-pfor"}};
 
     ASSERT_FALSE(matcher(BeginParallelForEvent {.name = "does-not-match"}));
     ASSERT_FALSE(matcher(EndParallelForEvent   {.event_id = 42}));
@@ -254,7 +254,7 @@ TEST(EventQueueMatcher, traits)
 //! @test Check the behavior of @ref Kokkos::utils::callbacks::EventQueueMatcher.
 TEST(EventQueueMatcher, operator_parentheses)
 {
-    const auto execs = Kokkos::Experimental::partition_space(execution_space{}, 1,1);
+    const auto execs = Kokkos::Experimental::partition_space(execution_space{}, 1, 1);
 
     const auto dev_id_0 = Kokkos::Tools::Experimental::device_id(execs.at(0));
     const auto dev_id_1 = Kokkos::Tools::Experimental::device_id(execs.at(1));
@@ -308,8 +308,8 @@ TEST(ConjunctionMatcher, traits)
 TEST(ConjunctionMatcher, everyone_agrees)
 {
     ConjunctionMatcher matcher{
-        EventRegionMatcher{.matcher = EventRegexMatcher{.regex = std::regex("buried-region-one")}},
-        EventRegionMatcher{.matcher = EventRegexMatcher{.regex = std::regex("buried-region-two")}}
+        EventRegionMatcher<EventRegexMatcher>{{{std::regex("buried-region-one")}}},
+        EventRegionMatcher<EventRegexMatcher>{{{std::regex("buried-region-two")}}}
     };
 
     ASSERT_FALSE(matcher(PushRegionEvent{.name = "not-the-one-we-want"}));
@@ -334,7 +334,7 @@ TEST(ConjunctionMatcher, everyone_agrees)
 TEST(ConjunctionMatcher, different_event_type_sets)
 {
     ConjunctionMatcher matcher{
-        EventRegexMatcher{.regex = std::regex("my-triggering-event")},
+        EventRegexMatcher{{std::regex("my-triggering-event")}},
         AnyEventMatcher{}
     };
 
@@ -370,10 +370,10 @@ TEST(ConjunctionMatcher, order_of_evaluation)
     using matcher_t = RecordingMatcher<EventNameMatcher>;
 
     ConjunctionMatcher matcher{
-        matcher_t{.matcher = {"matcher-a"}},
-        matcher_t{.matcher = {"matcher-a"}},
-        matcher_t{.matcher = {"matcher-b"}},
-        matcher_t{.matcher = {"matcher-c"}}
+        matcher_t{{"matcher-a"}},
+        matcher_t{{"matcher-a"}},
+        matcher_t{{"matcher-b"}},
+        matcher_t{{"matcher-c"}}
     };
 
     ASSERT_FALSE(matcher(BeginFenceEvent{.name = "matcher-a", .event_id = 0}));

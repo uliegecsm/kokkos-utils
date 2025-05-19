@@ -18,7 +18,7 @@ namespace Kokkos::utils::callbacks
  *       @c event_id as the begin event. For instance, given a @ref BeginParallelForEvent
  *       event, only one @ref EndParallelForEvent event should match.
  */
-template <Matcher BeginMatcherType, BeginEvent BeginEventType> requires MatcherFor<BeginMatcherType, BeginEventType>
+template <BeginEvent BeginEventType, MatcherFor<BeginEventType> BeginMatcherType>
 struct EventBeginEndIdMatcher
 {
     using end_event_t = paired_event_t<BeginEventType>;
