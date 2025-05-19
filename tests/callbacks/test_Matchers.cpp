@@ -259,7 +259,7 @@ TEST(EventQueueMatcher, operator_parentheses)
     const auto dev_id_0 = Kokkos::Tools::Experimental::device_id(execs.at(0));
     const auto dev_id_1 = Kokkos::Tools::Experimental::device_id(execs.at(1));
 
-    EventQueueMatcher<execution_space> matcher {.exec = execs.at(0)};
+    const EventQueueMatcher<execution_space> matcher {.exec = execs.at(0)};
 
     ASSERT_EQ  (matcher(BeginParallelForEvent{.name = "", .dev_id = dev_id_1}), dev_id_0 == dev_id_1);
     ASSERT_TRUE(matcher(BeginParallelForEvent{.name = "", .dev_id = dev_id_0}));
