@@ -66,6 +66,7 @@ target_sources(
 
             include/kokkos-utils/callbacks/ConjunctionMatcher.hpp
             include/kokkos-utils/callbacks/EnqueuedEventTimer.hpp
+            include/kokkos-utils/callbacks/EnqueuedEventWithLaunchTimer.hpp
             include/kokkos-utils/callbacks/EventBeginEndIdMatcher.hpp
             include/kokkos-utils/callbacks/EventIdMatcher.hpp
             include/kokkos-utils/callbacks/EventInProfileSectionMatcher.hpp
