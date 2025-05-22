@@ -2,6 +2,7 @@
 
 #include "Kokkos_Core.hpp"
 
+#include "kokkos-utils/tests/fixtures/ExecutionSpaceInstanceFixture.hpp"
 #include "kokkos-utils/timer/Timer.hpp"
 
 /**
@@ -23,16 +24,9 @@ namespace Kokkos::utils::tests::timer
 using namespace Kokkos::utils::timer;
 
 template <typename T>
-struct TimerTest : public ::testing::Test
-{
-public:
-    void SetUp() override {
-        this->exec = Kokkos::Experimental::partition_space(execution_space{}, 1)[0];
-    }
-
-protected:
-    execution_space exec {};
-};
+struct TimerTest : public ::testing::Test,
+                   public ExecutionSpaceInstanceFixture<execution_space>
+{};
 
 using TimerTypes = ::testing::Types<
     Timer<void>,

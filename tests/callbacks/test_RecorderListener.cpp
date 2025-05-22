@@ -3,12 +3,12 @@
 
 #include "Kokkos_Core.hpp"
 
-#include "kokkos-utils/impl/type_traits.hpp"
-
 #include "kokkos-utils/callbacks/EventInProfileSectionMatcher.hpp"
 #include "kokkos-utils/callbacks/EventRegexMatcher.hpp"
 #include "kokkos-utils/callbacks/Helpers.hpp"
 #include "kokkos-utils/callbacks/RecorderListener.hpp"
+#include "kokkos-utils/impl/type_traits.hpp"
+#include "kokkos-utils/tests/fixtures/ExecutionSpaceInstanceFixture.hpp"
 
 #include "tests/callbacks/Helpers.hpp"
 #include "tests/callbacks/TestWorkload.hpp"
@@ -32,16 +32,9 @@ using namespace Kokkos::utils::callbacks;
 //! Listener to record events that occur in a profile section.
 using event_in_profile_section_recorder_t = RecorderListener<EventInProfileSectionMatcher<EventRegexMatcher>, EventTypeList>;
 
-class RecorderListenerTest : public ManagerTestFixture
-{
-public:
-    void SetUp() override {
-        this->exec = Kokkos::Experimental::partition_space(execution_space{}, 1)[0];
-    }
-
-protected:
-    execution_space exec {};
-};
+class RecorderListenerTest : public ManagerTestFixture,
+                             public ExecutionSpaceInstanceFixture<execution_space>
+{};
 
 //! @test Check traits of @ref Kokkos::utils::callbacks::RecorderListener.
 TEST(RecorderListener, traits)
