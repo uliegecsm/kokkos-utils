@@ -5,6 +5,7 @@
 
 #include "kokkos-utils/callbacks/Helpers.hpp"
 #include "kokkos-utils/impl/type_traits.hpp"
+#include "kokkos-utils/tests/fixtures/ExecutionSpaceInstanceFixture.hpp"
 
 #include "tests/callbacks/TestWorkload.hpp"
 
@@ -24,16 +25,9 @@ namespace Kokkos::utils::tests::callbacks
 
 using namespace Kokkos::utils::callbacks;
 
-class ManagerTest : public ManagerTestFixture
-{
-public:
-    void SetUp() override {
-        this->exec = Kokkos::Experimental::partition_space(execution_space{}, 1)[0];
-    }
-
-protected:
-    execution_space exec {};
-};
+class ManagerTest : public ManagerTestFixture,
+                    public ExecutionSpaceInstanceFixture<execution_space>
+{};
 
 //! @test Check properties of @ref Kokkos::utils::callbacks::Manager being a singleton class.
 TEST(Manager, singleton_traits)

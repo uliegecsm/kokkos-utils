@@ -91,6 +91,8 @@ target_sources(
             include/kokkos-utils/impl/type_list.hpp
             include/kokkos-utils/impl/type_traits.hpp
 
+            include/kokkos-utils/tests/fixtures/ExecutionSpaceInstanceFixture.hpp
+
             include/kokkos-utils/timer/Duration.hpp
             include/kokkos-utils/timer/Event.hpp
             include/kokkos-utils/timer/Timer.hpp
