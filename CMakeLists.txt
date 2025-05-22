@@ -64,6 +64,7 @@ target_sources(
         FILES
             include/kokkos-utils/atomics/InsertOp.hpp
 
+            include/kokkos-utils/callbacks/BeginEndTimerListener.hpp
             include/kokkos-utils/callbacks/ConjunctionMatcher.hpp
             include/kokkos-utils/callbacks/EnqueuedEventTimer.hpp
             include/kokkos-utils/callbacks/EnqueuedEventWithLaunchTimer.hpp
@@ -81,6 +82,8 @@ target_sources(
             include/kokkos-utils/callbacks/Manager.hpp
             include/kokkos-utils/callbacks/Matcher.hpp
             include/kokkos-utils/callbacks/RecorderListener.hpp
+            include/kokkos-utils/callbacks/RegionTimerListener.hpp
+            include/kokkos-utils/callbacks/TimerListener.hpp
 
             include/kokkos-utils/concepts/DualView.hpp
             include/kokkos-utils/concepts/ExecutionSpace.hpp
