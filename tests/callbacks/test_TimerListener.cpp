@@ -144,6 +144,34 @@ TEST_F(TimerListenerTest, parallel_for)
     Manager::unregister_listener(par_for_timer_no_match.get());
 }
 
+//! @test Check the parallel for timer listener when used with @ref EnqueuedEventWithLaunchTimer.
+TEST_F(TimerListenerTest, with_launch)
+{
+    using parallel_for_with_launch_timer_t = ParallelForWithLaunchTimerListener<EventNameMatcher, execution_space>;
+
+    using unit_t = Kokkos::utils::timer::microseconds;
+    
+    Kokkos::utils::timer::Timer<void> timer_external;
+
+    const auto par_for_timer = std::make_shared<parallel_for_with_launch_timer_t>(
+        "computation - level 0 - pfor", exec
+    );
+
+    Manager::register_listener(par_for_timer);
+
+    timer_external.start();
+
+    MyWorkload<execution_space>{}.execute(exec);
+
+    timer_external.stop();
+
+    ASSERT_GT(par_for_timer->timer.duration(), unit_t{0.});
+    ASSERT_GT(par_for_timer->timer.launch(),   unit_t{0.});
+    ASSERT_LE(par_for_timer->timer.launch(), timer_external.duration());
+
+    Manager::unregister_listener(par_for_timer.get());
+}
+
 //! Listener to time regions whose name matches a regex.
 using region_timer_t = RegionTimerListener<EventRegexMatcher>;
 
