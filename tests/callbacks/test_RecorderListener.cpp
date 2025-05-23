@@ -8,7 +8,7 @@
 #include "kokkos-utils/callbacks/Helpers.hpp"
 #include "kokkos-utils/callbacks/RecorderListener.hpp"
 #include "kokkos-utils/impl/type_traits.hpp"
-#include "kokkos-utils/tests/fixtures/ExecutionSpaceInstanceFixture.hpp"
+#include "kokkos-utils/tests/fixtures/ExecutionSpaceInstance.hpp"
 
 #include "tests/callbacks/Helpers.hpp"
 #include "tests/callbacks/TestWorkload.hpp"
@@ -33,7 +33,7 @@ using namespace Kokkos::utils::callbacks;
 using event_in_profile_section_recorder_t = RecorderListener<EventInProfileSectionMatcher<EventRegexMatcher>, EventTypeList>;
 
 class RecorderListenerTest : public ManagerTestFixture,
-                             public ExecutionSpaceInstanceFixture<execution_space>
+                             public fixtures::ExecutionSpaceInstance<execution_space>
 {};
 
 //! @test Check traits of @ref Kokkos::utils::callbacks::RecorderListener.

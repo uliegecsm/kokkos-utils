@@ -5,7 +5,7 @@
 
 #include "kokkos-utils/callbacks/Helpers.hpp"
 #include "kokkos-utils/impl/type_traits.hpp"
-#include "kokkos-utils/tests/fixtures/ExecutionSpaceInstanceFixture.hpp"
+#include "kokkos-utils/tests/fixtures/ExecutionSpaceInstance.hpp"
 
 #include "tests/callbacks/TestWorkload.hpp"
 
@@ -26,7 +26,7 @@ namespace Kokkos::utils::tests::callbacks
 using namespace Kokkos::utils::callbacks;
 
 class ManagerTest : public ManagerTestFixture,
-                    public ExecutionSpaceInstanceFixture<execution_space>
+                    public fixtures::ExecutionSpaceInstance<execution_space>
 {};
 
 //! @test Check properties of @ref Kokkos::utils::callbacks::Manager being a singleton class.
