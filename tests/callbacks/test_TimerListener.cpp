@@ -9,7 +9,7 @@
 #include "kokkos-utils/callbacks/Manager.hpp"
 #include "kokkos-utils/callbacks/RegionTimerListener.hpp"
 #include "kokkos-utils/callbacks/TimerListener.hpp"
-#include "kokkos-utils/tests/fixtures/ExecutionSpaceInstanceFixture.hpp"
+#include "kokkos-utils/tests/fixtures/ExecutionSpaceInstance.hpp"
 #include "kokkos-utils/timer/Duration.hpp"
 
 #include "tests/callbacks/TestWorkload.hpp"
@@ -35,7 +35,7 @@ using namespace Kokkos::utils::callbacks;
 using parallel_for_timer_t = ParallelForTimerListener<EventRegexMatcher, execution_space>;
 
 class TimerListenerTest : public ManagerTestFixture,
-                          public ExecutionSpaceInstanceFixture<execution_space>
+                          public fixtures::ExecutionSpaceInstance<execution_space>
 {};
 
 //! @test Check traits of @ref ParallelForTimerListener.

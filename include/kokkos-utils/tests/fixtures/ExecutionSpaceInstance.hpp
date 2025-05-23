@@ -3,15 +3,15 @@
 
 #include "kokkos-utils/concepts/ExecutionSpace.hpp"
 
-namespace Kokkos::utils::tests
+namespace Kokkos::utils::tests::fixtures
 {
 
 //! Fixture class that creates a new execution space instance.
 template <Kokkos::utils::concepts::ExecutionSpace Exec>
-class ExecutionSpaceInstanceFixture
+class ExecutionSpaceInstance
 {
 public:
-    ExecutionSpaceInstanceFixture() : exec(Kokkos::Experimental::partition_space(Exec{}, 1)[0]) {}
+    ExecutionSpaceInstance() : exec(Kokkos::Experimental::partition_space(Exec{}, 1)[0]) {}
 
 protected:
     Exec exec;
