@@ -18,7 +18,7 @@ namespace Kokkos::utils::callbacks
  * reduce, parallel scan, or deep copy operation. In such a situation, the execution space
  * instance passed to this class's constructor should be the same as the one passed to the workload.
  */
-template <Matcher MatcherType, Event BeginEventType, Event EndEventType, Kokkos::utils::concepts::ExecutionSpace Exec> requires MatcherFor<MatcherType, BeginEventType>
+template <Matcher MatcherType, Event BeginEventType, Kokkos::utils::concepts::ExecutionSpace Exec> requires MatcherFor<MatcherType, BeginEventType>
 struct BeginEndTimerListener : public TimerListener<EventBeginEndIdMatcher<BeginEventType, ConjunctionMatcher<EventQueueMatcher<Exec>, MatcherType>>, EnqueuedEventTimer<Exec>>
 {
     using queue_matcher_t = EventQueueMatcher<Exec>;
@@ -35,19 +35,19 @@ struct BeginEndTimerListener : public TimerListener<EventBeginEndIdMatcher<Begin
 
 //! Timer listener for a parallel for that matches @p MatcherType.
 template <MatcherFor<BeginParallelForEvent> MatcherType, Kokkos::utils::concepts::ExecutionSpace Exec>
-using ParallelForTimerListener = BeginEndTimerListener<MatcherType, BeginParallelForEvent, EndParallelForEvent, Exec>;
+using ParallelForTimerListener = BeginEndTimerListener<MatcherType, BeginParallelForEvent, Exec>;
 
 //! Timer listener for a parallel reduce that matches @p MatcherType.
 template <MatcherFor<BeginParallelReduceEvent> MatcherType, Kokkos::utils::concepts::ExecutionSpace Exec>
-using ParallelReduceTimerListener = BeginEndTimerListener<MatcherType, BeginParallelReduceEvent, EndParallelReduceEvent, Exec>;
+using ParallelReduceTimerListener = BeginEndTimerListener<MatcherType, BeginParallelReduceEvent, Exec>;
 
 //! Timer listener for a parallel scan that matches @p MatcherType.
 template <MatcherFor<BeginParallelScanEvent> MatcherType, Kokkos::utils::concepts::ExecutionSpace Exec>
-using ParallelScanTimerListener = BeginEndTimerListener<MatcherType, BeginParallelScanEvent, EndParallelScanEvent, Exec>;
+using ParallelScanTimerListener = BeginEndTimerListener<MatcherType, BeginParallelScanEvent, Exec>;
 
 //! Timer listener for a deep copy that matches @p MatcherType.
 template <MatcherFor<BeginDeepCopyEvent> MatcherType, Kokkos::utils::concepts::ExecutionSpace Exec>
-using DeepCopyTimerListener = BeginEndTimerListener<MatcherType, BeginDeepCopyEvent, EndDeepCopyEvent, Exec>;
+using DeepCopyTimerListener = BeginEndTimerListener<MatcherType, BeginDeepCopyEvent, Exec>;
 
 } // namespace Kokkos::utils::callbacks
 
