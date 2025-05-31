@@ -8,15 +8,9 @@
 namespace Kokkos::utils::callbacks
 {
 
-class ManagerTestFixture : public virtual ::testing::Test
-{
-public:
-    ManagerTestFixture()  { Kokkos::utils::callbacks::Manager::initialize(); }
-    ~ManagerTestFixture() { Kokkos::utils::callbacks::Manager::finalize(); }
-};
-
-#define TEST_F_WITH_CB_MGR(__test_fixture_name__, __test_name__) \
-    class __test_fixture_name__ : public ManagerTestFixture {};  \
+#define TEST_F_WITH_CB_MGR(__test_fixture_name__, __test_name__)        \
+    class __test_fixture_name__ : public ::testing::Test,               \
+                                  public scoped::callbacks::Manager {}; \
     TEST_F(__test_fixture_name__, __test_name__)
 
 #define DEFINE_EVENT_MATCHER(__eventtype__)                                                                  \

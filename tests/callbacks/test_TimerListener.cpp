@@ -9,7 +9,8 @@
 #include "kokkos-utils/callbacks/Manager.hpp"
 #include "kokkos-utils/callbacks/RegionTimerListener.hpp"
 #include "kokkos-utils/callbacks/TimerListener.hpp"
-#include "kokkos-utils/tests/fixtures/ExecutionSpaceInstance.hpp"
+#include "kokkos-utils/tests/scoped/ExecutionSpace.hpp"
+#include "kokkos-utils/tests/scoped/callbacks/Manager.hpp"
 #include "kokkos-utils/timer/Duration.hpp"
 
 #include "tests/callbacks/TestWorkload.hpp"
@@ -34,8 +35,9 @@ using namespace Kokkos::utils::callbacks;
 //! Listener to time parallel for regions whose name matches a regex.
 using parallel_for_timer_t = ParallelForTimerListener<EventRegexMatcher, execution_space>;
 
-class TimerListenerTest : public ManagerTestFixture,
-                          public fixtures::ExecutionSpaceInstance<execution_space>
+class TimerListenerTest : public ::testing::Test,
+                          public scoped::callbacks::Manager,
+                          public scoped::ExecutionSpace<execution_space>
 {};
 
 //! @test Check traits of @ref ParallelForTimerListener.
@@ -130,8 +132,8 @@ TEST_F(TimerListenerTest, parallel_for)
         std::regex("this-should-not-match"), exec
     );
 
-    Manager::register_listener(par_for_timer_matching);
-    Manager::register_listener(par_for_timer_no_match);
+    Kokkos::utils::callbacks::Manager::register_listener(par_for_timer_matching);
+    Kokkos::utils::callbacks::Manager::register_listener(par_for_timer_no_match);
 
     MyWorkload<execution_space>{}.execute(exec);
 
@@ -140,8 +142,8 @@ TEST_F(TimerListenerTest, parallel_for)
     EXPECT_FALSE(par_for_timer_no_match->connected() || par_for_timer_no_match->closed())
         << "The listener should not be connected or closed because the events did not match.";
 
-    Manager::unregister_listener(par_for_timer_matching.get());
-    Manager::unregister_listener(par_for_timer_no_match.get());
+    Kokkos::utils::callbacks::Manager::unregister_listener(par_for_timer_matching.get());
+    Kokkos::utils::callbacks::Manager::unregister_listener(par_for_timer_no_match.get());
 }
 
 //! @test Check the parallel for timer listener when used with @ref EnqueuedEventWithLaunchTimer.
@@ -157,7 +159,7 @@ TEST_F(TimerListenerTest, with_launch)
         "computation - level 0 - pfor", exec
     );
 
-    Manager::register_listener(par_for_timer);
+    Kokkos::utils::callbacks::Manager::register_listener(par_for_timer);
 
     timer_external.start();
 
@@ -169,7 +171,7 @@ TEST_F(TimerListenerTest, with_launch)
     ASSERT_GT(par_for_timer->timer.launch(),   unit_t{0.});
     ASSERT_LE(par_for_timer->timer.launch(), timer_external.duration());
 
-    Manager::unregister_listener(par_for_timer.get());
+    Kokkos::utils::callbacks::Manager::unregister_listener(par_for_timer.get());
 }
 
 //! Listener to time regions whose name matches a regex.
@@ -209,16 +211,16 @@ TEST_F(TimerListenerTest, region)
         std::regex("computation - level 0")
     );
 
-    Manager::register_listener(par_for_timer);
-    Manager::register_listener(region_timer);
+    Kokkos::utils::callbacks::Manager::register_listener(par_for_timer);
+    Kokkos::utils::callbacks::Manager::register_listener(region_timer);
 
     MyWorkload<execution_space>{}.execute(exec);
 
     ASSERT_GT(par_for_timer->timer.duration(), Kokkos::utils::timer::milliseconds{0.});
     ASSERT_LT(par_for_timer->timer.duration(), region_timer->timer.duration());
 
-    Manager::unregister_listener(par_for_timer.get());
-    Manager::unregister_listener(region_timer.get());
+    Kokkos::utils::callbacks::Manager::unregister_listener(par_for_timer.get());
+    Kokkos::utils::callbacks::Manager::unregister_listener(region_timer.get());
 }
 
 //! @test Check traits of @ref RegionTimerListener when used with @ref EnqueuedEventTimer.
