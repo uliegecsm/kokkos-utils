@@ -2,7 +2,7 @@
 
 #include "Kokkos_Core.hpp"
 
-#include "kokkos-utils/tests/fixtures/ExecutionSpaceInstance.hpp"
+#include "kokkos-utils/tests/scoped/ExecutionSpace.hpp"
 #include "kokkos-utils/timer/Timer.hpp"
 
 /**
@@ -25,7 +25,7 @@ using namespace Kokkos::utils::timer;
 
 template <typename T>
 struct TimerTest : public ::testing::Test,
-                   public fixtures::ExecutionSpaceInstance<execution_space>
+                   public scoped::ExecutionSpace<execution_space>
 {};
 
 using TimerTypes = ::testing::Types<

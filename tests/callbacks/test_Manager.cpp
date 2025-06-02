@@ -5,7 +5,8 @@
 
 #include "kokkos-utils/callbacks/Helpers.hpp"
 #include "kokkos-utils/impl/type_traits.hpp"
-#include "kokkos-utils/tests/fixtures/ExecutionSpaceInstance.hpp"
+#include "kokkos-utils/tests/scoped/ExecutionSpace.hpp"
+#include "kokkos-utils/tests/scoped/callbacks/Manager.hpp"
 
 #include "tests/callbacks/TestWorkload.hpp"
 
@@ -25,8 +26,9 @@ namespace Kokkos::utils::tests::callbacks
 
 using namespace Kokkos::utils::callbacks;
 
-class ManagerTest : public ManagerTestFixture,
-                    public fixtures::ExecutionSpaceInstance<execution_space>
+class ManagerTest : public ::testing::Test,
+                    public scoped::callbacks::Manager,
+                    public scoped::ExecutionSpace<execution_space>
 {};
 
 //! @test Check properties of @ref Kokkos::utils::callbacks::Manager being a singleton class.
@@ -62,11 +64,11 @@ TEST_F(ManagerTest, dispatch_to_call_operators_of_single_listener)
 {
     const auto tester_listener = std::make_shared<TesterListener<BeginParallelForEvent, EndParallelForEvent, BeginFenceEvent>>();
 
-    Manager::register_listener(tester_listener);
+    Kokkos::utils::callbacks::Manager::register_listener(tester_listener);
 
     MyWorkload<execution_space>{}.execute(exec);
 
-    Manager::unregister_listener(tester_listener.get());
+    Kokkos::utils::callbacks::Manager::unregister_listener(tester_listener.get());
 
     const auto& [begin_parallel_for_events, end_parallel_for_events, begin_fence_events] = tester_listener->events;
 
@@ -96,13 +98,13 @@ TEST_F(ManagerTest, dispatch_to_call_operators_of_multiple_listeners)
     const auto tester_listener_a = std::make_shared<TesterListener<BeginParallelForEvent>>();
     const auto tester_listener_b = std::make_shared<TesterListener<BeginParallelForEvent, EndParallelForEvent>>();
 
-    Manager::register_listener(tester_listener_a);
-    Manager::register_listener(tester_listener_b);
+    Kokkos::utils::callbacks::Manager::register_listener(tester_listener_a);
+    Kokkos::utils::callbacks::Manager::register_listener(tester_listener_b);
 
     MyWorkload<execution_space>{}.execute(exec);
 
-    Manager::unregister_listener(tester_listener_a.get());
-    Manager::unregister_listener(tester_listener_b.get());
+    Kokkos::utils::callbacks::Manager::unregister_listener(tester_listener_a.get());
+    Kokkos::utils::callbacks::Manager::unregister_listener(tester_listener_b.get());
 
     const auto& [begin_parallel_for_events_listener_a]                                     = tester_listener_a->events;
     const auto& [begin_parallel_for_events_listener_b, end_parallel_for_events_listener_b] = tester_listener_b->events;
@@ -128,7 +130,7 @@ TEST_F(ManagerTest, listener_from_lambda)
     const view_t my_src_view(Kokkos::view_alloc(Kokkos::WithoutInitializing, exec, "my rank-0 src view"));
     const view_t my_dst_view(Kokkos::view_alloc(Kokkos::WithoutInitializing, exec, "my rank-0 dst view"));
 
-    auto listener_handle = Manager::register_listener(
+    auto listener_handle = Kokkos::utils::callbacks::Manager::register_listener(
         [&](const BeginDeepCopyEvent& event) {
             if (event.dst.size == sizeof(int) && event.src.ptr == my_src_view.data()
                 && event.dst.ptr == my_dst_view.data()) matched = true;
@@ -139,7 +141,7 @@ TEST_F(ManagerTest, listener_from_lambda)
 
     ASSERT_TRUE(matched);
 
-    Manager::unregister_listener(listener_handle);
+    Kokkos::utils::callbacks::Manager::unregister_listener(listener_handle);
 }
 
 } // namespace Kokkos::utils::tests::callbacks

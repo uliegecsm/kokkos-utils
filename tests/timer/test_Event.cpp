@@ -2,7 +2,7 @@
 
 #include "Kokkos_Core.hpp"
 
-#include "kokkos-utils/tests/fixtures/ExecutionSpaceInstance.hpp"
+#include "kokkos-utils/tests/scoped/ExecutionSpace.hpp"
 #include "kokkos-utils/timer/Duration.hpp"
 #include "kokkos-utils/timer/Event.hpp"
 
@@ -26,7 +26,7 @@ using namespace Kokkos::utils::timer;
 
 template <typename T>
 struct EventTest : public ::testing::Test,
-                   public fixtures::ExecutionSpaceInstance<execution_space>
+                   public scoped::ExecutionSpace<execution_space>
 {};
 
 using EventTypes = ::testing::Types<

@@ -8,7 +8,8 @@
 #include "kokkos-utils/callbacks/Helpers.hpp"
 #include "kokkos-utils/callbacks/RecorderListener.hpp"
 #include "kokkos-utils/impl/type_traits.hpp"
-#include "kokkos-utils/tests/fixtures/ExecutionSpaceInstance.hpp"
+#include "kokkos-utils/tests/scoped/ExecutionSpace.hpp"
+#include "kokkos-utils/tests/scoped/callbacks/Manager.hpp"
 
 #include "tests/callbacks/Helpers.hpp"
 #include "tests/callbacks/TestWorkload.hpp"
@@ -32,8 +33,9 @@ using namespace Kokkos::utils::callbacks;
 //! Listener to record events that occur in a profile section.
 using event_in_profile_section_recorder_t = RecorderListener<EventInProfileSectionMatcher<EventRegexMatcher>, EventTypeList>;
 
-class RecorderListenerTest : public ManagerTestFixture,
-                             public fixtures::ExecutionSpaceInstance<execution_space>
+class RecorderListenerTest : public ::testing::Test,
+                             public scoped::callbacks::Manager,
+                             public scoped::ExecutionSpace<execution_space>
 {};
 
 //! @test Check traits of @ref Kokkos::utils::callbacks::RecorderListener.
@@ -51,7 +53,8 @@ TEST(RecorderListener, traits)
 }
 
 template <Event EvenType>
-class RecorderListenerSingleEventTypeTest : public ManagerTestFixture {};
+class RecorderListenerSingleEventTypeTest : public ::testing::Test,
+                                            public scoped::callbacks::Manager {};
 
 TYPED_TEST_SUITE(RecorderListenerSingleEventTypeTest, EventTestTypes);
 
@@ -78,8 +81,8 @@ TEST_F(RecorderListenerTest, recorded_events)
 
     const auto any_event_recorder = std::make_shared<RecorderListener<EventTypeList>>();
 
-    Manager::register_listener(recorder);
-    Manager::register_listener(any_event_recorder);
+    Kokkos::utils::callbacks::Manager::register_listener(recorder);
+    Kokkos::utils::callbacks::Manager::register_listener(any_event_recorder);
 
     MyWorkload<execution_space>{}.execute(exec);
 
@@ -131,8 +134,8 @@ TEST_F(RecorderListenerTest, recorded_events)
     ASSERT_THAT(output, ::testing::HasSubstr("computation - level 0 - pfor"));
     ASSERT_THAT(output, ::testing::HasSubstr("computation - level 0 - fence after pfor"));
 
-    Manager::unregister_listener(recorder.get());
-    Manager::unregister_listener(any_event_recorder.get());
+    Kokkos::utils::callbacks::Manager::unregister_listener(recorder.get());
+    Kokkos::utils::callbacks::Manager::unregister_listener(any_event_recorder.get());
 }
 
 //! @test Check the behavior of @ref Kokkos::utils::callbacks::RecorderListener<MatcherType, EventTypes...>::record.
@@ -181,7 +184,7 @@ TEST_F_WITH_CB_MGR(FenceFinderTest, recorded_events)
 
     const auto fence_finder = std::make_shared<fence_finder_t>(EventRegexMatcher(std::regex("computation - level 0 - fence after pfor")));
 
-    Manager::register_listener(fence_finder);
+    Kokkos::utils::callbacks::Manager::register_listener(fence_finder);
 
     MyWorkload<execution_space>{}.execute(exec);
 
@@ -196,7 +199,7 @@ TEST_F_WITH_CB_MGR(FenceFinderTest, recorded_events)
         )
     );
 
-    Manager::unregister_listener(fence_finder.get());
+    Kokkos::utils::callbacks::Manager::unregister_listener(fence_finder.get());
 }
 
 } // namespace Kokkos::utils::tests::callbacks
