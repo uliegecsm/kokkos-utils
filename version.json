@@ -9,6 +9,9 @@
         "doxygen" : {
             "value" : "1.13.2"
         },
+        "googlebenchmark" : {
+            "value" : "1.9.4"
+        },
         "googletest" : {
             "value" : "1.16.0"
         },
