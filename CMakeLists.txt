@@ -83,6 +83,7 @@ target_sources(
             include/kokkos-utils/callbacks/Matcher.hpp
             include/kokkos-utils/callbacks/RecorderListener.hpp
             include/kokkos-utils/callbacks/RegionTimerListener.hpp
+            include/kokkos-utils/callbacks/SequenceOfRegionTimerListener.hpp
             include/kokkos-utils/callbacks/TimerListener.hpp
 
             include/kokkos-utils/concepts/DualView.hpp
@@ -146,6 +147,11 @@ install(EXPORT KokkosUtilsConfig DESTINATION lib/cmake/KokkosUtils NAMESPACE Kok
 if(KokkosUtils_ENABLE_TESTS)
     enable_testing()
     add_subdirectory(tests)
+endif()
+
+#---- Benchmarking.
+if(KokkosUtils_ENABLE_TESTS)
+    add_subdirectory(benchmarks)
 endif()
 
 #---- Documentation.
