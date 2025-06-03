@@ -106,6 +106,31 @@ RUN <<EOF
     cmake --build build --target install
 EOF
 
+# Compile Google Benchmark.
+FROM requirements AS google-benchmark-compile
+
+ARG GOOGLEBENCHMARK_VERSION
+
+RUN <<EOF
+    set -ex
+
+    git clone --depth=1 --branch=min_rel_accuracy https://github.com/uliegecsm/benchmark googlebenchmark
+
+    cd googlebenchmark
+
+    git checkout 0bf52e0fe082a8d1d64a28f614359af36579cb15
+
+    cmake -S . -B build \
+        -DCMAKE_INSTALL_PREFIX=/opt/google-benchmark-${GOOGLEBENCHMARK_VERSION} \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBENCHMARK_ENABLE_TESTING=OFF \
+        -DBENCHMARK_INSTALL_DOCS=OFF
+
+    cmake --build build -j4
+
+    cmake --build build --target install
+EOF
+
 # Compile Kokkos.
 FROM requirements AS kokkos-compile
 
@@ -141,14 +166,17 @@ EOF
 FROM requirements AS final
 
 ARG DOXYGEN_VERSION
+ARG GOOGLEBENCHMARK_VERSION
 ARG GOOGLETEST_VERSION
 ARG KOKKOS_VERSION
 ARG KOKKOS_PRESET
 
-COPY --from=doxygen-compile     /opt/doxygen-${DOXYGEN_VERSION}                /opt/doxygen-${DOXYGEN_VERSION}
-COPY --from=google-test-compile /opt/google-test-${GOOGLETEST_VERSION}         /opt/google-test-${GOOGLETEST_VERSION}
-COPY --from=kokkos-compile      /opt/kokkos-${KOKKOS_VERSION}/${KOKKOS_PRESET} /opt/kokkos-${KOKKOS_VERSION}/${KOKKOS_PRESET}
+COPY --from=doxygen-compile          /opt/doxygen-${DOXYGEN_VERSION}                  /opt/doxygen-${DOXYGEN_VERSION}
+COPY --from=google-benchmark-compile /opt/google-benchmark-${GOOGLEBENCHMARK_VERSION} /opt/google-benchmark-${GOOGLEBENCHMARK_VERSION}
+COPY --from=google-test-compile      /opt/google-test-${GOOGLETEST_VERSION}           /opt/google-test-${GOOGLETEST_VERSION}
+COPY --from=kokkos-compile           /opt/kokkos-${KOKKOS_VERSION}/${KOKKOS_PRESET}   /opt/kokkos-${KOKKOS_VERSION}/${KOKKOS_PRESET}
 
+ENV benchmark_ROOT=/opt/google-benchmark-${GOOGLEBENCHMARK_VERSION}
 ENV Doxygen_ROOT=/opt/doxygen-${DOXYGEN_VERSION}
 ENV GTest_ROOT=/opt/google-test-${GOOGLETEST_VERSION}
 ENV Kokkos_ROOT=/opt/kokkos-${KOKKOS_VERSION}/${KOKKOS_PRESET}
