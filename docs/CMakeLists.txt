@@ -23,6 +23,7 @@ set(HOMEPAGE_MD ${CMAKE_SOURCE_DIR}/README.md)
 #---- Doxygen settings.
 set(DOXYGEN_USE_MDFILE_AS_MAINPAGE ${HOMEPAGE_MD})
 set(DOXYGEN_TIMESTAMP YES)
+set(DOXYGEN_EXTRACT_PRIVATE YES)
 set(DOXYGEN_EXTRACT_ALL YES)
 set(DOXYGEN_EXTRACT_STATIC YES)
 set(DOXYGEN_WARN_AS_ERROR YES)
@@ -39,8 +40,8 @@ get_target_property(KokkosUtils_TARGET_FILES_FOR_DOC kokkosutils HEADER_SET_${Ko
 get_property(KokkosUtils_FILES_FOR_DOC GLOBAL PROPERTY KokkosUtils_FILES_FOR_DOC)
 
 include(${CMAKE_SOURCE_DIR}/cmake/functions/list.cmake)
-check_list_length(KokkosUtils_TARGET_FILES_FOR_DOC 37)
-check_list_length(KokkosUtils_FILES_FOR_DOC        21)
+check_list_length(KokkosUtils_TARGET_FILES_FOR_DOC 38)
+check_list_length(KokkosUtils_FILES_FOR_DOC        22)
 
 #---- Add Doxygen as a target.
 #     See also https://cmake.org/cmake/help/latest/module/FindDoxygen.html.

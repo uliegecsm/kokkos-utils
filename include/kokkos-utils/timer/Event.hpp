@@ -31,7 +31,14 @@ template <typename T>
 requires Kokkos::utils::concepts::ExecutionSpace<T> || std::is_void_v<T>
 struct Event
 {
-    using impl_event_t = std::chrono::steady_clock::time_point;
+    //! Let's choose a steady clock.
+    using impl_clock_t = std::conditional_t<
+        std::chrono::high_resolution_clock::is_steady,
+        std::chrono::high_resolution_clock,
+        std::chrono::steady_clock
+    >;
+
+    using impl_event_t = typename impl_clock_t::time_point;
 
     impl_event_t event;
 

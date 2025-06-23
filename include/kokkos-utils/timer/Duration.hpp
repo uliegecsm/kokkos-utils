@@ -8,6 +8,9 @@ namespace Kokkos::utils::timer
 
 //! @name Helper types to represent time durations.
 ///@{
+//! Similar to @c std::chrono::nanoseconds, but using @c double instead of an integer type to represent the tick count.
+using nanoseconds = std::chrono::duration<double, std::nano>;
+
 //! Similar to @c std::chrono::microseconds, but using @c double instead of an integer type to represent the tick count.
 using microseconds = std::chrono::duration<double, std::micro>;
 
