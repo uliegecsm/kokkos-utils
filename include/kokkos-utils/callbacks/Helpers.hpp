@@ -34,6 +34,8 @@ DEFINE_EVENT_MATCHER(BeginFenceEvent)
 DEFINE_EVENT_MATCHER(EndFenceEvent)
 DEFINE_EVENT_MATCHER(AllocateDataEvent)
 DEFINE_EVENT_MATCHER(DeallocateDataEvent)
+DEFINE_EVENT_MATCHER(BeginDeepCopyEvent)
+DEFINE_EVENT_MATCHER(EndDeepCopyEvent)
 DEFINE_EVENT_MATCHER(CreateProfileSectionEvent)
 DEFINE_EVENT_MATCHER(DestroyProfileSectionEvent)
 DEFINE_EVENT_MATCHER(StartProfileSectionEvent)
@@ -136,6 +138,51 @@ template <typename T, typename... Matchers>
 auto ContainsInOrder(Matchers&&... matchers) {
     return ::testing::MakePolymorphicMatcher(impl::ContainsInOrderMatcher<T, std::remove_cvref_t<Matchers>...>(std::forward<Matchers>(matchers)...));
 }
+
+template <typename T>
+struct PartialMatcher;
+
+/**
+ * @brief For an allocation, one typically wants to check the memory space, label and size of the allocation.
+ *
+ * Therefore, the @ref Kokkos::utils::callbacks::AllocDescriptor::ptr is not included in the comparison (as it is subject to change from one run to another).
+ */
+template <>
+struct PartialMatcher<AllocDescriptor>
+{
+    decltype(auto) operator()(AllocDescriptor descr) const {
+        return ::testing::AllOf(
+            ::testing::Field(
+                &AllocDescriptor::kpsh,
+                ::testing::Field(&Kokkos_Profiling_SpaceHandle::name, ::testing::StrEq(descr.kpsh.name))
+            ),
+            ::testing::Field(
+                &AllocDescriptor::name,
+                ::testing::StrEq(std::move(descr.name))
+            ),
+            ::testing::Field(
+                &AllocDescriptor::size,
+                ::testing::Eq(descr.size)
+            )
+        );
+    }
+};
+
+/**
+ * Uses @ref Kokkos::utils::callbacks::PartialMatcher<AllocDescriptor> for the
+ * @ref Kokkos::utils::callbacks::BeginDeepCopyEvent::dst and 
+ * @ref Kokkos::utils::callbacks::BeginDeepCopyEvent::src.
+ */
+template <>
+struct PartialMatcher<BeginDeepCopyEvent>
+{
+    decltype(auto) operator()(BeginDeepCopyEvent event) const {
+        return ::testing::AllOf(
+            ::testing::Field(&BeginDeepCopyEvent::dst, PartialMatcher<AllocDescriptor>{}(std::move(event.dst))),
+            ::testing::Field(&BeginDeepCopyEvent::src, PartialMatcher<AllocDescriptor>{}(std::move(event.src)))
+        );
+    }
+};
 
 } // namespace Kokkos::utils::callbacks
 

@@ -303,10 +303,14 @@ using paired_event_t = typename PairedEventType<EventType>::type;
 
 //! @name Stream operators.
 ///@{
-//! Helper function related to the implementation of the stream operators.
-template <Event EventType>
+/**
+ * @brief Helper function to remove the @c Kokkos::utils::callbacks:: prefix.
+ *
+ * @note For the sake of performance, the size is hardcoded to @c 26 instead of doing a search.
+ */
+template <typename T>
 constexpr auto get_name() {
-    return Kokkos::Impl::TypeInfo<EventType>::name().substr(26); // erase "Kokkos::utils::callbacks::"
+    return Kokkos::Impl::TypeInfo<T>::name().substr(26);
 }
 
 template <Event EventType>
@@ -361,6 +365,11 @@ inline std::ostream& operator<<(std::ostream &out, const PushRegionEvent& event)
 inline std::ostream& operator<<(std::ostream &out, const ProfileEvent& event) {
     return out << get_name<ProfileEvent>() << ": "
                << "{name = " << std::quoted(event.name) << "}";
+}
+
+inline std::ostream& operator<<(std::ostream& out, const AllocDescriptor& descr) {
+    return out << get_name<AllocDescriptor>() << ": "
+               << "{name = " << std::quoted(descr.name) << " (" << descr.kpsh.name << ", " << descr.ptr << ") of size " << descr.size << '}';
 }
 ///@}
 
