@@ -91,4 +91,48 @@ TEST(PartialMatcher, BeginDeepCopyEvent)
     ASSERT_THAT(event, ::testing::Not(PartialMatcher<BeginDeepCopyEvent>{}(partial_no_match_src)));
 }
 
+//! @test Check that @ref Kokkos::utils::callbacks::Equivalent works as expected for @ref Kokkos::utils::callbacks::AllocDescriptor.
+TEST(Equivalent, AllocDescriptor)
+{
+    const AllocDescriptor event{.kpsh = {.name = "Cuda"}, .name = "my-label", .ptr = reinterpret_cast<void*>(0x7ffee2b9d8f0), .size = 128};
+
+    const AllocDescriptor partial_match              {.kpsh = {.name = "Cuda"}, .name = "my-label", .size = 128};
+    const AllocDescriptor partial_no_match_kpsh_name {.kpsh = {.name = "osef"}, .name = "my-label", .size = 128};
+    const AllocDescriptor partial_no_match_name      {.kpsh = {.name = "Cuda"}, .name = "my-xxxxx", .size = 128};
+    const AllocDescriptor partial_no_match_size      {.kpsh = {.name = "Cuda"}, .name = "my-label", .size = 129};
+
+    ASSERT_THAT(event,                Equivalent(partial_match));
+    ASSERT_THAT(event, ::testing::Not(Equivalent(partial_no_match_kpsh_name)));
+    ASSERT_THAT(event, ::testing::Not(Equivalent(partial_no_match_name)));
+    ASSERT_THAT(event, ::testing::Not(Equivalent(partial_no_match_size)));
+}
+
+//! @test Check that @ref Kokkos::utils::callbacks::Equivalent works as expected for @ref Kokkos::utils::callbacks::BeginDeepCopyEvent.
+TEST(Equivalent, BeginDeepCopyEvent)
+{
+    const BeginDeepCopyEvent event {
+        .dst = AllocDescriptor{.kpsh = {.name = "Cuda"}, .name = "my-dst", .ptr = reinterpret_cast<void*>(0x7ffee2b9d8f0), .size = 128},
+        .src = AllocDescriptor{.kpsh = {.name = "Cuda"}, .name = "my-src", .ptr = reinterpret_cast<void*>(0x7ffee2b9d8f0), .size = 128}
+    };
+
+    const BeginDeepCopyEvent partial_match {
+        .dst = AllocDescriptor{.kpsh = {.name = "Cuda"}, .name = "my-dst", .size = 128},
+        .src = AllocDescriptor{.kpsh = {.name = "Cuda"}, .name = "my-src", .size = 128}
+    };
+
+    const BeginDeepCopyEvent partial_no_match_dst {
+        .dst = AllocDescriptor{.kpsh = {.name = "Cuda"}, .name = "my-xxx", .size = 128},
+        .src = AllocDescriptor{.kpsh = {.name = "Cuda"}, .name = "my-src", .size = 128}
+    };
+
+    const BeginDeepCopyEvent partial_no_match_src {
+        .dst = AllocDescriptor{.kpsh = {.name = "Cuda"}, .name = "my-dst", .size = 128},
+        .src = AllocDescriptor{.kpsh = {.name = "Cuda"}, .name = "my-xxx", .size = 128}
+    };
+
+    ASSERT_THAT(event,                Equivalent(partial_match));
+    ASSERT_THAT(event, ::testing::Not(Equivalent(partial_no_match_dst)));
+    ASSERT_THAT(event, ::testing::Not(Equivalent(partial_no_match_src)));
+}
+
 } // namespace Kokkos::utils::tests::callbacks
