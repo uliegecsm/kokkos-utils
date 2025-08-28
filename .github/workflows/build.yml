@@ -62,7 +62,7 @@ jobs:
                       base_image     : ubuntu:24.04
                       platforms      : linux/amd64
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
               with:
                   set-safe-directory: true
 
@@ -151,7 +151,7 @@ jobs:
             image: ${{ needs.set-vars.outputs.CI_IMAGE }}:${{ matrix.compiler_family }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
             options: --platform=linux/amd64 ${{ matrix.options }}
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
 
             - name: Configure and build.
               run : |
@@ -179,7 +179,7 @@ jobs:
         container:
             image: ${{ needs.set-vars.outputs.CI_IMAGE }}:gcc-OpenMP
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
 
             - name: Build Doxygen documentation.
               run : |
