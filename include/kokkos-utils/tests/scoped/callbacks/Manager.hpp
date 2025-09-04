@@ -6,7 +6,7 @@
 namespace Kokkos::utils::tests::scoped::callbacks
 {
 //! Initializing and finalizing @ref Kokkos::utils::callbacks::Manager in a RAII manner.
-struct KOKKOS_ATTRIBUTE_NODISCARD Manager
+struct [[nodiscard]] Manager
 {
     Manager()  { Kokkos::utils::callbacks::Manager::initialize(); }
     ~Manager() { Kokkos::utils::callbacks::Manager::finalize(); }
