@@ -101,10 +101,10 @@ using listener_call_opr_list_tuple_t = Kokkos::utils::impl::type_list_to_tuple_t
 } // namespace impl
 
 /**
- * @brief Class to manage @ref Kokkos profiling callback calls.
+ * @brief Class to manage @c Kokkos profiling callback calls.
  *
  * This class allows the registration of callable objects as listeners for events representing
- * @ref Kokkos profiling callback calls.
+ * @c Kokkos profiling callback calls.
  *
  * On initialization, this class uses @c Kokkos::Tools::Experimental::get_callbacks to retrieve
  * the callback function pointers already set within @ref Kokkos. Note that this class refers to
@@ -123,15 +123,15 @@ using listener_call_opr_list_tuple_t = Kokkos::utils::impl::type_list_to_tuple_t
  * refers to the call operators of these registered callable objects as the "registered callbacks".
  *
  * This class uses the setters @c Kokkos::Tools::Experimental::set_<event_type_name>_callback
- * to set the @ref Kokkos callback function pointers to this class's dispatching functions for the
- * event types for which there are registered callbacks. When a @ref Kokkos callback call is made,
+ * to set the @c Kokkos callback function pointers to this class's dispatching functions for the
+ * event types for which there are registered callbacks. When a @c Kokkos callback call is made,
  * these dispatching functions call the context callback first and then sequentially the registered
  * callbacks for the event type.
  *
  * On finalization, this class clears the list of registered callable objects and restores the
- * @ref Kokkos callback function pointers to the values they had prior to initializing this class.
+ * @c Kokkos callback function pointers to the values they had prior to initializing this class.
  *
- * @note The profiling callback calls are implemented in @ref Kokkos in terms of C function pointers.
+ * @note The profiling callback calls are implemented in @c Kokkos in terms of C function pointers.
  *       Class member functions cannot be converted to such C function pointers, unless they are
  *       static. This class is thus implemented as a singleton, and the dispatching functions are
  *       static member functions.
@@ -152,7 +152,7 @@ public:
 protected:
     /**
      * @brief Constructor. Retrieves and stores the @c Kokkos::Tools::Experimental::EventSet containing
-     *        the @ref Kokkos callback function pointers.
+     *        the @c Kokkos callback function pointers.
      */
     Manager() : context_callbacks(Kokkos::Tools::Experimental::get_callbacks()) {}
 
@@ -234,7 +234,7 @@ public:
 
 private:
     /**
-     * @brief Uses @c Kokkos::Tools::Experimental::set_callbacks to restore the @ref Kokkos callback
+     * @brief Uses @c Kokkos::Tools::Experimental::set_callbacks to restore the @c Kokkos callback
      *        function pointers to those retrieved on this class's initialization.
      */
     void reset_context_callbacks() const {
@@ -268,7 +268,7 @@ private:
 
     /**
      * @brief Uses the setters @c Kokkos::Tools::Experimental::set_<event_type_name>_callback
-     *        to set the @ref Kokkos callback function pointers to this class's dispatching functions
+     *        to set the @c Kokkos callback function pointers to this class's dispatching functions
      *        for the event types for which there are registered callbacks.
      */
     void set_dispatching_callbacks() const
@@ -289,7 +289,7 @@ private:
     }
 
     /// @note We don't forward in the templated lambda because the signature must be the one
-    ///       of the @ref Kokkos callback function pointers which pass by value.
+    ///       of the @c Kokkos callback function pointers which pass by value.
     template <Event EventType>
     static auto create_dispatching_callback_for_event_type_impl()
     {

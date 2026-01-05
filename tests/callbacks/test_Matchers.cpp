@@ -23,7 +23,7 @@
  * ---------------------------
  *
  * This group of tests check the behavior of the matchers that can act as predicates
- * for the events associated with @ref Kokkos profiling callbacks.
+ * for the events associated with @c Kokkos profiling callbacks.
  */
 
 using execution_space = Kokkos::DefaultExecutionSpace;

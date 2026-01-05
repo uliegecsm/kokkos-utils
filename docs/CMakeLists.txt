@@ -7,16 +7,6 @@ find_package(
     REQUIRED
 )
 
-#---- Fetch Kokkos tag file. Note that the Kokkos project does not generate a tag file, but Trilinos does.
-set(KOKKOS_TAG_FILE     "${CMAKE_CURRENT_BINARY_DIR}/Kokkos.tag")
-set(KOKKOS_TAG_FILE_URL "https://docs.trilinos.org/dev/packages/common/tag_files/kokkos.tag")
-message(STATUS "Fetching Kokkos tag file with ${KOKKOS_TAG_FILE_URL} and storing it to ${KOKKOS_TAG_FILE}.")
-file(DOWNLOAD ${KOKKOS_TAG_FILE_URL} ${KOKKOS_TAG_FILE} STATUS fetch_kokkos_tag_file_status)
-list(GET fetch_kokkos_tag_file_status 0 fetch_kokkos_tag_file_status_return_code)
-if(NOT fetch_kokkos_tag_file_status_return_code EQUAL 0)
-    message(FATAL_ERROR "An error occurred while fetching tag file for package Kokkos with ${KOKKOS_TAG_FILE_URL} (${fetch_kokkos_tag_file_status}).")
-endif()
-
 #---- Our 'homepage' is the README file.
 set(HOMEPAGE_MD ${CMAKE_SOURCE_DIR}/README.md)
 
@@ -30,7 +20,6 @@ set(DOXYGEN_WARN_AS_ERROR YES)
 set(DOXYGEN_SOURCE_BROWSER YES)
 set(DOXYGEN_WARN_IF_UNDOCUMENTED NO)
 set(DOXYGEN_GENERATE_TAGFILE "${CMAKE_CURRENT_BINARY_DIR}/html/${CMAKE_PROJECT_NAME}.tag")
-set(DOXYGEN_TAGFILES "${KOKKOS_TAG_FILE}")
 set(DOXYGEN_MACRO_EXPANSION YES)
 
 #---- Extract files for documentation.
