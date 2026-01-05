@@ -49,8 +49,8 @@ jobs:
                       kokkos_arch    : BLACKWELL120
                     - backend        : HIP
                       compiler_family: rocm
-                      base_image     : rocm/dev-ubuntu-24.04:6.4
-                      tag_suffix     : -6.4
+                      base_image     : rocm/dev-ubuntu-24.04:6.4.3
+                      tag_suffix     : -6.4.3
                       platforms      : linux/amd64
                       kokkos_arch    : AMD_GFX906
                     - backend        : OpenMP
@@ -141,7 +141,7 @@ jobs:
                     - backend        : HIP
                       compiler_family: rocm
                       runs_on        : [self-hosted, linux, amd64, docker, rocm, amd_gfx906]
-                      tag_suffix     : -6.4
+                      tag_suffix     : -6.4.3
                       options        : --device /dev/kfd --device /dev/dri
                     - backend        : OpenMP
                       compiler_family: gcc
