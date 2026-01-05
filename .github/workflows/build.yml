@@ -43,7 +43,7 @@ jobs:
                 include:
                     - backend        : Cuda
                       compiler_family: gcc
-                      base_image     : nvidia/cuda:12.9.0-devel-ubuntu24.04
+                      base_image     : nvcr.io/nvidia/cuda:12.9.0-devel-ubuntu24.04
                       tag_suffix     : -12.9.0
                       platforms      : linux/amd64
                       kokkos_arch    : BLACKWELL120
