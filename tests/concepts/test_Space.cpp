@@ -14,7 +14,7 @@ using execution_space = Kokkos::DefaultExecutionSpace;
  * Concepts related to space
  * -------------------------
  *
- * This group of tests check the behavior of our concepts related to @ref Kokkos space.
+ * This group of tests check the behavior of our concepts related to @c Kokkos space.
  */
 
 namespace Kokkos::utils::tests::concepts

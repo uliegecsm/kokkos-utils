@@ -16,9 +16,9 @@ template <typename...>
 class RecorderListener;
 
 /**
- * @brief Listener for recording @ref Kokkos profiling callback calls.
+ * @brief Listener for recording @c Kokkos profiling callback calls.
  *
- * Records the @ref Kokkos profiling callback call that are represented by one
+ * Records the @c Kokkos profiling callback call that are represented by one
  * of the types @p EventTypes... and satisfy @p Matcher. The recorded events
  * are pushed back into a container in the order they are received.
  */

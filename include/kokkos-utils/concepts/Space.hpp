@@ -6,7 +6,7 @@
 namespace Kokkos::utils::concepts
 {
 
-//! Specify that a type is a @ref Kokkos space.
+//! Specify that a type is a @c Kokkos space.
 template <typename T>
 concept Space = Kokkos::is_space<T>::value;
 

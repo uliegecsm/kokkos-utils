@@ -14,7 +14,7 @@
  * -------------------------
  *
  * This group of tests check the behavior of the event types defined in @ref Events.hpp
- * associated with @ref Kokkos profiling callbacks.
+ * associated with @c Kokkos profiling callbacks.
  */
 
 using execution_space = Kokkos::DefaultExecutionSpace;
@@ -246,10 +246,10 @@ TYPED_TEST(EventTest, get_and_set_callback_from_and_in_eventset)
     const auto callback_to_register = [] <typename... Args>(Args...) -> void {};
     static_assert(std::convertible_to<decltype(callback_to_register), callback_fptr_t>);
 
-    //! Set the new callback in @ref Kokkos (thus replacing the context callback).
+    //! Set the new callback in @c Kokkos (thus replacing the context callback).
     get_callback_setter<TypeParam>()(callback_to_register);
 
-    //! Check that the callback was set in @ref Kokkos as expected.
+    //! Check that the callback was set in @c Kokkos as expected.
     ASSERT_EQ(get_callback_from_eventset<TypeParam>(Kokkos::Tools::Experimental::get_callbacks()), callback_to_register);
 
     //! Reset the context callback in @ref Kokkos.
