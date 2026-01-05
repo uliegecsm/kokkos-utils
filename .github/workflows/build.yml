@@ -47,8 +47,8 @@ jobs:
                 include:
                     - backend        : Cuda
                       compiler_family: gcc
-                      base_image     : nvcr.io/nvidia/cuda:13.0.0-devel-ubuntu24.04
-                      tag_suffix     : -13.0.0
+                      base_image     : nvcr.io/nvidia/cuda:13.1.0-devel-ubuntu24.04
+                      tag_suffix     : -13.1.0
                       platforms      : linux/amd64
                       kokkos_arch    : BLACKWELL120
                     - backend        : HIP
@@ -114,7 +114,7 @@ jobs:
               with:
                   context: .
                   platforms: ${{ matrix.platforms }}
-                  push: ${{ github.ref == 'refs/heads/develop' }}
+                  push: true # ${{ github.ref == 'refs/heads/develop' }}
                   file: docker/dockerfile
                   tags: ${{ needs.set-vars.outputs.CI_IMAGE }}:${{ matrix.compiler_family }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
                   cache-from: type=registry,ref=${{ needs.set-vars.outputs.CI_IMAGE }}:${{ matrix.compiler_family }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
@@ -141,7 +141,7 @@ jobs:
                     - backend        : Cuda
                       compiler_family: gcc
                       runs_on        : [self-hosted, linux, amd64, docker, cuda, blackwell120]
-                      tag_suffix     : -13.0.0
+                      tag_suffix     : -13.1.0
                     - backend        : HIP
                       compiler_family: rocm
                       runs_on        : [self-hosted, linux, amd64, docker, rocm, amd_gfx906]
