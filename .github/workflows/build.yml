@@ -15,6 +15,10 @@ on:
         # let's start the scheduled action at a somewhat random time to avoid periods of high load.
         - cron: '42 5 * * 3'
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 env:
     REGISTRY: ghcr.io
 
