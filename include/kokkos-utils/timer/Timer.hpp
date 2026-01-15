@@ -13,7 +13,7 @@ namespace Kokkos::utils::timer
  * the elapsed time between events.
  */
 template <typename T>
-requires Kokkos::utils::concepts::ExecutionSpace<T> || std::is_void_v<T>
+requires Kokkos::ExecutionSpace<T> || std::is_void_v<T>
 class Timer
 {
 public:
@@ -42,7 +42,7 @@ public:
     }
 
     template <typename Exec = T>
-    requires Kokkos::utils::concepts::ExecutionSpace<Exec>
+    requires Kokkos::ExecutionSpace<Exec>
     void start(const Exec& exec)
     {
         if(! tick.has_value()) tick.emplace();
@@ -59,7 +59,7 @@ public:
     }
 
     template <typename Exec = T>
-    requires Kokkos::utils::concepts::ExecutionSpace<Exec>
+    requires Kokkos::ExecutionSpace<Exec>
     void stop(const Exec& exec)
     {
         if(! tock.has_value()) tock.emplace();

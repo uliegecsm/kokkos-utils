@@ -2,13 +2,12 @@
 #define KOKKOS_UTILS_CALLBACKS_EVENTQUEUEMATCHER_HPP
 
 #include "kokkos-utils/callbacks/Events.hpp"
-#include "kokkos-utils/concepts/ExecutionSpace.hpp"
 
 namespace Kokkos::utils::callbacks
 {
 
 //! Match an event whose @c dev_id is the same as the one of @ref exec.
-template <Kokkos::utils::concepts::ExecutionSpace Exec>
+template <Kokkos::ExecutionSpace Exec>
 struct EventQueueMatcher
 {
     template <EnqueuedEvent EventType>
