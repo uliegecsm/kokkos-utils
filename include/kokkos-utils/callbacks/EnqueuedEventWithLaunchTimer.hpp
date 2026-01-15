@@ -2,7 +2,6 @@
 #define KOKKOS_UTILS_CALLBACKS_ENQUEUEDEVENTWITHLAUNCHTIMER_HPP
 
 #include "kokkos-utils/callbacks/Events.hpp"
-#include "kokkos-utils/concepts/ExecutionSpace.hpp"
 #include "kokkos-utils/timer/Duration.hpp"
 #include "kokkos-utils/timer/Timer.hpp"
 
@@ -10,7 +9,7 @@ namespace Kokkos::utils::callbacks
 {
 
 //! Timer for events that are enqueued on @ref exec. This timer also measures the launch time.
-template <Kokkos::utils::concepts::ExecutionSpace Exec>
+template <Kokkos::ExecutionSpace Exec>
 struct EnqueuedEventWithLaunchTimer
 {
     //! Start the timer. The event must be on @ref exec.

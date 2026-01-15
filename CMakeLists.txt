@@ -87,8 +87,6 @@ target_sources(
             include/kokkos-utils/callbacks/TimerListener.hpp
 
             include/kokkos-utils/concepts/DualView.hpp
-            include/kokkos-utils/concepts/ExecutionSpace.hpp
-            include/kokkos-utils/concepts/MemorySpace.hpp
             include/kokkos-utils/concepts/Space.hpp
             include/kokkos-utils/concepts/View.hpp
 

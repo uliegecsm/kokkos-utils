@@ -3,8 +3,6 @@
 
 #include <chrono>
 
-#include "kokkos-utils/concepts/ExecutionSpace.hpp"
-
 namespace Kokkos::utils::timer
 {
 
@@ -28,7 +26,7 @@ namespace Kokkos::utils::timer
  * these specializations involve host-device synchronization.
  */
 template <typename T>
-requires Kokkos::utils::concepts::ExecutionSpace<T> || std::is_void_v<T>
+requires Kokkos::ExecutionSpace<T> || std::is_void_v<T>
 struct Event
 {
     //! Let's choose a steady clock.
@@ -50,7 +48,7 @@ struct Event
     }
 
     template <typename Exec = T>
-    requires Kokkos::utils::concepts::ExecutionSpace<Exec>
+    requires Kokkos::ExecutionSpace<Exec>
     void record(const Exec&) {
         event = std::chrono::steady_clock::now();
     }

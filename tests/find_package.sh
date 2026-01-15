@@ -23,11 +23,11 @@ EOF
 
 cat << EOF > ${WORK_DIR}/test.cpp
 #include "Kokkos_Core.hpp"
-#include "kokkos-utils/concepts/MemorySpace.hpp"
+#include "kokkos-utils/concepts/Space.hpp"
 
 int main()
 {
-    static_assert(Kokkos::utils::concepts::MemorySpace<Kokkos::DefaultExecutionSpace::memory_space>);
+    static_assert(Kokkos::utils::concepts::Space<Kokkos::DefaultExecutionSpace::memory_space>);
     return EXIT_SUCCESS;
 }
 EOF

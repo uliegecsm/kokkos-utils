@@ -5,12 +5,10 @@
 #include "Kokkos_Profiling_ProfileSection.hpp"
 #include "Kokkos_Profiling_ScopedRegion.hpp"
 
-#include "kokkos-utils/concepts/ExecutionSpace.hpp"
-
 namespace Kokkos::utils::tests::callbacks
 {
 
-template <Kokkos::utils::concepts::ExecutionSpace Exec>
+template <Kokkos::ExecutionSpace Exec>
 struct MyWorkload
 {
     struct MyFunctor

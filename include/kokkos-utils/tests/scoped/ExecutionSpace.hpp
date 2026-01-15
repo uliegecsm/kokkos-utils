@@ -1,13 +1,11 @@
 #ifndef KOKKOS_UTILS_TESTS_SCOPED_EXECUTIONSPACE_HPP
 #define KOKKOS_UTILS_TESTS_SCOPED_EXECUTIONSPACE_HPP
 
-#include "kokkos-utils/concepts/ExecutionSpace.hpp"
-
 namespace Kokkos::utils::tests::scoped
 {
 
 //! Create a new execution space instance with RAII semantics.
-template <Kokkos::utils::concepts::ExecutionSpace Exec>
+template <Kokkos::ExecutionSpace Exec>
 struct [[nodiscard]] ExecutionSpace
 {
     ExecutionSpace() : exec(Kokkos::Experimental::partition_space(Exec{}, 1)[0]) {}
