@@ -54,6 +54,9 @@
             // Inherit from this preset to use the HIP backend.
             "name"           : "HIP",
             "hidden"         : true,
+            "environment" : {
+                "ROCM_PATH" : "/opt/rocm"
+            },
             "cacheVariables" : {
                 "Kokkos_ENABLE_ROCTHRUST" : "OFF",
                 "Kokkos_ENABLE_HIP" : "ON"

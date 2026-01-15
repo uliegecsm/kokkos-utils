@@ -47,8 +47,8 @@ jobs:
                 include:
                     - backend        : Cuda
                       compiler_family: gcc
-                      base_image     : nvcr.io/nvidia/cuda:13.0.0-devel-ubuntu24.04
-                      tag_suffix     : -13.0.0
+                      base_image     : nvcr.io/nvidia/cuda:13.1.0-devel-ubuntu24.04
+                      tag_suffix     : -13.1.0
                       platforms      : linux/amd64
                       kokkos_arch    : BLACKWELL120
                     - backend        : HIP
@@ -90,7 +90,7 @@ jobs:
                   echo "CMAKE_VERSION=$(     jq .dependencies.cmake.value      version.json -j)" >> $GITHUB_ENV
                   echo "DOXYGEN_VERSION=$(   jq .dependencies.doxygen.value    version.json -j)" >> $GITHUB_ENV
                   echo "GOOGLETEST_VERSION=$(jq .dependencies.googletest.value version.json -j)" >> $GITHUB_ENV
-                  echo "KOKKOS_VERSION=$(    jq .dependencies.kokkos.value     version.json -j)" >> $GITHUB_ENV
+                  echo "KOKKOS_SHA=$(        jq .dependencies.kokkos.sha       version.json -j)" >> $GITHUB_ENV
 
             - name: Set up QEMU.
               if  : steps.changed-files.outputs.any_changed == 'true'
@@ -128,7 +128,7 @@ jobs:
                       GOOGLETEST_VERSION=${{ env.GOOGLETEST_VERSION }}
                       KOKKOS_ARCH=${{ matrix.kokkos_arch }}
                       KOKKOS_PRESET=${{ matrix.compiler_family }}-${{ matrix.backend }}
-                      KOKKOS_VERSION=${{ env.KOKKOS_VERSION }}
+                      KOKKOS_SHA=${{ env.KOKKOS_SHA }}
                   labels: "org.opencontainers.image.source=${{ github.repositoryUrl }}"
 
     build-library-and-test:
@@ -141,7 +141,7 @@ jobs:
                     - backend        : Cuda
                       compiler_family: gcc
                       runs_on        : [self-hosted, linux, amd64, docker, cuda, blackwell120]
-                      tag_suffix     : -13.0.0
+                      tag_suffix     : -13.1.0
                     - backend        : HIP
                       compiler_family: rocm
                       runs_on        : [self-hosted, linux, amd64, docker, rocm, amd_gfx906]

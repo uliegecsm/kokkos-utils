@@ -136,14 +136,16 @@ FROM requirements AS kokkos-compile
 
 ARG KOKKOS_ARCH
 ARG KOKKOS_PRESET
-ARG KOKKOS_VERSION
+ARG KOKKOS_SHA
+
+ADD https://github.com/kokkos/kokkos/archive/${KOKKOS_SHA}.tar.gz /opt/kokkos-sources/${KOKKOS_SHA}.tar.gz
 
 RUN --mount=target=/cmake/presets/kokkos.json,type=bind,source=cmake/presets/kokkos.json <<EOF
     set -ex
 
-    git clone --depth=1 --branch=${KOKKOS_VERSION} https://github.com/kokkos/kokkos kokkos
-
-    cd kokkos
+    cd /opt/kokkos-sources
+    tar -zxf ${KOKKOS_SHA}.tar.gz
+    cd kokkos-${KOKKOS_SHA}
 
     cp /cmake/presets/kokkos.json CMakePresets.json
 
@@ -154,7 +156,7 @@ RUN --mount=target=/cmake/presets/kokkos.json,type=bind,source=cmake/presets/kok
     fi
 
     cmake -S . --preset=${KOKKOS_PRESET} \
-        -DCMAKE_INSTALL_PREFIX=/opt/kokkos-${KOKKOS_VERSION}/${KOKKOS_PRESET} \
+        -DCMAKE_INSTALL_PREFIX=/opt/kokkos-${KOKKOS_SHA}/${KOKKOS_PRESET} \
         ${KOKKOS_ARCH_ARG}
 
     cmake --build --preset=${KOKKOS_PRESET} -j4
@@ -168,15 +170,15 @@ FROM requirements AS final
 ARG DOXYGEN_VERSION
 ARG GOOGLEBENCHMARK_VERSION
 ARG GOOGLETEST_VERSION
-ARG KOKKOS_VERSION
+ARG KOKKOS_SHA
 ARG KOKKOS_PRESET
 
 COPY --from=doxygen-compile          /opt/doxygen-${DOXYGEN_VERSION}                  /opt/doxygen-${DOXYGEN_VERSION}
 COPY --from=google-benchmark-compile /opt/google-benchmark-${GOOGLEBENCHMARK_VERSION} /opt/google-benchmark-${GOOGLEBENCHMARK_VERSION}
 COPY --from=google-test-compile      /opt/google-test-${GOOGLETEST_VERSION}           /opt/google-test-${GOOGLETEST_VERSION}
-COPY --from=kokkos-compile           /opt/kokkos-${KOKKOS_VERSION}/${KOKKOS_PRESET}   /opt/kokkos-${KOKKOS_VERSION}/${KOKKOS_PRESET}
+COPY --from=kokkos-compile           /opt/kokkos-${KOKKOS_SHA}/${KOKKOS_PRESET}       /opt/kokkos-${KOKKOS_SHA}/${KOKKOS_PRESET}
 
 ENV benchmark_ROOT=/opt/google-benchmark-${GOOGLEBENCHMARK_VERSION}
 ENV Doxygen_ROOT=/opt/doxygen-${DOXYGEN_VERSION}
 ENV GTest_ROOT=/opt/google-test-${GOOGLETEST_VERSION}
-ENV Kokkos_ROOT=/opt/kokkos-${KOKKOS_VERSION}/${KOKKOS_PRESET}
+ENV Kokkos_ROOT=/opt/kokkos-${KOKKOS_SHA}/${KOKKOS_PRESET}
