@@ -20,10 +20,12 @@ function(add_one_test)
     )
 
     # Set the test name, executable name and primary source file.
-    set(NAME            "test_${aot_args_NAME}")
-    set(EXECUTABLE_NAME "test_${aot_args_NAME}")
     cmake_path(SET SOURCE_FILE "test_${aot_args_NAME}.cpp")
     cmake_path(ABSOLUTE_PATH SOURCE_FILE)
+    
+    get_parent_relpath_repr(DIRECTORY ${CMAKE_SOURCE_DIR} FILENAME ${SOURCE_FILE})
+
+    set(EXECUTABLE_NAME ${gprr_PARENT_RELPATH_REPR}_${aot_args_NAME})
 
     # Add source file to the documentation list.
     set_property(GLOBAL APPEND PROPERTY KokkosUtils_FILES_FOR_DOC ${SOURCE_FILE})
@@ -91,5 +93,6 @@ add_subdirectory(atomics)
 add_subdirectory(callbacks)
 add_subdirectory(concepts)
 add_subdirectory(impl)
+add_subdirectory(printers)
 add_subdirectory(timer)
 add_subdirectory(view)

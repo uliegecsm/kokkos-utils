@@ -21,6 +21,8 @@ option(KokkosUtils_ENABLE_CLANG_TIDY "Enable clang-tidy" OFF)
 #---- Enable further debugging by exporting compile commands.
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+include(cmake/functions/path_helper.cmake)
+
 #---- Global property that helps us keep track of files that will automatically be added
 #     to our Doxygen documentation.
 define_property(GLOBAL PROPERTY KokkosUtils_FILES_FOR_DOC
@@ -92,6 +94,8 @@ target_sources(
 
             include/kokkos-utils/impl/type_list.hpp
             include/kokkos-utils/impl/type_traits.hpp
+
+            include/kokkos-utils/printers/View.hpp
 
             include/kokkos-utils/tests/scoped/ExecutionSpace.hpp
             include/kokkos-utils/tests/scoped/callbacks/Manager.hpp
