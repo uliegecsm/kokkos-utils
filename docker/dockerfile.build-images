@@ -5,7 +5,7 @@ RUN <<EOF
 
     apt update
 
-    apt --yes install docker.io
+    apt --yes install docker.io jq
 
     apt clean && rm -rf /var/lib/apt/lists/*
 EOF
