@@ -150,8 +150,6 @@ jobs:
 
             - name: Prepare.
               run : |
-                  apk add jq
-
                   echo "CMAKE_VERSION=$(     jq .dependencies.cmake.value      version.json -j)" >> $GITHUB_ENV
                   echo "DOXYGEN_VERSION=$(   jq .dependencies.doxygen.value    version.json -j)" >> $GITHUB_ENV
                   echo "GOOGLETEST_VERSION=$(jq .dependencies.googletest.value version.json -j)" >> $GITHUB_ENV
