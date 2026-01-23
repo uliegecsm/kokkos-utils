@@ -187,8 +187,38 @@ jobs:
                       KOKKOS_SHA=${{ env.KOKKOS_SHA }}
                   labels: "org.opencontainers.image.source=${{ github.repositoryUrl }}"
 
-    build-library-and-test:
+    finalize-images:
         needs: [set-vars-and-skips, build-images]
+        if: ${{ needs.set-vars-and-skips.outputs.build-images == 'true' }}
+        runs-on: ubuntu-latest
+        permissions:
+            packages: write
+        container:
+            image: docker:latest
+        services:
+            docker:
+                image: docker:dind
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - backend        : OpenMP
+                      compiler_family: gcc
+        steps:
+            - uses: docker/login-action@v3
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - run: |
+                docker buildx imagetools create \
+                    --tag=${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler_family }}-${{ matrix.backend }}${{ matrix.tag_suffix }} \
+                    ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler_family }}-${{ matrix.backend }}${{ matrix.tag_suffix }}-amd64 \
+                    ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler_family }}-${{ matrix.backend }}${{ matrix.tag_suffix }}-arm64
+
+    build-library-and-test:
+        needs: [set-vars-and-skips, finalize-images]
         runs-on: ${{ matrix.runs_on || 'ubuntu-latest' }}
         if: ${{ ! failure() && ! cancelled() }}
         strategy:
@@ -235,7 +265,7 @@ jobs:
                   bash tests/find_package.sh ${{ matrix.compiler_family }}
 
     build-documentation:
-        needs: [set-vars-and-skips, build-images]
+        needs: [set-vars-and-skips, finalize-images]
         if: ${{ ! failure() && ! cancelled() }}
         runs-on: [ubuntu-latest]
         container:
