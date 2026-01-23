@@ -158,7 +158,7 @@ protected:
 
 public:
     static void initialize() { singleton = new Manager(); }
-    static void finalize()   { delete singleton; }
+    static void finalize()   { if(singleton) delete singleton; }
 
     static Manager& get_instance() { return *singleton; }
 
