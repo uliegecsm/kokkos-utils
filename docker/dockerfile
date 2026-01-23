@@ -82,7 +82,9 @@ RUN <<EOF
 
     cd doxygen
 
-    cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/opt/doxygen-${DOXYGEN_VERSION}
+    cmake -S . -B build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/opt/doxygen-${DOXYGEN_VERSION}
 
     cmake --build build -j4 --target install
 EOF
@@ -99,7 +101,9 @@ RUN <<EOF
 
     cd googletest
 
-    cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/opt/google-test-${GOOGLETEST_VERSION}
+    cmake -S . -B build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/opt/google-test-${GOOGLETEST_VERSION}
 
     cmake --build build -j4
 
