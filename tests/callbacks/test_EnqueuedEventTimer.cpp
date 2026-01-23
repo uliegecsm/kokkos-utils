@@ -6,6 +6,8 @@
 #include "kokkos-utils/callbacks/EnqueuedEventWithLaunchTimer.hpp"
 #include "kokkos-utils/timer/Duration.hpp"
 
+#include "tests/IgnoreWarnings.hpp"
+
 /**
  * @addtogroup unittests
  *
@@ -111,10 +113,13 @@ TYPED_TEST_SUITE(TimerTest, TimerTypes);
  */
 TYPED_TEST(TimerTest, start_aborts_for_wrongly_enqueued_event)
 {
+PRAGMA_DIAGNOSTIC_PUSH
+PRAGMA_DIAGNOSTIC_IGNORED("-Wswitch-default")
     ASSERT_DEATH({
         this->timer.start(BeginParallelForEvent{.name = "my-name", .dev_id =
             this->dev_id + 1, .event_id = 1});
     }, "EnqueuedEventTimer cannot be started for a wrongly enqueued event.");
+PRAGMA_DIAGNOSTIC_POP
 }
 
 } // namespace Kokkos::utils::tests::callbacks

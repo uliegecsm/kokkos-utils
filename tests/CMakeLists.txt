@@ -46,6 +46,11 @@ function(add_one_test)
         PRIVATE
             -Wall
             -Wextra
+            -Werror=dangling-else
+            -Werror=shadow
+            -Werror=switch-default
+            -Werror=suggest-override
+            -Werror=overloaded-virtual
             -Werror
             "$<$<IN_LIST:CUDA,${Kokkos_DEVICES}>:--Werror=cross-execution-space-call,all-warnings>"
     )

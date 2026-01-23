@@ -90,11 +90,11 @@ bool test_slice_on_device(const ViewType& view, const size_t expected_size)
 
     Kokkos::parallel_reduce(
         Kokkos::RangePolicy<execution_space>(0, 1),
-        KOKKOS_LAMBDA(const int, bool& result)
+        KOKKOS_LAMBDA(const int, bool& current)
         {
             const auto subview = Kokkos::subview      (view, 0, Kokkos::ALL, Kokkos::ALL, Kokkos::ALL);
             const auto slice   = utils::view::slice<4>(view, 0);
-            result = (
+            current = (
                 subview.size() == expected_size && subview.rank() == 3 &&
                 slice  .size() == expected_size && slice  .rank() == 3 &&
                 slice.extent(0) == dim_2 &&

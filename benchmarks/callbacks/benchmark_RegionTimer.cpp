@@ -237,7 +237,7 @@ public:
     }
 
 private:
-    Kokkos::utils::timer::Timer<void> timer;
+    Kokkos::utils::timer::Timer<void> timer{};
 };
 
 using SequenceOfRegionTimerListenerBenchmark = Fixture<SequenceOfRegionTimerListenerBenchmarkImpl>;

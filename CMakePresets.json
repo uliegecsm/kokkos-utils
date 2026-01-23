@@ -44,6 +44,12 @@
             "cacheVariables": {"KokkosUtils_ENABLE_CLANG_TIDY" : "ON"}
         },
         {
+            "$comment": "Inherit from this preset to use C++23.",
+            "name" : "cxx23",
+            "hidden" : true,
+            "cacheVariables" : {"CMAKE_CXX_STANDARD": "23"}
+        },
+        {
             "name"           : "gcc-OpenMP",
             "inherits"       : ["default", "gcc"],
             "cacheVariables" : {
@@ -52,7 +58,7 @@
         },
         {
             "name"           : "clang-OpenMP",
-            "inherits"       : ["default", "clang", "clang-tidy"],
+            "inherits"       : ["cxx23", "default", "clang", "clang-tidy"],
             "cacheVariables" : {
                 "EXPECTED_Kokkos_DEVICES" : "SERIAL;OPENMP"
             }

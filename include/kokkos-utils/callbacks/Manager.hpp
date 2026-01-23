@@ -157,8 +157,8 @@ protected:
     Manager() : context_callbacks(Kokkos::Tools::Experimental::get_callbacks()) {}
 
 public:
-    static void initialize() { singleton = std::unique_ptr<Manager>(new Manager()); }
-    static void finalize()   { singleton.reset(); }
+    static void initialize() { singleton = new Manager(); }
+    static void finalize()   { delete singleton; }
 
     static Manager& get_instance() { return *singleton; }
 
@@ -446,7 +446,7 @@ private:
 
     listener_list_t listeners {};
 
-    static inline std::unique_ptr<Manager> singleton = nullptr;
+    static inline Manager* singleton = nullptr;
 
     Kokkos::Tools::Experimental::EventSet context_callbacks {};
 
