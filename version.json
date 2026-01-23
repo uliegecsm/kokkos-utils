@@ -4,7 +4,7 @@
     },
     "dependencies" : {
         "cmake" : {
-            "value" : "3.31.5"
+            "value" : "4.2.1"
         },
         "doxygen" : {
             "value" : "1.13.2"
