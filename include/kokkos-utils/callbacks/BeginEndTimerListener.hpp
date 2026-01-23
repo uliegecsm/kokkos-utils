@@ -29,8 +29,8 @@ struct BeginEndTimerListener : public TimerListener<EventBeginEndIdMatcher<Begin
     using base_t          = TimerListener<matcher_t, timer_t>;
 
     template <typename T>
-    BeginEndTimerListener(T&& matcher, const Exec& exec) : base_t{
-        matcher_t{.matcher = ConjunctionMatcher{queue_matcher_t{.exec = exec}, MatcherType{std::forward<T>(matcher)}}},
+    BeginEndTimerListener(T&& matcher_, const Exec& exec) : base_t{
+        matcher_t{.matcher = ConjunctionMatcher{queue_matcher_t{.exec = exec}, MatcherType{std::forward<T>(matcher_)}}},
         timer_t{.exec = exec}
     } {}
 };

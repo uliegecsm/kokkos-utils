@@ -21,8 +21,8 @@ struct ConjunctionMatcher
     template <Event EventType> requires (MatcherFor<MatcherTypes, EventType> && ...)
     bool operator()(const EventType& event)
     {
-        return std::apply([&event] (MatcherTypes&... matchers) {
-                return (matchers(event) && ...);
+        return std::apply([&event] (MatcherTypes&... matchers_) {
+                return (matchers_(event) && ...);
         }, matchers);
     }
 
