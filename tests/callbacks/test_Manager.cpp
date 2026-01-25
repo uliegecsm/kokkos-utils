@@ -26,20 +26,56 @@ namespace Kokkos::utils::tests::callbacks
 
 using namespace Kokkos::utils::callbacks;
 
-class ManagerTest : public ::testing::Test,
-                    public scoped::callbacks::Manager,
-                    public scoped::ExecutionSpace<execution_space>
-{};
-
 //! @test Check properties of @ref Kokkos::utils::callbacks::Manager being a singleton class.
-TEST(Manager, singleton_traits)
+constexpr bool test_singleton_traits()
 {
     static_assert( ! std::is_copy_constructible_v<Manager>);
     static_assert( ! std::is_copy_assignable_v   <Manager>);
 
     static_assert( ! std::is_move_constructible_v<Manager>);
     static_assert( ! std::is_move_assignable_v   <Manager>);
+
+    return true;
 }
+static_assert(test_singleton_traits());
+
+/**
+ * @test Check that calling @ref Kokkos::utils::callbacks::Manager::initialize many times in a row,
+ *       followed by many calls to @ref Kokkos::utils::callbacks::Manager::finalize works as expected.
+ */
+TEST(Manager, initialize_finalize)
+{
+    ASSERT_FALSE(Manager::is_initialized());
+
+    Manager::initialize();
+    ASSERT_TRUE(Manager::is_initialized());
+
+    const auto* ptr = std::addressof(Manager::get_instance());
+
+    Manager::initialize();
+    ASSERT_TRUE(Manager::is_initialized());
+
+    ASSERT_EQ(ptr, std::addressof(Manager::get_instance()));
+
+    Manager::initialize();
+    ASSERT_TRUE(Manager::is_initialized());
+
+    ASSERT_EQ(ptr, std::addressof(Manager::get_instance()));
+
+    Manager::finalize();
+    ASSERT_FALSE(Manager::is_initialized());
+
+    Manager::finalize();
+    ASSERT_FALSE(Manager::is_initialized());
+
+    Manager::finalize();
+    ASSERT_FALSE(Manager::is_initialized());
+}
+
+class ManagerTest : public ::testing::Test,
+                    public scoped::callbacks::Manager,
+                    public scoped::ExecutionSpace<execution_space>
+{};
 
 /**
  * @brief Listener that stores the events it receives.
