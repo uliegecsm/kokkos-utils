@@ -157,8 +157,8 @@ protected:
     Manager() : context_callbacks(Kokkos::Tools::Experimental::get_callbacks()) {}
 
 public:
-    static void initialize() { singleton = new Manager(); }
-    static void finalize()   { if(singleton) delete singleton; }
+    static void initialize() { if(singleton == nullptr) singleton = new Manager(); }
+    static void finalize()   { if(singleton != nullptr) { delete singleton; singleton = nullptr; }}
 
     static Manager& get_instance() { return *singleton; }
 
