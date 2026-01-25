@@ -160,6 +160,8 @@ public:
     static void initialize() { if(singleton == nullptr) singleton = new Manager(); }
     static void finalize()   { if(singleton != nullptr) { delete singleton; singleton = nullptr; }}
 
+    static bool is_initialized() { return singleton != nullptr; }
+
     static Manager& get_instance() { return *singleton; }
 
     /**
