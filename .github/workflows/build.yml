@@ -39,7 +39,7 @@ jobs:
 
             # For the 'build-images' job.
             - id: build-images-changed-files
-              uses: tj-actions/changed-files@v47.0.1
+              uses: tj-actions/changed-files@v47.0.2
               with:
                   files: |
                       .github/**
