@@ -1,5 +1,8 @@
 set -ex
 
+COMPILER_FAMILY=$1
+KOKKOS_UTILS_VERSION=$2
+
 CMAKE_INSTALL_PREFIX=/opt/this-is-our-install-folder-for-test-purposes
 
 echo "> Running find package test with installation expected in ${CMAKE_INSTALL_PREFIX}."
@@ -13,8 +16,7 @@ cmake_minimum_required(VERSION 3.23)
 
 project(test LANGUAGES CXX)
 
-find_package(Kokkos CONFIG REQUIRED)
-find_package(KokkosUtils CONFIG REQUIRED)
+find_package(KokkosUtils CONFIG REQUIRED VERSION ${KOKKOS_UTILS_VERSION})
 
 add_executable(test)
 target_sources(test PRIVATE test.cpp)
@@ -37,7 +39,6 @@ cd $WORK_DIR
 export KokkosUtils_ROOT=${CMAKE_INSTALL_PREFIX}
 echo ${KokkosUtils_ROOT}
 
-COMPILER_FAMILY=$1
 if [ "${COMPILER_FAMILY}" = "clang" ];then
     export CXX=clang++
 elif [ "${COMPILER_FAMILY}" = "rocm" ];then

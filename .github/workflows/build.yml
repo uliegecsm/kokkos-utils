@@ -269,10 +269,12 @@ jobs:
 
             - name: Test find package after install.
               run : |
+                  KOKKOS_UTILS_VERSION=$(python3 -c 'import json; print(json.load(open("version.json"))["kokkos-utils"]["value"])')
+
                   test -d include/
                   rm -rf include/
 
-                  bash tests/find_package.sh ${{ matrix.compiler_family }}
+                  bash tests/find_package.sh "${{ matrix.compiler_family }}" "${KOKKOS_UTILS_VERSION}"
 
     build-documentation:
         needs: [set-vars-and-skips, finalize-images]
