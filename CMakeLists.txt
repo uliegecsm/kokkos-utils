@@ -62,7 +62,7 @@ target_sources(
     INTERFACE
         FILE_SET headers
         TYPE HEADERS
-        BASE_DIRS include/kokkos-utils
+        BASE_DIRS include
         FILES
             include/kokkos-utils/atomics/InsertOp.hpp
 
@@ -110,13 +110,6 @@ target_sources(
             include/kokkos-utils/view/slice.hpp
 )
 
-target_include_directories(
-    kokkosutils
-    INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
-        $<INSTALL_INTERFACE:include/>
-)
-
 target_compile_features(
     kokkosutils
     INTERFACE
@@ -142,8 +135,31 @@ if(KokkosUtils_ENABLE_CLANG_TIDY)
 endif()
 
 #---- Install.
-install(TARGETS kokkosutils EXPORT KokkosUtilsConfig FILE_SET headers DESTINATION include/kokkos-utils)
-install(EXPORT KokkosUtilsConfig DESTINATION lib/cmake/KokkosUtils NAMESPACE Kokkos::)
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+    cmake/KokkosUtilsConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/KokkosUtilsConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/KokkosUtils
+)
+
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/KokkosUtilsConfigVersion.cmake"
+    VERSION "${KOKKOS_UTILS_VERSION}"
+    COMPATIBILITY ExactVersion)
+
+install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/KokkosUtilsConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/KokkosUtilsConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/KokkosUtils)
+
+install(TARGETS kokkosutils 
+    EXPORT KokkosUtilsTargets
+    FILE_SET headers
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+install(EXPORT KokkosUtilsTargets
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/KokkosUtils
+    NAMESPACE Kokkos::)
 
 #---- Testing.
 if(KokkosUtils_ENABLE_TESTS)
