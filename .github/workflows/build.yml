@@ -83,7 +83,7 @@ jobs:
 
             - uses: docker/setup-buildx-action@v3
 
-            - uses: docker/build-push-action@v6.18.0
+            - uses: docker/build-push-action@v7
               with:
                   context: null
                   platforms: linux/amd64,linux/arm64
@@ -166,7 +166,7 @@ jobs:
                   password: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Build and push.
-              uses: docker/build-push-action@v6
+              uses: docker/build-push-action@v7
               with:
                   context: .
                   platforms: ${{ matrix.platforms }}
