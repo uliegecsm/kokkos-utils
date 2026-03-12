@@ -28,6 +28,7 @@ class RecorderListener<MatcherType, EventTypes...>
 public:
     using matcher_t         = MatcherType;
     using event_type_list_t = Kokkos::Impl::type_list<EventTypes...>;
+    using event_variant_t   = std::variant<EventTypes...>;
 
 public:
     RecorderListener() = default;
@@ -77,7 +78,7 @@ public:
      * @note We use a @c std::deque because it can automatically expand when needed (whereas
      *       @c std::vector requires a reallocation and a copy).
      */
-    std::deque<std::variant<EventTypes...>> recorded_events {};
+    std::deque<event_variant_t> recorded_events {};
 
 private:
     MatcherType matcher {};

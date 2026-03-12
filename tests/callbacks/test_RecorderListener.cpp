@@ -79,7 +79,9 @@ TEST_F(RecorderListenerTest, recorded_events)
     EventInProfileSectionMatcher matcher{.matcher = EventRegexMatcher{.regex = std::regex("profile section")}};
     const auto recorder = std::make_shared<event_in_profile_section_recorder_t>(std::move(matcher));
 
-    const auto any_event_recorder = std::make_shared<RecorderListener<EventTypeList>>();
+    using recorder_t = RecorderListener<EventTypeList>;
+
+    const auto any_event_recorder = std::make_shared<recorder_t>();
 
     Kokkos::utils::callbacks::Manager::register_listener(recorder);
     Kokkos::utils::callbacks::Manager::register_listener(any_event_recorder);
@@ -94,7 +96,7 @@ TEST_F(RecorderListenerTest, recorded_events)
 
     ASSERT_THAT(
         recorder->recorded_events,
-        ContainsInOrder<typename decltype(recorder->recorded_events)::value_type>(
+        ContainsInOrder<typename recorder_t::event_variant_t>(
             APushRegionEventWithName(::testing::StrEq("computation - level 0")),
             ABeginParallelForEventWithName(::testing::StrEq("computation - level 0 - pfor")),
             AEndParallelForEvent(),
