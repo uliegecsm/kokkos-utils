@@ -1,6 +1,7 @@
 #ifndef KOKKOS_UTILS_CALLBACKS_MANAGER_HPP
 #define KOKKOS_UTILS_CALLBACKS_MANAGER_HPP
 
+#include <atomic>
 #include <list>
 #include <ranges>
 
@@ -211,9 +212,11 @@ public:
         );
 
         Kokkos::utils::impl::for_each<event_type_list_t>([&] <Event EventType>() {
-            get<Kokkos::utils::impl::type_list_index_v<EventType, EventTypeList>>(get_instance().registered_callbacks).remove(
-                dynamic_cast<const impl::ListenerConceptCallOperator<EventType>*>(iter->get())
-            );
+            if constexpr(Kokkos::utils::impl::type_list_contains_v<EventType, EventTypeList>) {
+                get<Kokkos::utils::impl::type_list_index_v<EventType, EventTypeList>>(get_instance().registered_callbacks).remove(
+                    dynamic_cast<const impl::ListenerConceptCallOperator<EventType>*>(iter->get())
+                );
+            }
         });
 
         listeners.erase(iter);
@@ -232,6 +235,26 @@ public:
         get_instance().listeners.erase(iter);
 
         get_instance().set_dispatching_callbacks();
+    }
+
+    //! Dispatch the event to all registered listeners that can handle it.
+    template <Event EventType>
+    void dispatch(const EventType& event) const {
+        for (auto& listener: this->listeners) {
+            if (const auto* const callable = dynamic_cast<const impl::ListenerConceptCallOperator<EventType>*>(listener.get()); callable != nullptr) {
+                callable->operator()(event);
+            }
+        }
+    }
+
+    //! Get the next available event ID.
+    uint64_t get_next_event_id() noexcept {
+        return next_event_id.fetch_add(1, std::memory_order_relaxed);
+    }
+
+    //! Get the next available section ID.
+    uint32_t get_next_section_id() noexcept {
+        return next_section_id.fetch_add(1, std::memory_order_relaxed);
     }
 
 private:
@@ -258,9 +281,11 @@ private:
         /// For each event type that the callable object can be invoked with, store the raw pointer
         /// to the listener model in the list of listeners for this event type.
         Kokkos::utils::impl::for_each<event_type_list_t>([&] <Event EventType>() {
-            get<Kokkos::utils::impl::type_list_index_v<EventType, EventTypeList>>(get_instance().registered_callbacks).push_back(
-                dynamic_cast<const impl::ListenerConceptCallOperator<EventType>*>(iter->get())
-            );
+            if constexpr(Kokkos::utils::impl::type_list_contains_v<EventType, EventTypeList>) {
+                get<Kokkos::utils::impl::type_list_index_v<EventType, EventTypeList>>(get_instance().registered_callbacks).push_back(
+                    dynamic_cast<const impl::ListenerConceptCallOperator<EventType>*>(iter->get())
+                );
+            }
         });
 
         get_instance().set_dispatching_callbacks();
@@ -428,11 +453,11 @@ private:
 
     template <BeginEvent EventType>
     void increment_id_if_needed_for_event_type_impl(EventType& event) {
-        event.event_id = next_event_id++;
+        event.event_id = this->get_next_event_id();
     }
 
     void increment_id_if_needed_for_event_type_impl(CreateProfileSectionEvent& event) {
-        event.section_id = next_section_id++;
+        event.section_id = this->get_next_section_id();
     }
 
     template <Event EventType>
@@ -452,9 +477,22 @@ private:
 
     Kokkos::Tools::Experimental::EventSet context_callbacks {};
 
-    uint64_t next_event_id   = 0;
-    uint32_t next_section_id = 0;
+    std::atomic<uint64_t> next_event_id{0};
+    std::atomic<uint32_t> next_section_id{0};
 };
+
+template <Event EventType>
+void dispatch(const EventType& event) {
+    Manager::get_instance().dispatch(event);
+}
+
+inline uint64_t get_next_event_id() noexcept {
+    return Manager::get_instance().get_next_event_id();
+}
+
+inline uint32_t get_next_section_id() noexcept {
+    return Manager::get_instance().get_next_section_id();
+}
 
 } // namespace Kokkos::utils::callbacks
 
