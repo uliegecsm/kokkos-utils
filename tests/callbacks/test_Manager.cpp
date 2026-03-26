@@ -72,6 +72,34 @@ TEST(Manager, initialize_finalize)
     ASSERT_FALSE(Manager::is_initialized());
 }
 
+/**
+ * @test Check that calling @ref Kokkos::utils::callbacks::dispatch is fine
+ *       even if the @ref Kokkos::utils::callbacks::Manager is not initialized.
+ */
+TEST(Manager, dispatch) {
+    ASSERT_FALSE(Manager::is_initialized());
+
+    dispatch(ProfileEvent{});
+}
+
+/**
+ * @test Check that @ref Kokkos::utils::callbacks::get_next_event_id returns @ref Kokkos::utils::callbacks::EventTraits::invalid_event_id
+ *       only when the @ref Kokkos::utils::callbacks::Manager is not initialized.
+ */
+TEST(Manager, get_next_event_id) {
+    ASSERT_FALSE(Manager::is_initialized());
+
+    ASSERT_EQ(get_next_event_id(), EventTraits::invalid_event_id);
+
+    Manager::initialize();
+
+    ASSERT_TRUE(Manager::is_initialized());
+
+    ASSERT_NE(get_next_event_id(), EventTraits::invalid_event_id);
+
+    Manager::finalize();
+}
+
 class ManagerTest : public ::testing::Test,
                     public scoped::callbacks::Manager,
                     public scoped::ExecutionSpace<execution_space>

@@ -248,12 +248,12 @@ public:
     }
 
     //! Get the next available event ID.
-    uint64_t get_next_event_id() noexcept {
+    auto get_next_event_id() noexcept {
         return next_event_id.fetch_add(1, std::memory_order_relaxed);
     }
 
     //! Get the next available section ID.
-    uint32_t get_next_section_id() noexcept {
+    auto get_next_section_id() noexcept {
         return next_section_id.fetch_add(1, std::memory_order_relaxed);
     }
 
@@ -329,7 +329,7 @@ private:
     template <BeginEvent EventType>
     static auto create_dispatching_callback_for_event_type_impl()
     {
-        return [] (const char* name, const uint32_t dev_id, uint64_t* event_id) -> void
+        return [] (const char* name, const uint32_t dev_id, EventTraits::event_id_t* event_id) -> void
         {
             EventType event{ .name = name, .dev_id = dev_id, .event_id = *event_id };
             get_instance().dispatch(event);
@@ -477,20 +477,23 @@ private:
 
     Kokkos::Tools::Experimental::EventSet context_callbacks {};
 
-    std::atomic<uint64_t> next_event_id{0};
+    std::atomic<EventTraits::event_id_t> next_event_id{0};
     std::atomic<uint32_t> next_section_id{0};
 };
 
+//! If the @ref Manager is initialized, call @ref Manager::dispatch with @c event.
 template <Event EventType>
 void dispatch(const EventType& event) {
-    Manager::get_instance().dispatch(event);
+    if (Manager::is_initialized())
+        Manager::get_instance().dispatch(event);
 }
 
-inline uint64_t get_next_event_id() noexcept {
-    return Manager::get_instance().get_next_event_id();
+//! If the @ref Manager is initialized, return @ref Manager::get_next_event_id. Otherwise, return @ref EventTraits::invalid_event_id.
+inline auto get_next_event_id() noexcept {
+    return Manager::is_initialized() ? Manager::get_instance().get_next_event_id() : EventTraits::invalid_event_id;
 }
 
-inline uint32_t get_next_section_id() noexcept {
+inline auto get_next_section_id() noexcept {
     return Manager::get_instance().get_next_section_id();
 }
 
