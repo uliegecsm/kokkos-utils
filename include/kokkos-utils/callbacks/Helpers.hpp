@@ -99,7 +99,7 @@ public:
 
 private:
     template <size_t Idx, typename IteratorType>
-    bool MatchAndExplainImpl(const IteratorType it_first, const IteratorType it_last, ::testing::MatchResultListener* const listener) const
+    bool MatchAndExplainImpl(const IteratorType& it_first, const IteratorType& it_last, ::testing::MatchResultListener* const listener) const
     {
         if (it_first == it_last) {;
             *listener << "does not contain in order an element that "
@@ -154,7 +154,7 @@ struct PartialMatcher;
 template <>
 struct PartialMatcher<AllocDescriptor>
 {
-    decltype(auto) operator()(AllocDescriptor descr) const {
+    decltype(auto) operator()(const AllocDescriptor& descr) const {
         return ::testing::AllOf(
             ::testing::Field(
                 &AllocDescriptor::kpsh,
@@ -162,7 +162,7 @@ struct PartialMatcher<AllocDescriptor>
             ),
             ::testing::Field(
                 &AllocDescriptor::name,
-                ::testing::StrEq(std::move(descr.name))
+                ::testing::StrEq(descr.name)
             ),
             ::testing::Field(
                 &AllocDescriptor::size,
@@ -180,10 +180,10 @@ struct PartialMatcher<AllocDescriptor>
 template <>
 struct PartialMatcher<BeginDeepCopyEvent>
 {
-    decltype(auto) operator()(BeginDeepCopyEvent event) const {
+    decltype(auto) operator()(const BeginDeepCopyEvent& event) const {
         return ::testing::AllOf(
-            ::testing::Field(&BeginDeepCopyEvent::dst, PartialMatcher<AllocDescriptor>{}(std::move(event.dst))),
-            ::testing::Field(&BeginDeepCopyEvent::src, PartialMatcher<AllocDescriptor>{}(std::move(event.src)))
+            ::testing::Field(&BeginDeepCopyEvent::dst, PartialMatcher<AllocDescriptor>{}(event.dst)),
+            ::testing::Field(&BeginDeepCopyEvent::src, PartialMatcher<AllocDescriptor>{}(event.src))
         );
     }
 };

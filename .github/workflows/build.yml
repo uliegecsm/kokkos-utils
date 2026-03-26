@@ -44,7 +44,7 @@ jobs:
                   files: |
                       .github/**
                       cmake/presets/**
-                      docker/dockerfile.builder
+                      docker/*
                       requirements/**
                       version.json
 
@@ -113,6 +113,7 @@ jobs:
                     - backend        : Cuda
                       compiler:
                         family: gcc
+                        version: 14
                       base_image     : nvcr.io/nvidia/cuda:13.1.0-devel-ubuntu24.04
                       tag_suffix     : -13.1.0
                       platforms      : linux/amd64
@@ -129,6 +130,7 @@ jobs:
                     - backend        : OpenMP
                       compiler:
                         family: gcc
+                        version: 14
                       base_image     : ubuntu:24.04
                       platforms      : linux/amd64
                       tag_suffix     : -amd64
@@ -136,6 +138,7 @@ jobs:
                     - backend        : OpenMP
                       compiler:
                         family: gcc
+                        version: 14
                       base_image     : ubuntu:24.04
                       platforms      : linux/arm64
                       runs-on        : ubuntu-24.04-arm
@@ -143,9 +146,17 @@ jobs:
                     - backend        : OpenMP
                       compiler:
                         family: clang
+                        version: 18
                       base_image     : ubuntu:24.04
                       platforms      : linux/amd64
                       runs-on        : ubuntu-latest
+                    - backend: OpenMP
+                      compiler:
+                        family: clang
+                        version: 22
+                      base_image: ubuntu:24.04
+                      platforms: linux/amd64
+                      runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v6
               with:
@@ -177,14 +188,15 @@ jobs:
                   platforms: ${{ matrix.platforms }}
                   push: ${{ github.ref == 'refs/heads/develop' }}
                   file: docker/dockerfile
-                  tags: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
-                  cache-from: type=registry,ref=${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
+                  tags: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
+                  cache-from: type=registry,ref=${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
                   cache-to: type=inline
                   target: final
                   build-args: |
                       BASE_IMAGE=${{ matrix.base_image }}
                       CMAKE_VERSION=${{ env.CMAKE_VERSION }}
                       COMPILER_FAMILY=${{ matrix.compiler.family }}
+                      COMPILER_VERSION=${{ matrix.compiler.version }}
                       DOXYGEN_VERSION=${{ env.DOXYGEN_VERSION }}
                       GOOGLETEST_VERSION=${{ env.GOOGLETEST_VERSION }}
                       KOKKOS_ARCH=${{ matrix.kokkos_arch }}
@@ -210,6 +222,7 @@ jobs:
                     - backend: OpenMP
                       compiler:
                         family: gcc
+                        version: 14
         steps:
             - uses: docker/login-action@v4
               with:
@@ -219,9 +232,9 @@ jobs:
 
             - run: |
                 docker buildx imagetools create \
-                    --tag=${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.backend }}${{ matrix.tag_suffix }} \
-                    ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.backend }}${{ matrix.tag_suffix }}-amd64 \
-                    ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.backend }}${{ matrix.tag_suffix }}-arm64
+                    --tag=${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }} \
+                    ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}-amd64 \
+                    ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}-arm64
 
     build-library-and-test:
         needs: [set-vars-and-skips, finalize-images]
@@ -234,6 +247,7 @@ jobs:
                     - backend        : Cuda
                       compiler:
                         family: gcc
+                        version: 14
                       runs-on        : [self-hosted, linux, amd64, docker, cuda, blackwell120]
                       tag_suffix     : -13.1.0
                       platform       : linux/amd64
@@ -247,20 +261,29 @@ jobs:
                     - backend        : OpenMP
                       compiler:
                         family: gcc
+                        version: 14
                       runs-on        : ubuntu-24.04
                       platform       : linux/amd64
                     - backend        : OpenMP
                       compiler:
                         family: gcc
+                        version: 14
                       runs-on        : ubuntu-24.04-arm
                       platform       : linux/arm64
                     - backend        : OpenMP
                       compiler:
                         family: clang
+                        version: 18
+                      runs-on        : ubuntu-latest
+                      platform       : linux/amd64
+                    - backend        : OpenMP
+                      compiler:
+                        family: clang
+                        version: 22
                       runs-on        : ubuntu-latest
                       platform       : linux/amd64
         container:
-            image: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
+            image: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
             options: --platform=${{ matrix.platform }} ${{ matrix.options }}
         steps:
             - uses: actions/checkout@v6
@@ -292,7 +315,7 @@ jobs:
         if: ${{ ! failure() && ! cancelled() }}
         runs-on: [ubuntu-latest]
         container:
-            image: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:gcc-OpenMP
+            image: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:gcc-14-OpenMP
         steps:
             - uses: actions/checkout@v6
 

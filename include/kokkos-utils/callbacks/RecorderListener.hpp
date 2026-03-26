@@ -47,7 +47,7 @@ public:
     template <EventOneOf<EventTypes...> EventType>
     void operator()(const EventType& event) {
         if (matcher(event)) {
-            std::lock_guard lock(mtx);
+            const std::lock_guard lock(mtx);
             recorded_events.push_back(event);
         }
     }
