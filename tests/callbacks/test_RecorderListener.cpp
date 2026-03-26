@@ -205,7 +205,7 @@ TEST_F_WITH_CB_MGR(FenceFinderTest, recorded_events)
 }
 
 struct CustomEvent {
-    uint64_t event_id = 0;
+    EventTraits::event_id_t event_id = EventTraits::invalid_event_id;
 
     bool operator==(const CustomEvent&) const = default;
 };
@@ -216,7 +216,7 @@ inline std::ostream& operator<<(std::ostream& out, const CustomEvent& event) {
 
 struct CustomEventWithPayload {
     std::string payload {};
-    uint64_t event_id = 0;
+    EventTraits::event_id_t event_id = EventTraits::invalid_event_id;
 
     bool operator==(const CustomEventWithPayload&) const = default;
 };

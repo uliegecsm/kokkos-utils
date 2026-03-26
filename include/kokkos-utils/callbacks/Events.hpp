@@ -10,6 +10,13 @@
 namespace Kokkos::utils::callbacks
 {
 
+//! Event traits.
+struct EventTraits {
+    using event_id_t = uint64_t;
+
+    static constexpr event_id_t invalid_event_id = Kokkos::Experimental::finite_max_v<event_id_t>;
+};
+
 //! Equality comparison for @c Kokkos_Profiling_SpaceHandle.
 bool operator==(const Kokkos_Profiling_SpaceHandle& fst, const Kokkos_Profiling_SpaceHandle& snd) {
     return strcmp(fst.name, snd.name) == 0;
@@ -30,7 +37,7 @@ struct BeginParallelForEvent
 {
     std::string name {};
     uint32_t dev_id = 0;
-    uint64_t event_id = 0;
+    EventTraits::event_id_t event_id = EventTraits::invalid_event_id;
 
     bool operator==(const BeginParallelForEvent&) const = default;
 };
@@ -38,7 +45,7 @@ struct BeginParallelForEvent
 //! End-parallel-for event associated with @c Kokkos::Tools::Experimental::EventSet::end_parallel_for.
 struct EndParallelForEvent
 {
-    uint64_t event_id = 0;
+    EventTraits::event_id_t event_id = EventTraits::invalid_event_id;
 
     bool operator==(const EndParallelForEvent&) const = default;
 };
@@ -48,7 +55,7 @@ struct BeginParallelReduceEvent
 {
     std::string name {};
     uint32_t dev_id = 0;
-    uint64_t event_id = 0;
+    EventTraits::event_id_t event_id = EventTraits::invalid_event_id;
 
     bool operator==(const BeginParallelReduceEvent&) const = default;
 };
@@ -56,7 +63,7 @@ struct BeginParallelReduceEvent
 //! End-parallel-reduce event associated with @c Kokkos::Tools::Experimental::EventSet::end_parallel_reduce.
 struct EndParallelReduceEvent
 {
-    uint64_t event_id = 0;
+    EventTraits::event_id_t event_id = EventTraits::invalid_event_id;
 
     bool operator==(const EndParallelReduceEvent&) const = default;
 };
@@ -66,7 +73,7 @@ struct BeginParallelScanEvent
 {
     std::string name {};
     uint32_t dev_id = 0;
-    uint64_t event_id = 0;
+    EventTraits::event_id_t event_id = EventTraits::invalid_event_id;
 
     bool operator==(const BeginParallelScanEvent&) const = default;
 };
@@ -74,7 +81,7 @@ struct BeginParallelScanEvent
 //! End-parallel-scan event associated with @c Kokkos::Tools::Experimental::EventSet::end_parallel_scan.
 struct EndParallelScanEvent
 {
-    uint64_t event_id = 0;
+    EventTraits::event_id_t event_id = EventTraits::invalid_event_id;
 
     bool operator==(const EndParallelScanEvent&) const = default;
 };
@@ -84,7 +91,7 @@ struct BeginFenceEvent
 {
     std::string name {};
     uint32_t dev_id = 0;
-    uint64_t event_id = 0;
+    EventTraits::event_id_t event_id = EventTraits::invalid_event_id;
 
     bool operator==(const BeginFenceEvent&) const = default;
 };
@@ -92,7 +99,7 @@ struct BeginFenceEvent
 //! End-fence event associated with @c Kokkos::Tools::Experimental::EventSet::end_fence.
 struct EndFenceEvent
 {
-    uint64_t event_id = 0;
+    EventTraits::event_id_t event_id = EventTraits::invalid_event_id;
 
     bool operator==(const EndFenceEvent&) const = default;
 };
@@ -222,20 +229,20 @@ concept Event = std::default_initializable<T>
 template <typename EventType>
 concept BeginEvent =
     Event<EventType> &&
-    std::constructible_from<EventType, const char*, uint32_t, uint64_t> &&
+    std::constructible_from<EventType, const char*, uint32_t, EventTraits::event_id_t> &&
     requires (EventType event) {
         { event.name }     -> std::same_as<std::string&>;
         { event.dev_id }   -> std::same_as<uint32_t&>;
-        { event.event_id } -> std::same_as<uint64_t&>;
+        { event.event_id } -> std::same_as<EventTraits::event_id_t&>;
     };
 
 //! Concept to constrain any end event type.
 template <typename EventType>
 concept EndEvent =
     Event<EventType> && (! BeginEvent<EventType>) &&
-    std::constructible_from<EventType, uint64_t> &&
+    std::constructible_from<EventType, EventTraits::event_id_t> &&
     requires (EventType event) {
-        { event.event_id } -> std::same_as<uint64_t&>;
+        { event.event_id } -> std::same_as<EventTraits::event_id_t&>;
     };
 
 //! Concept to constrain any data event type.
@@ -267,7 +274,7 @@ concept NamedEvent =
 //! Concept to constrain any event type that has a member variable @c event_id.
 template <typename EventType>
 concept IndexedEvent = Event<EventType> && requires (EventType event) {
-    { event.event_id } -> std::same_as<uint64_t&>;
+    { event.event_id } -> std::same_as<EventTraits::event_id_t&>;
 };
 
 //! Concept to constrain any event type that has a member variable @c dev_id.
