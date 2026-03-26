@@ -30,7 +30,7 @@ struct RegionTimerListener : public TimerListener<EventTypeMatcher<EventRegionMa
     using base_t           = TimerListener<matcher_t, timer_t>;
 
     template <typename T, typename U = TimerType>
-    RegionTimerListener(T&& matcher_, U&& timer_ = TimerType{}) : base_t{
+    explicit RegionTimerListener(T&& matcher_, U&& timer_ = TimerType{}) : base_t{
         matcher_t{matcher_t{.matcher = {.matcher = {std::forward<T>(matcher_)}}}},
         timer_t{std::forward<U>(timer_)}
     } {}

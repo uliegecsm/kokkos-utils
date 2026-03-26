@@ -240,7 +240,7 @@ public:
     //! Dispatch the event to all registered listeners that can handle it.
     template <Event EventType>
     void dispatch(const EventType& event) const {
-        for (auto& listener: this->listeners) {
+        for (const auto& listener: this->listeners) {
             if (const auto* const callable = dynamic_cast<const impl::ListenerConceptCallOperator<EventType>*>(listener.get()); callable != nullptr) {
                 callable->operator()(event);
             }
