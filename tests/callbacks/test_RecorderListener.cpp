@@ -204,4 +204,104 @@ TEST_F_WITH_CB_MGR(FenceFinderTest, recorded_events)
     Kokkos::utils::callbacks::Manager::unregister_listener(fence_finder.get());
 }
 
+struct CustomEvent {
+    uint64_t event_id = 0;
+
+    bool operator==(const CustomEvent&) const = default;
+};
+
+inline std::ostream& operator<<(std::ostream& out, const CustomEvent& event) {
+    return out << "CustomEvent: " << "{event_id = " << event.event_id << "}";
+}
+
+struct CustomEventWithPayload {
+    std::string payload {};
+    uint64_t event_id = 0;
+
+    bool operator==(const CustomEventWithPayload&) const = default;
+};
+
+inline std::ostream& operator<<(std::ostream& out, const CustomEventWithPayload& event) {
+    return out << "CustomEventWithPayload: " << "{payload = " << event.payload << ", event_id = " << event.event_id << "}";
+}
+
+static_assert(Kokkos::utils::callbacks::Event<CustomEvent>);
+static_assert(Kokkos::utils::callbacks::Event<CustomEventWithPayload>);
+
+DEFINE_EVENT_MATCHER_IN(Kokkos::utils::tests::callbacks, CustomEvent)
+DEFINE_EVENT_MATCHER_IN(Kokkos::utils::tests::callbacks, CustomEventWithPayload)
+
+//! @test Check the behavior of @ref Kokkos::utils::callbacks::RecorderListener<MatcherType, EventTypes...>::record with a mix of @c Kokkos and custom events.
+TEST_F(RecorderListenerTest, record_mix_kokkos_and_custom_events) {
+    using recorder_listener_t = RecorderListener<BeginParallelForEvent, CustomEvent, CustomEventWithPayload>;
+
+    static_assert(std::same_as<
+        Kokkos::utils::callbacks::listener_event_type_list_t<recorder_listener_t>,
+        Kokkos::Impl::type_list<BeginParallelForEvent, CustomEvent, CustomEventWithPayload>
+    >);
+
+    static_assert(Kokkos::utils::callbacks::impl::ImplicitListener<recorder_listener_t>);
+    static_assert(Kokkos::utils::callbacks::impl::ExplicitListener<recorder_listener_t>);
+    static_assert(Kokkos::utils::callbacks::Listener<recorder_listener_t>);
+    static_assert(Kokkos::utils::callbacks::ListenerFor<recorder_listener_t, BeginParallelForEvent, CustomEvent, CustomEventWithPayload>);
+
+    ASSERT_THAT(
+        (recorder_listener_t::record([&exec = this->exec]{
+            MyWorkload<execution_space>{}.execute(exec);
+            Kokkos::utils::callbacks::dispatch(CustomEventWithPayload{
+                .payload = "My taylor is rich.",
+                .event_id = Kokkos::utils::callbacks::get_next_event_id()
+            });
+            Kokkos::utils::callbacks::dispatch(CustomEvent{
+                .event_id = Kokkos::utils::callbacks::get_next_event_id()
+            });
+        })),
+        ContainsInOrder<typename recorder_listener_t::event_variant_t>(
+            ABeginParallelForEvent(
+                ::testing::Field(&BeginParallelForEvent::name, ::testing::StrEq("computation - level 0 - pfor")),
+                ::testing::Field(&BeginParallelForEvent::dev_id, ::testing::Eq(Kokkos::Tools::Experimental::device_id(this->exec))),
+                ::testing::Field(&BeginParallelForEvent::event_id, ::testing::Eq(0))
+            ),
+            ACustomEventWithPayload(
+                ::testing::Field(&CustomEventWithPayload::payload, ::testing::StrEq("My taylor is rich.")),
+                ::testing::Field(&CustomEventWithPayload::event_id, ::testing::Eq(1))
+            ),
+            ACustomEvent(
+                ::testing::Field(&CustomEvent::event_id, ::testing::Eq(2))
+            )
+        )
+    );
+}
+
+//! @test Check the behavior of @ref Kokkos::utils::callbacks::RecorderListener<MatcherType, EventTypes...>::record with only a custom event.
+TEST_F(RecorderListenerTest, record_custom_event) {
+    using recorder_listener_t = RecorderListener<CustomEventWithPayload>;
+
+    static_assert(std::same_as<
+        Kokkos::utils::callbacks::listener_event_type_list_t<recorder_listener_t>,
+        Kokkos::Impl::type_list<CustomEventWithPayload>
+    >);
+
+    static_assert(!Kokkos::utils::callbacks::impl::ImplicitListener<recorder_listener_t>);
+    static_assert(Kokkos::utils::callbacks::impl::ExplicitListener<recorder_listener_t>);
+    static_assert(Kokkos::utils::callbacks::Listener<recorder_listener_t>);
+    static_assert(Kokkos::utils::callbacks::ListenerFor<recorder_listener_t, CustomEventWithPayload>);
+    static_assert(!Kokkos::utils::callbacks::ListenerFor<recorder_listener_t, CustomEvent>);
+
+    ASSERT_THAT(
+        (recorder_listener_t::record([]{
+            Kokkos::utils::callbacks::dispatch(CustomEventWithPayload{
+                .payload = "My taylor is rich.",
+                .event_id = Kokkos::utils::callbacks::get_next_event_id()
+            });
+        })),
+        ::testing::ElementsAre(
+            ACustomEventWithPayload(
+                ::testing::Field(&CustomEventWithPayload::payload, ::testing::StrEq("My taylor is rich.")),
+                ::testing::Field(&CustomEventWithPayload::event_id, ::testing::Eq(0))
+            )
+        )
+    );
+}
+
 } // namespace Kokkos::utils::tests::callbacks

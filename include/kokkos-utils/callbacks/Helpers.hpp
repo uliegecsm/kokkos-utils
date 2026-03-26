@@ -13,16 +13,18 @@ namespace Kokkos::utils::callbacks
                                   public scoped::callbacks::Manager {}; \
     TEST_F(__test_fixture_name__, __test_name__)
 
-#define DEFINE_EVENT_MATCHER(__eventtype__)                                                                  \
+#define DEFINE_EVENT_MATCHER_IN(__namespace__, __eventtype__)                                                \
     template <typename... Matchers>                                                                          \
     auto A##__eventtype__(Matchers&&... matchers)                                                            \
     {                                                                                                        \
-        using EventType = Kokkos::utils::callbacks::__eventtype__;                                           \
+        using EventType = __namespace__::__eventtype__;                                                      \
         if constexpr (sizeof...(Matchers) == 0)                                                              \
             return ::testing::VariantWith<EventType>(::testing::_);                                          \
         else                                                                                                 \
             return ::testing::VariantWith<EventType>(::testing::AllOf(std::forward<Matchers>(matchers)...)); \
     }
+
+#define DEFINE_EVENT_MATCHER(__eventtype__) DEFINE_EVENT_MATCHER_IN(Kokkos::utils::callbacks, __eventtype__)
 
 DEFINE_EVENT_MATCHER(BeginParallelForEvent)
 DEFINE_EVENT_MATCHER(EndParallelForEvent)
@@ -44,13 +46,15 @@ DEFINE_EVENT_MATCHER(PushRegionEvent)
 DEFINE_EVENT_MATCHER(PopRegionEvent)
 DEFINE_EVENT_MATCHER(ProfileEvent)
 
-#define DEFINE_EVENT_WITH_NAME_MATCHER(__eventtype__)                                                                 \
+#define DEFINE_EVENT_WITH_NAME_MATCHER_IN(__namespace__, __eventtype__)                                               \
     template <typename Matcher>                                                                                       \
     auto A##__eventtype__##WithName(Matcher&& matcher)                                                                \
     {                                                                                                                 \
-        using EventType = Kokkos::utils::callbacks::__eventtype__;                                                    \
+        using EventType = __namespace__::__eventtype__;                                                               \
         return ::testing::VariantWith<EventType>(::testing::Field(&EventType::name, std::forward<Matcher>(matcher))); \
     }
+
+#define DEFINE_EVENT_WITH_NAME_MATCHER(__eventtype__) DEFINE_EVENT_WITH_NAME_MATCHER_IN(Kokkos::utils::callbacks, __eventtype__)
 
 DEFINE_EVENT_WITH_NAME_MATCHER(BeginParallelForEvent)
 DEFINE_EVENT_WITH_NAME_MATCHER(BeginParallelReduceEvent)

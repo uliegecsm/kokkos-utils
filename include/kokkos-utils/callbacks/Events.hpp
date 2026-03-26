@@ -211,9 +211,12 @@ using EventTypeList = Kokkos::Impl::type_list<
 
 //! @name Concepts to constrain event types of similar nature.
 ///@{
-//! Concept to constrain any event type in @ref Kokkos::utils::callbacks::EventTypeList.
+//! Concept to constrain any event type.
 template <typename T>
-concept Event = impl::type_list_contains_v<T, EventTypeList>;
+concept Event = std::default_initializable<T>
+    && std::copyable<T>
+    && std::movable<T>
+    && std::equality_comparable<T>;
 
 //! Concept to constrain any begin event type.
 template <typename EventType>
@@ -313,12 +316,6 @@ constexpr auto get_name() {
     return Kokkos::Impl::TypeInfo<T>::name().substr(26);
 }
 
-template <Event EventType>
-std::ostream& operator<<(std::ostream &out, const EventType& /* event */) {
-    return out << get_name<EventType>() << ": "
-               << "{}";
-}
-
 template <BeginEvent EventType>
 std::ostream& operator<<(std::ostream &out, const EventType& event) {
     return out << get_name<EventType>() << ": "
@@ -346,6 +343,11 @@ inline std::ostream& operator<<(std::ostream &out, const BeginDeepCopyEvent& eve
                << "dst = "  << std::quoted(dst.name) << " (" << dst.kpsh.name << ", " << dst.ptr << ") of size " << src.size << "}";
 }
 
+inline std::ostream& operator<<(std::ostream &out, const EndDeepCopyEvent& /* event */) {
+    return out << get_name<EndDeepCopyEvent>() << ": "
+               << "{}";
+}
+
 inline std::ostream& operator<<(std::ostream &out, const CreateProfileSectionEvent& event) {
     return out << get_name<CreateProfileSectionEvent>() << ": "
                << "{name = " << std::quoted(event.name) << ", section_id = " << event.section_id << "}";
@@ -360,6 +362,11 @@ std::ostream& operator<<(std::ostream &out, const EventType& event) {
 inline std::ostream& operator<<(std::ostream &out, const PushRegionEvent& event) {
     return out << get_name<PushRegionEvent>() << ": "
                << "{name = " << std::quoted(event.name) << "}";
+}
+
+inline std::ostream& operator<<(std::ostream &out, const PopRegionEvent& /* event */) {
+    return out << get_name<PopRegionEvent>() << ": "
+               << "{}";
 }
 
 inline std::ostream& operator<<(std::ostream &out, const ProfileEvent& event) {

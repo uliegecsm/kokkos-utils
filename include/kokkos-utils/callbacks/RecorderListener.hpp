@@ -3,6 +3,7 @@
 
 #include <deque>
 #include <functional>
+#include <mutex>
 #include <variant>
 
 #include "kokkos-utils/callbacks/Listener.hpp"
@@ -37,9 +38,18 @@ public:
     explicit RecorderListener(T&& matcher_)
       : matcher(std::forward<T>(matcher_)) {}
 
+    RecorderListener(const RecorderListener&)            = delete;
+    RecorderListener& operator=(const RecorderListener&) = delete;
+    RecorderListener(RecorderListener&&)                 = delete;
+    RecorderListener& operator=(RecorderListener&&)      = delete;
+
+    //! Ensure atomic growth of @ref recorded_events with @ref mtx.
     template <EventOneOf<EventTypes...> EventType>
     void operator()(const EventType& event) {
-        if (matcher(event)) this->recorded_events.push_back(event);
+        if (matcher(event)) {
+            std::lock_guard lock(mtx);
+            recorded_events.push_back(event);
+        }
     }
 
     /**
@@ -82,6 +92,7 @@ public:
 
 private:
     MatcherType matcher {};
+    mutable std::mutex mtx;
 };
 
 template <typename MatcherType, Event... EventTypes>
