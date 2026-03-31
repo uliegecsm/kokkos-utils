@@ -22,7 +22,7 @@ function(add_one_test)
     # Set the test name, executable name and primary source file.
     cmake_path(SET SOURCE_FILE "test_${aot_args_NAME}.cpp")
     cmake_path(ABSOLUTE_PATH SOURCE_FILE)
-    
+
     get_parent_relpath_repr(DIRECTORY ${CMAKE_SOURCE_DIR} FILENAME ${SOURCE_FILE})
 
     set(EXECUTABLE_NAME ${gprr_PARENT_RELPATH_REPR}_${aot_args_NAME})

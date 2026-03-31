@@ -400,7 +400,7 @@ TEST(ConjunctionMatcher, order_of_evaluation)
         BeginFenceEvent{.name = "matcher-a", .event_id = 0},
         BeginFenceEvent{.name = "matcher-a", .event_id = 1}
     ));
-    
+
     //! The forth matcher will be evaluated for all events for which the third matcher evaluated to @c true.
     ASSERT_THAT(std::get<3>(matcher.matchers).encountered, ::testing::IsEmpty());
 }

@@ -152,7 +152,7 @@ install(
     FILES "${CMAKE_CURRENT_BINARY_DIR}/KokkosUtilsConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/KokkosUtilsConfigVersion.cmake"
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/KokkosUtils)
 
-install(TARGETS kokkosutils 
+install(TARGETS kokkosutils
     EXPORT KokkosUtilsTargets
     FILE_SET headers
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
