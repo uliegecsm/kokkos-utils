@@ -152,7 +152,7 @@ TEST_F(TimerListenerTest, with_launch)
     using parallel_for_with_launch_timer_t = ParallelForWithLaunchTimerListener<EventNameMatcher, execution_space>;
 
     using unit_t = Kokkos::utils::timer::microseconds;
-    
+
     Kokkos::utils::timer::Timer<void> timer_external;
 
     const auto par_for_timer = std::make_shared<parallel_for_with_launch_timer_t>(

@@ -174,7 +174,7 @@ struct PartialMatcher<AllocDescriptor>
 
 /**
  * Uses @ref Kokkos::utils::callbacks::PartialMatcher<AllocDescriptor> for the
- * @ref Kokkos::utils::callbacks::BeginDeepCopyEvent::dst and 
+ * @ref Kokkos::utils::callbacks::BeginDeepCopyEvent::dst and
  * @ref Kokkos::utils::callbacks::BeginDeepCopyEvent::src.
  */
 template <>

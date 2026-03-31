@@ -24,6 +24,15 @@ env:
 
 jobs:
 
+    pre-commit:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.14'
+      - uses: pre-commit/action@v3.0.1
+
     set-vars-and-skips:
         runs-on: ubuntu-latest
         outputs:
