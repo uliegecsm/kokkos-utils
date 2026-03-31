@@ -47,6 +47,28 @@ TEST(ContainsInOrderMatcher, Matches)
     ASSERT_THAT(vec, ::testing::Not(ContainsInOrder<int>(::testing::Eq(2), ::testing::Eq(1))));
 }
 
+//! @test Check that @ref Kokkos::utils::tests::callbacks::ElementAt can describe itself.
+TEST(ElementAtMatcher, CanDescribeItself)
+{
+    const auto matcher = ElementAt<int>(42, ::testing::Eq(666));
+    ASSERT_EQ(::testing::DescribeMatcher<std::vector<int>>(matcher), "element at index 42 is equal to 666");
+
+    const auto matcher_not = ::testing::Not(ElementAt<int>(42, ::testing::Eq(666)));
+    ASSERT_EQ(::testing::DescribeMatcher<std::vector<int>>(matcher_not), "element at index 42 isn't equal to 666");
+}
+
+//! @test Check that @ref Kokkos::utils::tests::callbacks::ElementAt matches as expected.
+TEST(ElementAtMatcher, Matches)
+{
+    const std::vector<int> vec{1, 2, 3, 4};
+    ASSERT_THAT(vec,                ElementAt<int>( 0, ::testing::Eq(1)));
+    ASSERT_THAT(vec,                ElementAt<int>( 1, ::testing::Eq(2)));
+    ASSERT_THAT(vec,                ElementAt<int>( 2, ::testing::Eq(3)));
+    ASSERT_THAT(vec,                ElementAt<int>( 3, ::testing::Eq(4)));
+    ASSERT_THAT(vec, ::testing::Not(ElementAt<int>( 0, ::testing::Eq(2))));
+    ASSERT_THAT(vec, ::testing::Not(ElementAt<int>(42, ::testing::Eq(2))));
+}
+
 //! @test Check that @ref Kokkos::utils::callbacks::PartialMatcher works as expected for @ref Kokkos::utils::callbacks::AllocDescriptor.
 TEST(PartialMatcher, AllocDescriptor)
 {

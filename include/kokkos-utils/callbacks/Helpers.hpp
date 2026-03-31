@@ -136,11 +136,58 @@ private:
     std::tuple<Matchers...> matchers;
 };
 
+template <typename ElementType, typename ElementMatcher>
+class ElementAtMatcher
+{
+public:
+    explicit ElementAtMatcher(const size_t index, ElementMatcher matcher)
+        : m_index(index), m_matcher(std::move(matcher)) {}
+
+    template <typename IterableType>
+    bool MatchAndExplain(const IterableType& arg, ::testing::MatchResultListener* const listener) const
+    {
+        if (m_index >= arg.size()) {
+            *listener << "index " << m_index << " is out of bounds (size " << arg.size() << ")";
+            return false;
+        }
+        return ::testing::ExplainMatchResult(m_matcher, arg[m_index], listener);
+    }
+
+    void DescribeTo(std::ostream* out) const
+    {
+        *out << "element at index " << m_index << " "
+             << ::testing::DescribeMatcher<ElementType>(m_matcher, false);
+    }
+
+    void DescribeNegationTo(std::ostream* out) const
+    {
+        *out << "element at index " << m_index << " "
+             << ::testing::DescribeMatcher<ElementType>(m_matcher, true);
+    }
+
+private:
+    size_t m_index;
+    ElementMatcher m_matcher;
+};
+
 } // namespace impl
 
 template <typename T, typename... Matchers>
 auto ContainsInOrder(Matchers&&... matchers) {
     return ::testing::MakePolymorphicMatcher(impl::ContainsInOrderMatcher<T, std::remove_cvref_t<Matchers>...>(std::forward<Matchers>(matchers)...));
+}
+
+/**
+ * @brief Check that an element at a given index matches.
+ *
+ * @code
+ * ASSERT_THAT(iterable, ElementAt(index, matcher));
+ * @endcode
+ */
+template <typename ElementType, typename ElementMatcher>
+auto ElementAt(const size_t index, ElementMatcher&& matcher) {
+    return ::testing::MakePolymorphicMatcher(
+        impl::ElementAtMatcher<ElementType, std::remove_cvref_t<ElementMatcher>>{index, std::forward<ElementMatcher>(matcher)});
 }
 
 template <typename T>
