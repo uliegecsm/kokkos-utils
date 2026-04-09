@@ -15,7 +15,9 @@ namespace Kokkos::utils::callbacks
 template <Matcher... MatcherTypes> requires (sizeof...(MatcherTypes) > 1)
 struct ConjunctionMatcher
 {
-    template <typename... Args> requires (sizeof...(Args) == sizeof...(MatcherTypes))
+    ConjunctionMatcher() = default;
+
+    template <typename... Args> requires (sizeof...(Args) > 0 && sizeof...(Args) == sizeof...(MatcherTypes))
     explicit ConjunctionMatcher(Args&&... args) : matchers(std::forward<Args>(args)...) {}
 
     template <Event EventType> requires (MatcherFor<MatcherTypes, EventType> && ...)
@@ -26,7 +28,7 @@ struct ConjunctionMatcher
         }, matchers);
     }
 
-    std::tuple<MatcherTypes...> matchers;
+    std::tuple<MatcherTypes...> matchers {};
 };
 
 template <typename... MatcherTypes>

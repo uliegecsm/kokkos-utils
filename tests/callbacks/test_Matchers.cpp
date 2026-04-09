@@ -347,6 +347,14 @@ TEST(ConjunctionMatcher, different_event_type_sets)
     ASSERT_TRUE (matcher(BeginFenceEvent{.name = "my-triggering-event"}));
 }
 
+//! @test Check that @ref Kokkos::utils::callbacks::ConjunctionMatcher can be default constructed.
+TEST(ConjunctionMatcher, default_constructed)
+{
+    using matcher_t = ConjunctionMatcher<AnyEventMatcher, AnyEventMatcher>;
+
+    static_assert(std::default_initializable<matcher_t>);
+}
+
 //! Helper matcher that records in @ref encountered all the events passed to it.
 template <Matcher MatcherType>
 struct RecordingMatcher
