@@ -1,6 +1,8 @@
 #ifndef KOKKOS_UTILS_TESTS_SCOPED_EXECUTIONSPACE_HPP
 #define KOKKOS_UTILS_TESTS_SCOPED_EXECUTIONSPACE_HPP
 
+#include "Kokkos_Core.hpp"
+
 namespace Kokkos::utils::tests::scoped
 {
 
