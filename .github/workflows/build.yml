@@ -337,7 +337,7 @@ jobs:
               run : |
                   python3 tests/check_tag_file.py --tag-file=$PWD/build-with-gcc-OpenMP/docs/html/kokkos-utils.tag
 
-            - uses: actions/upload-pages-artifact@v4
+            - uses: actions/upload-pages-artifact@v5
               with:
                   path: build-with-gcc-OpenMP/docs/html
 
