@@ -63,7 +63,12 @@ struct EventRegionMatcher
         return TrueOnBoundary ? false : this->matching;
     }
 
-    MatcherType matcher {};
+    //! The preprocessor condition is a workaround for an ICE in nvcc 12.8 with gcc 14.2.0.
+#if defined(KOKKOS_ENABLE_CUDA) && (defined(KOKKOS_COMPILER_GNU) && KOKKOS_COMPILER_GNU == 1420) && (defined(KOKKOS_COMPILER_NVCC) && KOKKOS_COMPILER_NVCC == 1280)
+    MatcherType matcher;
+#else
+    MatcherType matcher{};
+#endif
     bool matching = false;
     uint32_t nested_level = invalid_nested_level;
 };
