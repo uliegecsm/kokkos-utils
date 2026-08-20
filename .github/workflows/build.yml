@@ -195,7 +195,7 @@ jobs:
               with:
                   context: .
                   platforms: ${{ matrix.platforms }}
-                  push: ${{ github.ref == 'refs/heads/develop' }}
+                  push: true #${{ github.ref == 'refs/heads/develop' }}
                   file: docker/dockerfile
                   tags: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
                   cache-from: type=registry,ref=${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}

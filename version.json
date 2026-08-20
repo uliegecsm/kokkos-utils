@@ -4,7 +4,7 @@
     },
     "dependencies" : {
         "cmake" : {
-            "value" : "4.2.1"
+            "value" : "4.4.2"
         },
         "doxygen" : {
             "value" : "1.13.2"
@@ -13,11 +13,11 @@
             "value" : "1.9.5"
         },
         "googletest" : {
-            "value" : "1.17.0"
+            "value" : "1.18.0"
         },
         "kokkos" : {
-            "value" : "5.1.99",
-            "sha"   : "1a270d792150b24bf28d085d4007e5d3851759bf"
+            "value" : "5.2.99",
+            "sha"   : "e511cd4f64f6d77a3b3a24933b87073bfc397820"
         }
     }
 }
