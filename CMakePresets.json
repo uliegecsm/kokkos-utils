@@ -26,6 +26,12 @@
             "cacheVariables" : {"CMAKE_CXX_COMPILER" : "clang++"}
         },
         {
+            "$comment": "Inherit from this preset to use the intel compiler family.",
+            "name"           : "intel",
+            "hidden"         : true,
+            "cacheVariables" : {"CMAKE_CXX_COMPILER" : "icpx"}
+        },
+        {
             "$comment": "Inherit from this preset to use the rocm compiler family.",
             "name"           : "rocm",
             "hidden"         : true,
@@ -51,30 +57,37 @@
         },
         {
             "name"           : "gcc-OpenMP",
-            "inherits"       : ["default", "gcc"],
+            "inherits"       : ["gcc", "default"],
             "cacheVariables" : {
                 "EXPECTED_Kokkos_DEVICES" : "SERIAL;OPENMP"
             }
         },
         {
             "name"           : "clang-OpenMP",
-            "inherits"       : ["cxx23", "default", "clang", "clang-tidy"],
+            "inherits"       : ["clang-tidy", "clang", "cxx23", "default"],
             "cacheVariables" : {
                 "EXPECTED_Kokkos_DEVICES" : "SERIAL;OPENMP"
             }
         },
         {
             "name"           : "gcc-Cuda",
-            "inherits"       : ["default", "Cuda"],
+            "inherits"       : ["Cuda", "default"],
             "cacheVariables" : {
                 "EXPECTED_Kokkos_DEVICES" : "SERIAL;OPENMP;CUDA"
             }
         },
         {
             "name"           : "rocm-HIP",
-            "inherits"       : ["default", "rocm"],
+            "inherits"       : ["rocm", "default"],
             "cacheVariables" : {
                 "EXPECTED_Kokkos_DEVICES" : "SERIAL;OPENMP;HIP"
+            }
+        },
+        {
+            "name"     : "intel-SYCL",
+            "inherits" : ["intel", "default"],
+            "cacheVariables" : {
+                "EXPECTED_Kokkos_DEVICES" : "SERIAL;OPENMP;SYCL"
             }
         }
     ],
@@ -102,6 +115,11 @@
         {
             "name"            : "rocm-HIP",
             "configurePreset" : "rocm-HIP",
+            "inherits"        : "default"
+        },
+        {
+            "name"            : "intel-SYCL",
+            "configurePreset" : "intel-SYCL",
             "inherits"        : "default"
         }
     ],
@@ -135,6 +153,11 @@
         {
             "name"            : "rocm-HIP",
             "configurePreset" : "rocm-HIP",
+            "inherits"        : "default"
+        },
+        {
+            "name"            : "intel-SYCL",
+            "configurePreset" : "intel-SYCL",
             "inherits"        : "default"
         }
     ]

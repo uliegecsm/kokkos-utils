@@ -146,6 +146,14 @@ jobs:
                       kokkos_arch    : AMD_GFX1201
                       runs-on        : ubuntu-latest
                       python_version : 3.14
+                    - backend        : SYCL
+                      compiler:
+                        family: intel
+                        version: '2026.0'
+                      base_image     : nvcr.io/nvidia/cuda:12.8.1-devel-ubuntu24.04
+                      platforms      : linux/amd64
+                      kokkos_arch    : VOLTA70
+                      runs-on        : ubuntu-latest
                     - backend        : OpenMP
                       compiler:
                         family: gcc
@@ -207,7 +215,7 @@ jobs:
               with:
                   context: .
                   platforms: ${{ matrix.platforms }}
-                  push: ${{ github.ref == 'refs/heads/develop' }}
+                  push: true #${{ github.ref == 'refs/heads/develop' }}
                   file: docker/dockerfile
                   tags: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
                   cache-from: type=registry,ref=${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
@@ -287,6 +295,12 @@ jobs:
                       tag_suffix     : -7.14.0
                       platform       : linux/amd64
                       options        : --device /dev/kfd --device /dev/dri
+                    - backend        : SYCL
+                      compiler:
+                        family: intel
+                        version: '2026.0'
+                      runs-on        : [self-hosted, linux, amd64, docker, cuda, volta70]
+                      platform       : linux/amd64
                     - backend        : OpenMP
                       compiler:
                         family: gcc
