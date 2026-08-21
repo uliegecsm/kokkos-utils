@@ -29,6 +29,12 @@
             "cacheVariables" : {"CMAKE_CXX_COMPILER" : "clang++"}
         },
         {
+            "$comment": "Inherit from this preset to use the intel compiler family.",
+            "name"           : "intel",
+            "hidden"         : true,
+            "cacheVariables" : {"CMAKE_CXX_COMPILER" : "icpx"}
+        },
+        {
             "$comment": "Inherit from this preset to use the rocm compiler family.",
             "name"           : "rocm",
             "hidden"         : true,
@@ -63,20 +69,39 @@
             }
         },
         {
+            "$comment": "Inherit from this preset to use the SYCL backend.",
+            "name"     : "SYCL",
+            "hidden"         : true,
+            "cacheVariables" : {
+                "Kokkos_ENABLE_SYCL" : "ON",
+                "$comment": "RDC is enabled because of https://github.com/uliegecsm/kokkos-execution/pull/114#issuecomment-4153192133. It requires building static libs.",
+                "Kokkos_ENABLE_SYCL_RELOCATABLE_DEVICE_CODE": "ON",
+                "BUILD_SHARED_LIBS": "OFF",
+                "Kokkos_ENABLE_ONEDPL" : "OFF",
+                "Kokkos_ENABLE_UNSUPPORTED_ARCHS" : "ON",
+                "CMAKE_CXX_FLAGS" : "-fp-model=precise",
+                "EXPECTED_Kokkos_DEVICES" : "SERIAL;OPENMP;SYCL"
+            }
+        },
+        {
             "name"     : "gcc-OpenMP",
-            "inherits" : ["default", "gcc", "OpenMP"]
+            "inherits" : ["OpenMP", "gcc", "default"]
         },
         {
             "name"     : "clang-OpenMP",
-            "inherits" : ["default", "clang", "OpenMP"]
+            "inherits" : ["OpenMP", "clang", "default"]
         },
         {
             "name"     : "gcc-Cuda",
-            "inherits" : ["default", "gcc", "OpenMP", "Cuda"]
+            "inherits" : ["Cuda", "OpenMP", "gcc", "default"]
         },
         {
             "name"     : "rocm-HIP",
-            "inherits" : ["default", "rocm", "OpenMP", "HIP"]
+            "inherits" : ["HIP", "OpenMP", "rocm", "default"]
+        },
+        {
+            "name"     : "intel-SYCL",
+            "inherits" : ["SYCL", "OpenMP", "intel", "default"]
         }
     ],
     "buildPresets" : [
@@ -103,6 +128,11 @@
         {
             "name"            : "rocm-HIP",
             "configurePreset" : "rocm-HIP",
+            "inherits"        : "default"
+        },
+        {
+            "name"            : "intel-SYCL",
+            "configurePreset" : "intel-SYCL",
             "inherits"        : "default"
         }
     ]
