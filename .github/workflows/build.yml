@@ -136,6 +136,15 @@ jobs:
                       platforms      : linux/amd64
                       kokkos_arch    : AMD_GFX906
                       runs-on        : ubuntu-latest
+                    - backend        : HIP
+                      compiler:
+                        family: rocm
+                      base_image     : rocm/dev-ubuntu-26.04:7.14.0-full
+                      tag_suffix     : -7.14.0
+                      platforms      : linux/amd64
+                      kokkos_arch    : AMD_GFX1201
+                      runs-on        : ubuntu-latest
+                      python_version : 3.14
                     - backend        : OpenMP
                       compiler:
                         family: gcc
@@ -211,6 +220,7 @@ jobs:
                       KOKKOS_ARCH=${{ matrix.kokkos_arch }}
                       KOKKOS_PRESET=${{ matrix.compiler.family }}-${{ matrix.backend }}
                       KOKKOS_SHA=${{ env.KOKKOS_SHA }}
+                      PYTHON_VERSION=${{ matrix.python_version || '3.12' }}
                   labels: "org.opencontainers.image.source=${{ github.repositoryUrl }}"
 
     finalize-images:
@@ -265,6 +275,13 @@ jobs:
                         family: rocm
                       runs-on        : [self-hosted, linux, amd64, docker, rocm, amd_gfx906]
                       tag_suffix     : -6.4.3
+                      platform       : linux/amd64
+                      options        : --device /dev/kfd --device /dev/dri
+                    - backend        : HIP
+                      compiler:
+                        family: rocm
+                      runs-on        : [self-hosted, linux, amd64, docker, rocm, amd_gfx1201]
+                      tag_suffix     : -7.14.0
                       platform       : linux/amd64
                       options        : --device /dev/kfd --device /dev/dri
                     - backend        : OpenMP
