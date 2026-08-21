@@ -124,7 +124,7 @@ jobs:
                         family: gcc
                         version: 15
                       base_image     : nvcr.io/nvidia/cuda:13.3.1-devel-ubuntu26.04
-                      tag_suffix     : -13.3.1
+                      tag_suffix     : -13.3.1-blackwell120
                       platforms      : linux/amd64
                       kokkos_arch    : BLACKWELL120
                       runs-on        : ubuntu-latest
@@ -133,7 +133,7 @@ jobs:
                       compiler:
                         family: rocm
                       base_image     : rocm/dev-ubuntu-24.04:6.4.3
-                      tag_suffix     : -6.4.3
+                      tag_suffix     : -6.4.3-amd_gfx906
                       platforms      : linux/amd64
                       kokkos_arch    : AMD_GFX906
                       runs-on        : ubuntu-latest
@@ -141,7 +141,7 @@ jobs:
                       compiler:
                         family: rocm
                       base_image     : rocm/dev-ubuntu-26.04:7.14.0-full
-                      tag_suffix     : -7.14.0
+                      tag_suffix     : -7.14.0-amd_gfx1201
                       platforms      : linux/amd64
                       kokkos_arch    : AMD_GFX1201
                       runs-on        : ubuntu-latest
@@ -151,6 +151,7 @@ jobs:
                         family: intel
                         version: '2026.0'
                       base_image     : nvcr.io/nvidia/cuda:12.8.1-devel-ubuntu24.04
+                      tag_suffix     : -volta70
                       platforms      : linux/amd64
                       kokkos_arch    : VOLTA70
                       runs-on        : ubuntu-latest
@@ -215,10 +216,10 @@ jobs:
               with:
                   context: .
                   platforms: ${{ matrix.platforms }}
-                  push: true #${{ github.ref == 'refs/heads/develop' }}
+                  push: ${{ github.ref == 'refs/heads/develop' }}
                   file: docker/dockerfile
-                  tags: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
-                  cache-from: type=registry,ref=${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
+                  tags: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}${{ matrix.compiler.version && '-' || '' }}${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
+                  cache-from: type=registry,ref=${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}${{ matrix.compiler.version && '-' || '' }}${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
                   cache-to: type=inline
                   target: final
                   build-args: |
@@ -279,20 +280,20 @@ jobs:
                         family: gcc
                         version: 15
                       runs-on        : [self-hosted, linux, amd64, docker, cuda, blackwell120]
-                      tag_suffix     : -13.3.1
+                      tag_suffix     : -13.3.1-blackwell120
                       platform       : linux/amd64
                     - backend        : HIP
                       compiler:
                         family: rocm
                       runs-on        : [self-hosted, linux, amd64, docker, rocm, amd_gfx906]
-                      tag_suffix     : -6.4.3
+                      tag_suffix     : -6.4.3-amd_gfx906
                       platform       : linux/amd64
                       options        : --device /dev/kfd --device /dev/dri
                     - backend        : HIP
                       compiler:
                         family: rocm
                       runs-on        : [self-hosted, linux, amd64, docker, rocm, amd_gfx1201]
-                      tag_suffix     : -7.14.0
+                      tag_suffix     : -7.14.0-amd_gfx1201
                       platform       : linux/amd64
                       options        : --device /dev/kfd --device /dev/dri
                     - backend        : SYCL
@@ -300,6 +301,7 @@ jobs:
                         family: intel
                         version: '2026.0'
                       runs-on        : [self-hosted, linux, amd64, docker, cuda, volta70]
+                      tag_suffix     : -volta70
                       platform       : linux/amd64
                     - backend        : OpenMP
                       compiler:
@@ -326,7 +328,7 @@ jobs:
                       runs-on        : ubuntu-latest
                       platform       : linux/amd64
         container:
-            image: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}-${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
+            image: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}${{ matrix.compiler.version && '-' || '' }}${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
             options: --platform=${{ matrix.platform }} ${{ matrix.options }}
         steps:
             - uses: actions/checkout@v7
