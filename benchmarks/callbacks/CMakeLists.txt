@@ -4,6 +4,11 @@ target_sources(
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/benchmark_RegionTimer.cpp
 )
+target_include_directories(
+    benchmarks_callbacks_RegionTimer
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}
+)
 target_link_libraries(
     benchmarks_callbacks_RegionTimer
     PRIVATE

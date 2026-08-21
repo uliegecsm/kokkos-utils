@@ -1,5 +1,3 @@
-#include "benchmark/benchmark.h"
-
 #include "Kokkos_Core.hpp"
 
 #include "kokkos-utils/callbacks/EventNameMatcher.hpp"
@@ -7,6 +5,8 @@
 #include "kokkos-utils/callbacks/SequenceOfRegionTimerListener.hpp"
 
 #include "kokkos-utils/tests/scoped/callbacks/Manager.hpp"
+
+#include "tests/Benchmarking.hpp"
 
 /**
  * @addtogroup unitbenchmarks
@@ -94,6 +94,9 @@ public:
     using impl_t = T;
 
 public:
+    FIXME_PARTIAL_OVERRIDE_WARNING_NVCC(TearDown)
+    FIXME_PARTIAL_OVERRIDE_WARNING_NVCC(SetUp)
+
     void SetUp(const ::benchmark::State& state) override {
         impl.emplace(state);
     }

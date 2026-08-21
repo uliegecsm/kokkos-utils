@@ -102,8 +102,10 @@ private:
     bool MatchAndExplainImpl(const IteratorType& it_first, const IteratorType& it_last, ::testing::MatchResultListener* const listener) const
     {
         if (it_first == it_last) {;
-            *listener << "does not contain in order an element that "
-                      << ::testing::DescribeMatcher<T>(std::get<Idx>(matchers), false);
+            if (listener->IsInterested()) {
+                *listener->stream() << "does not contain in order an element that "
+                                    << ::testing::DescribeMatcher<T>(std::get<Idx>(matchers), false);
+            }
             return false;
         }
 
@@ -147,8 +149,10 @@ public:
     bool MatchAndExplain(const IterableType& arg, ::testing::MatchResultListener* const listener) const
     {
         if (m_index >= arg.size()) {
-            *listener << "index " << m_index << " is out of bounds (size " << arg.size() << ")";
-            return false;
+            if (listener->IsInterested()) {
+                *listener->stream() << "index " << m_index << " is out of bounds (size " << arg.size() << ")";
+                return false;
+            }
         }
         return ::testing::ExplainMatchResult(m_matcher, arg[m_index], listener);
     }

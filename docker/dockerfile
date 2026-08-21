@@ -43,7 +43,17 @@ RUN <<EOF
     g++ -dumpfullversion -dumpversion
 EOF
 
+COPY <<EOF /opt/toolchain.cmake
+set(CMAKE_C_COMPILER /usr/bin/gcc)
+set(CMAKE_CXX_COMPILER /usr/bin/g++)
+EOF
+
 FROM requirements-python AS requirements-compiler-rocm
+
+COPY <<EOF /opt/toolchain.cmake
+set(CMAKE_C_COMPILER /usr/bin/amdclang)
+set(CMAKE_CXX_COMPILER /usr/bin/amdclang++)
+EOF
 
 FROM requirements-python AS requirements-compiler-clang
 
@@ -71,6 +81,11 @@ RUN <<EOF
         clang++=clang++-${COMPILER_VERSION}                  \
         clang-tidy=clang-tidy-${COMPILER_VERSION}            \
         clang-format=clang-format-${COMPILER_VERSION}
+EOF
+
+COPY <<EOF /opt/toolchain.cmake
+set(CMAKE_C_COMPILER /usr/bin/clang)
+set(CMAKE_CXX_COMPILER /usr/bin/clang++)
 EOF
 
 FROM requirements-compiler-${COMPILER_FAMILY} AS requirements-system
@@ -126,6 +141,7 @@ RUN <<EOF
     cd doxygen
 
     cmake -S . -B build \
+        --toolchain /opt/toolchain.cmake \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/opt/doxygen-${DOXYGEN_VERSION}
 
@@ -145,6 +161,7 @@ RUN <<EOF
     cd googletest
 
     cmake -S . -B build \
+        --toolchain /opt/toolchain.cmake \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/opt/google-test-${GOOGLETEST_VERSION}
 
@@ -168,6 +185,7 @@ RUN <<EOF
     git checkout f649efee480295b01a04bf077cdd50b3293d56c5
 
     cmake -S . -B build \
+        --toolchain /opt/toolchain.cmake \
         -DCMAKE_INSTALL_PREFIX=/opt/google-benchmark-${GOOGLEBENCHMARK_VERSION} \
         -DCMAKE_BUILD_TYPE=Release \
         -DBENCHMARK_ENABLE_TESTING=OFF \
