@@ -122,7 +122,7 @@ jobs:
                     - backend        : Cuda
                       compiler:
                         family: gcc
-                        version: 14
+                        version: 15
                       base_image     : nvcr.io/nvidia/cuda:13.3.1-devel-ubuntu26.04
                       tag_suffix     : -13.3.1
                       platforms      : linux/amd64
@@ -149,19 +149,21 @@ jobs:
                     - backend        : OpenMP
                       compiler:
                         family: gcc
-                        version: 14
-                      base_image     : ubuntu:24.04
+                        version: 15
+                      base_image     : ubuntu:26.04
                       platforms      : linux/amd64
                       tag_suffix     : -amd64
                       runs-on        : ubuntu-latest
+                      python_version : 3.14
                     - backend        : OpenMP
                       compiler:
                         family: gcc
-                        version: 14
-                      base_image     : ubuntu:24.04
+                        version: 15
+                      base_image     : ubuntu:26.04
                       platforms      : linux/arm64
                       runs-on        : ubuntu-24.04-arm
                       tag_suffix     : -arm64
+                      python_version : 3.14
                     - backend        : OpenMP
                       compiler:
                         family: clang
@@ -242,7 +244,7 @@ jobs:
                     - backend: OpenMP
                       compiler:
                         family: gcc
-                        version: 14
+                        version: 15
         steps:
             - uses: docker/login-action@v4
               with:
@@ -267,7 +269,7 @@ jobs:
                     - backend        : Cuda
                       compiler:
                         family: gcc
-                        version: 14
+                        version: 15
                       runs-on        : [self-hosted, linux, amd64, docker, cuda, blackwell120]
                       tag_suffix     : -13.3.1
                       platform       : linux/amd64
@@ -288,13 +290,13 @@ jobs:
                     - backend        : OpenMP
                       compiler:
                         family: gcc
-                        version: 14
+                        version: 15
                       runs-on        : ubuntu-24.04
                       platform       : linux/amd64
                     - backend        : OpenMP
                       compiler:
                         family: gcc
-                        version: 14
+                        version: 15
                       runs-on        : ubuntu-24.04-arm
                       platform       : linux/arm64
                     - backend        : OpenMP
@@ -342,7 +344,7 @@ jobs:
         if: ${{ ! failure() && ! cancelled() }}
         runs-on: [ubuntu-latest]
         container:
-            image: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:gcc-14-OpenMP
+            image: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:gcc-15-OpenMP
         steps:
             - uses: actions/checkout@v7
 
