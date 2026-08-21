@@ -4,7 +4,7 @@ ARG COMPILER_FAMILY=not-given
 # Install Python3 (with the trickery for virtual environment).
 FROM ${BASE_IMAGE} AS requirements-python
 
-ARG PYTHON_VERSION=3.12
+ARG PYTHON_VERSION
 ENV VIRTUAL_ENV=/opt/venv-${PYTHON_VERSION}
 ENV PATH=${VIRTUAL_ENV}/bin:${PATH}
 
@@ -49,6 +49,8 @@ set(CMAKE_CXX_COMPILER /usr/bin/g++)
 EOF
 
 FROM requirements-python AS requirements-compiler-rocm
+
+ENV LD_LIBRARY_PATH=/opt/rocm/lib:$LD_LIBRARY_PATH
 
 COPY <<EOF /opt/toolchain.cmake
 set(CMAKE_C_COMPILER /usr/bin/amdclang)
