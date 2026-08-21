@@ -123,11 +123,12 @@ jobs:
                       compiler:
                         family: gcc
                         version: 14
-                      base_image     : nvcr.io/nvidia/cuda:13.1.0-devel-ubuntu24.04
-                      tag_suffix     : -13.1.0
+                      base_image     : nvcr.io/nvidia/cuda:13.3.1-devel-ubuntu26.04
+                      tag_suffix     : -13.3.1
                       platforms      : linux/amd64
                       kokkos_arch    : BLACKWELL120
                       runs-on        : ubuntu-latest
+                      python_version : 3.14
                     - backend        : HIP
                       compiler:
                         family: rocm
@@ -268,7 +269,7 @@ jobs:
                         family: gcc
                         version: 14
                       runs-on        : [self-hosted, linux, amd64, docker, cuda, blackwell120]
-                      tag_suffix     : -13.1.0
+                      tag_suffix     : -13.3.1
                       platform       : linux/amd64
                     - backend        : HIP
                       compiler:
