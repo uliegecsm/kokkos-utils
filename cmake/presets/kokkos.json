@@ -41,6 +41,12 @@
             "cacheVariables" : {"CMAKE_CXX_COMPILER" : "hipcc"}
         },
         {
+            "$comment": "Inherit from this preset to use C++23.",
+            "name" : "cxx23",
+            "hidden" : true,
+            "cacheVariables" : {"CMAKE_CXX_STANDARD": "23"}
+        },
+        {
             "$comment": "Inherit from this preset to use the OpenMP backend.",
             "name"           : "OpenMP",
             "hidden"         : true,
@@ -85,11 +91,11 @@
         },
         {
             "name"     : "gcc-OpenMP",
-            "inherits" : ["OpenMP", "gcc", "default"]
+            "inherits" : ["OpenMP", "gcc", "cxx23", "default"]
         },
         {
             "name"     : "clang-OpenMP",
-            "inherits" : ["OpenMP", "clang", "default"]
+            "inherits" : ["OpenMP", "clang", "cxx23", "default"]
         },
         {
             "name"     : "gcc-Cuda",
