@@ -127,6 +127,17 @@ jobs:
                       tag_suffix     : -13.3.1-blackwell120
                       platforms      : linux/amd64
                       kokkos_arch    : BLACKWELL120
+                      kokkos_preset  : nvidia-gcc-Cuda
+                      runs-on        : ubuntu-latest
+                      python_version : 3.14
+                    - backend        : Cuda
+                      compiler:
+                        family: clang
+                        version: 22
+                      base_image     : nvcr.io/nvidia/cuda:13.3.1-devel-ubuntu26.04
+                      tag_suffix     : -13.3.1-blackwell120
+                      platforms      : linux/amd64
+                      kokkos_arch    : BLACKWELL120
                       runs-on        : ubuntu-latest
                       python_version : 3.14
                     - backend        : HIP
@@ -187,6 +198,8 @@ jobs:
                       base_image: ubuntu:24.04
                       platforms: linux/amd64
                       runs-on: ubuntu-latest
+        env:
+            KOKKOS_PRESET: ${{ matrix.kokkos_preset || format('{0}-{1}', matrix.compiler.family, matrix.backend) }}
         steps:
             - uses: actions/checkout@v7
               with:
@@ -230,7 +243,7 @@ jobs:
                       DOXYGEN_VERSION=${{ env.DOXYGEN_VERSION }}
                       GOOGLETEST_VERSION=${{ env.GOOGLETEST_VERSION }}
                       KOKKOS_ARCH=${{ matrix.kokkos_arch }}
-                      KOKKOS_PRESET=${{ matrix.compiler.family }}-${{ matrix.backend }}
+                      KOKKOS_PRESET=${{ env.KOKKOS_PRESET }}
                       KOKKOS_SHA=${{ env.KOKKOS_SHA }}
                       PYTHON_VERSION=${{ matrix.python_version || '3.12' }}
                   labels: "org.opencontainers.image.source=${{ github.repositoryUrl }}"
@@ -282,6 +295,14 @@ jobs:
                       runs-on        : [self-hosted, linux, amd64, docker, cuda, blackwell120]
                       tag_suffix     : -13.3.1-blackwell120
                       platform       : linux/amd64
+                      preset         : nvidia-gcc-Cuda
+                    - backend        : Cuda
+                      compiler:
+                        family: clang
+                        version: 22
+                      runs-on        : [self-hosted, linux, amd64, docker, cuda, blackwell120]
+                      tag_suffix     : -13.3.1-blackwell120
+                      platform       : linux/amd64
                     - backend        : HIP
                       compiler:
                         family: rocm
@@ -327,6 +348,8 @@ jobs:
                         version: 22
                       runs-on        : ubuntu-latest
                       platform       : linux/amd64
+        env:
+            PRESET: ${{ matrix.preset || format('{0}-{1}', matrix.compiler.family, matrix.backend) }}
         container:
             image: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}${{ matrix.compiler.version && '-' || '' }}${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
             options: --platform=${{ matrix.platform }} ${{ matrix.options }}
@@ -335,16 +358,16 @@ jobs:
 
             - name: Configure and build.
               run : |
-                  cmake -S .    --preset=${{ matrix.compiler.family }}-${{ matrix.backend }} --warn-uninitialized -Werror=dev
-                  cmake --build --preset=${{ matrix.compiler.family }}-${{ matrix.backend }} -j$(($(nproc) > 4 ? 4 : $(nproc)))
+                  cmake -S .    --preset=${{ env.PRESET }} --warn-uninitialized -Werror=dev
+                  cmake --build --preset=${{ env.PRESET }} -j$(($(nproc) > 4 ? 4 : $(nproc)))
 
             - name: Test.
               run : |
-                  ctest --preset=${{ matrix.compiler.family }}-${{ matrix.backend }}
+                  ctest --preset=${{ env.PRESET }}
 
             - name: Test install.
               run : |
-                  bash tests/install.sh ${{ matrix.compiler.family }}-${{ matrix.backend }}
+                  bash tests/install.sh ${{ env.PRESET }}
 
             - name: Test find package after install.
               run : |
