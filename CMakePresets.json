@@ -38,10 +38,15 @@
             "cacheVariables" : {"CMAKE_CXX_COMPILER" : "hipcc"}
         },
         {
-            "$comment": "Inherit from this preset to use the Cuda backend.",
-            "name"           : "Cuda",
+            "$comment": "Inherit from this preset to use nvcc with gcc as the host compiler.",
+            "name"           : "nvidia-gcc",
             "hidden"         : true,
-            "cacheVariables" : {"CMAKE_CXX_COMPILER" : "$penv{Kokkos_ROOT}/bin/nvcc_wrapper"}
+            "cacheVariables" : {
+                "CMAKE_CXX_COMPILER" : "$penv{Kokkos_ROOT}/bin/nvcc_wrapper"
+            },
+            "environment" : {
+                "NVCC_WRAPPER_DEFAULT_COMPILER" : "g++"
+            }
         },
         {
             "$comment": "Inherit from this preset to use clang-tidy.",
@@ -70,8 +75,15 @@
             }
         },
         {
-            "name"           : "gcc-Cuda",
-            "inherits"       : ["Cuda", "default"],
+            "name"           : "nvidia-gcc-Cuda",
+            "inherits"       : ["nvidia-gcc", "default"],
+            "cacheVariables" : {
+                "EXPECTED_Kokkos_DEVICES" : "SERIAL;OPENMP;CUDA"
+            }
+        },
+        {
+            "name"           : "clang-Cuda",
+            "inherits"       : ["clang", "default"],
             "cacheVariables" : {
                 "EXPECTED_Kokkos_DEVICES" : "SERIAL;OPENMP;CUDA"
             }
@@ -108,8 +120,13 @@
             "inherits"        : "default"
         },
         {
-            "name"            : "gcc-Cuda",
-            "configurePreset" : "gcc-Cuda",
+            "name"            : "nvidia-gcc-Cuda",
+            "configurePreset" : "nvidia-gcc-Cuda",
+            "inherits"        : "default"
+        },
+        {
+            "name"            : "clang-Cuda",
+            "configurePreset" : "clang-Cuda",
             "inherits"        : "default"
         },
         {
@@ -146,8 +163,13 @@
             "inherits"        : "default"
         },
         {
-            "name"            : "gcc-Cuda",
-            "configurePreset" : "gcc-Cuda",
+            "name"            : "nvidia-gcc-Cuda",
+            "configurePreset" : "nvidia-gcc-Cuda",
+            "inherits"        : "default"
+        },
+        {
+            "name"            : "clang-Cuda",
+            "configurePreset" : "clang-Cuda",
             "inherits"        : "default"
         },
         {

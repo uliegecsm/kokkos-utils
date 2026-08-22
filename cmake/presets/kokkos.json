@@ -41,6 +41,17 @@
             "cacheVariables" : {"CMAKE_CXX_COMPILER" : "hipcc"}
         },
         {
+            "$comment": "Inherit from this preset to use nvcc with gcc as the host compiler.",
+            "name"           : "nvidia-gcc",
+            "hidden"         : true,
+            "cacheVariables" : {
+                "CMAKE_CXX_COMPILER" : "${sourceDir}/bin/nvcc_wrapper"
+            },
+            "environment" : {
+                "NVCC_WRAPPER_DEFAULT_COMPILER" : "g++"
+            }
+        },
+        {
             "$comment": "Inherit from this preset to use C++23.",
             "name" : "cxx23",
             "hidden" : true,
@@ -57,7 +68,6 @@
             "name"           : "Cuda",
             "hidden"         : true,
             "cacheVariables" : {
-                "CMAKE_CXX_COMPILER" : "${sourceDir}/bin/nvcc_wrapper",
                 "Kokkos_ENABLE_CUDA" : "ON",
                 "Kokkos_ENABLE_CUDA_CONSTEXPR" : "ON"
             }
@@ -98,8 +108,12 @@
             "inherits" : ["OpenMP", "clang", "cxx23", "default"]
         },
         {
-            "name"     : "gcc-Cuda",
-            "inherits" : ["Cuda", "OpenMP", "gcc", "default"]
+            "name"     : "nvidia-gcc-Cuda",
+            "inherits" : ["Cuda", "OpenMP", "nvidia-gcc", "default"]
+        },
+        {
+            "name"     : "clang-Cuda",
+            "inherits" : ["Cuda", "OpenMP", "clang", "default"]
         },
         {
             "name"     : "rocm-HIP",
@@ -127,8 +141,13 @@
             "inherits"        : "default"
         },
         {
-            "name"            : "gcc-Cuda",
-            "configurePreset" : "gcc-Cuda",
+            "name"            : "nvidia-gcc-Cuda",
+            "configurePreset" : "nvidia-gcc-Cuda",
+            "inherits"        : "default"
+        },
+        {
+            "name"            : "clang-Cuda",
+            "configurePreset" : "clang-Cuda",
             "inherits"        : "default"
         },
         {

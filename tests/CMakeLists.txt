@@ -52,8 +52,24 @@ function(add_one_test)
             -Werror=suggest-override
             -Werror=overloaded-virtual
             -Werror
-            "$<$<IN_LIST:CUDA,${Kokkos_DEVICES}>:--Werror=cross-execution-space-call,all-warnings>"
     )
+
+    kokkos_compiler_is_nvcc(CMAKE_CXX_COMPILER_IS_NVCC "${CMAKE_CXX_COMPILER}")
+    if(CMAKE_CXX_COMPILER_IS_NVCC)
+        target_compile_options(
+            ${EXECUTABLE_NAME}
+            PRIVATE
+                --Werror=cross-execution-space-call,all-warnings
+        )
+    endif()
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND "CUDA" IN_LIST Kokkos_DEVICES)
+        target_compile_options(
+            ${EXECUTABLE_NAME}
+            PRIVATE
+                -Wno-error=unknown-cuda-version
+        )
+    endif()
 
     # Tests must include any helper file under the 'tests' directory with the full relative path.
     target_include_directories(
