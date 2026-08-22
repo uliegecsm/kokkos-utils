@@ -57,7 +57,7 @@
         },
         {
             "name"           : "gcc-OpenMP",
-            "inherits"       : ["gcc", "default"],
+            "inherits"       : ["gcc", "cxx23", "default"],
             "cacheVariables" : {
                 "EXPECTED_Kokkos_DEVICES" : "SERIAL;OPENMP"
             }
