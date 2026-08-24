@@ -129,7 +129,6 @@ jobs:
                       kokkos_arch    : BLACKWELL120
                       kokkos_preset  : nvidia-gcc-Cuda
                       runs-on        : ubuntu-latest
-                      python_version : 3.14
                     - backend        : Cuda
                       compiler:
                         family: clang
@@ -139,7 +138,6 @@ jobs:
                       platforms      : linux/amd64
                       kokkos_arch    : BLACKWELL120
                       runs-on        : ubuntu-latest
-                      python_version : 3.14
                     - backend        : HIP
                       compiler:
                         family: rocm
@@ -148,6 +146,7 @@ jobs:
                       platforms      : linux/amd64
                       kokkos_arch    : AMD_GFX906
                       runs-on        : ubuntu-latest
+                      python_version : 3.12
                     - backend        : HIP
                       compiler:
                         family: rocm
@@ -156,7 +155,6 @@ jobs:
                       platforms      : linux/amd64
                       kokkos_arch    : AMD_GFX1201
                       runs-on        : ubuntu-latest
-                      python_version : 3.14
                     - backend        : SYCL
                       compiler:
                         family: intel
@@ -166,6 +164,7 @@ jobs:
                       platforms      : linux/amd64
                       kokkos_arch    : VOLTA70
                       runs-on        : ubuntu-latest
+                      python_version : 3.12
                     - backend        : OpenMP
                       compiler:
                         family: gcc
@@ -174,7 +173,6 @@ jobs:
                       platforms      : linux/amd64
                       tag_suffix     : -amd64
                       runs-on        : ubuntu-latest
-                      python_version : 3.14
                     - backend        : OpenMP
                       compiler:
                         family: gcc
@@ -183,7 +181,6 @@ jobs:
                       platforms      : linux/arm64
                       runs-on        : ubuntu-24.04-arm
                       tag_suffix     : -arm64
-                      python_version : 3.14
                     - backend        : OpenMP
                       compiler:
                         family: clang
@@ -191,11 +188,12 @@ jobs:
                       base_image     : ubuntu:24.04
                       platforms      : linux/amd64
                       runs-on        : ubuntu-latest
+                      python_version : 3.12
                     - backend: OpenMP
                       compiler:
                         family: clang
                         version: 22
-                      base_image: ubuntu:24.04
+                      base_image: ubuntu:26.04
                       platforms: linux/amd64
                       runs-on: ubuntu-latest
         env:
@@ -245,7 +243,7 @@ jobs:
                       KOKKOS_ARCH=${{ matrix.kokkos_arch }}
                       KOKKOS_PRESET=${{ env.KOKKOS_PRESET }}
                       KOKKOS_SHA=${{ env.KOKKOS_SHA }}
-                      PYTHON_VERSION=${{ matrix.python_version || '3.12' }}
+                      PYTHON_VERSION=${{ matrix.python_version || '3.14' }}
                   labels: "org.opencontainers.image.source=${{ github.repositoryUrl }}"
 
     finalize-images:
@@ -328,7 +326,7 @@ jobs:
                       compiler:
                         family: gcc
                         version: 16
-                      runs-on        : ubuntu-24.04
+                      runs-on        : ubuntu-latest
                       platform       : linux/amd64
                     - backend        : OpenMP
                       compiler:
