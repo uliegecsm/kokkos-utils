@@ -144,7 +144,7 @@ RUN <<EOF
     echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" \
         | tee /etc/apt/sources.list.d/oneAPI.list
 
-    apt-helpers install-packages --update --clean --packages intel-oneapi-compiler-dpcpp-cpp-${COMPILER_VERSION}
+    apt-helpers install-packages --update --packages intel-oneapi-compiler-dpcpp-cpp-${COMPILER_VERSION}
 EOF
 
 ENV PATH=/opt/intel/oneapi/compiler/latest/bin/:$PATH
@@ -155,7 +155,7 @@ ARG UNIFIED_RUNTIME_VERSION=7.0.0
 RUN --mount=type=tmpfs,target=/tmp/build <<EOF
     set -ex
 
-    apt-helpers install-packages --update --packages libhwloc-dev hwloc
+    apt-helpers install-packages --clean --packages libhwloc-dev hwloc
 
     cd /tmp/build
 
