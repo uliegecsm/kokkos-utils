@@ -193,7 +193,7 @@ public:
     //! Reset timers and run @ref MyFixture::run.
     void run(::benchmark::State& state)
     {
-        for(auto& timer : timers)
+        for(const auto& timer : timers)
             timer->reset();
 
         workload.execute(state);
@@ -246,7 +246,7 @@ private:
 using SequenceOfRegionTimerListenerBenchmark = Fixture<SequenceOfRegionTimerListenerBenchmarkImpl>;
 
 BENCHMARK_DEFINE_F(SequenceOfRegionTimerListenerBenchmark, time_sequence_of_regions)(::benchmark::State& state) {
-    for (auto sample : state) {
+    for (const auto sample : state) {
         this->impl->run(state);
     }
 }
@@ -259,7 +259,7 @@ BENCHMARK_REGISTER_F(SequenceOfRegionTimerListenerBenchmark, time_sequence_of_re
 using ManagerBenchmark = Fixture<ManagerBenchmarkImpl>;
 
 BENCHMARK_DEFINE_F(ManagerBenchmark, time_sequence_of_regions)(::benchmark::State& state) {
-    for (auto sample : state) {
+    for (const auto sample : state) {
         this->impl->run(state);
     }
 }
@@ -270,7 +270,7 @@ BENCHMARK_REGISTER_F(ManagerBenchmark, time_sequence_of_regions)
 using OverheadBenchmark = Fixture<OverheadBenchmarkImpl>;
 
 BENCHMARK_DEFINE_F(OverheadBenchmark, push_pop)(::benchmark::State& state) {
-    for (auto sample : state) {
+    for (const auto sample : state) {
         this->impl->run_push_pop();
     }
 }
@@ -290,7 +290,7 @@ BENCHMARK_DEFINE_F(OverheadBenchmark, timer)(::benchmark::State& state)
 
     size_t iter = 0;
 
-    for (auto sample : state) {
+    for (const auto sample : state) {
         reported_elapsed.at(iter++) = this->impl->run_timer().count();
     }
     const double reported_elapsed_mean = std::accumulate(reported_elapsed.cbegin(), reported_elapsed.cend(), double(0.), std::plus{}) / num_iters;

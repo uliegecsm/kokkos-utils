@@ -194,7 +194,7 @@ TEST_F(ManagerTest, listener_from_lambda)
     const view_t my_src_view(Kokkos::view_alloc(Kokkos::WithoutInitializing, exec, "my rank-0 src view"));
     const view_t my_dst_view(Kokkos::view_alloc(Kokkos::WithoutInitializing, exec, "my rank-0 dst view"));
 
-    auto listener_handle = Kokkos::utils::callbacks::Manager::register_listener(
+    const auto listener_handle = Kokkos::utils::callbacks::Manager::register_listener(
         [&](const BeginDeepCopyEvent& event) {
             if (event.dst.size == sizeof(int) && event.src.ptr == my_src_view.data()
                 && event.dst.ptr == my_dst_view.data()) matched = true;
