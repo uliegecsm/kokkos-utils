@@ -1,6 +1,6 @@
 {
     "kokkos-utils" : {
-        "value" : "0.0.4"
+        "value" : "0.0.5"
     },
     "dependencies" : {
         "cmake" : {

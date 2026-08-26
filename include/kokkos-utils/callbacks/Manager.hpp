@@ -206,7 +206,7 @@ public:
             listeners,
             [&] (const std::unique_ptr<impl::ListenerConceptBase>& listener)
             {
-                auto* const listener_ptr = dynamic_cast<listener_model_t*>(listener.get());
+                const auto* const listener_ptr = dynamic_cast<listener_model_t*>(listener.get());
                 return listener_ptr == nullptr ? false : listener_ptr->callable.get() == callable;
             }
         );
