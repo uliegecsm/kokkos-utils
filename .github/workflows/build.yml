@@ -150,8 +150,8 @@ jobs:
                     - backend        : HIP
                       compiler:
                         family: rocm
-                      base_image     : rocm/dev-ubuntu-26.04:7.14.0-full
-                      tag_suffix     : -7.14.0-amd_gfx1201
+                      base_image     : rocm/dev-ubuntu-26.04:10.0.0-full
+                      tag_suffix     : -10.0.0-amd_gfx1201
                       platforms      : linux/amd64
                       kokkos_arch    : AMD_GFX1201
                       runs-on        : ubuntu-latest
@@ -312,7 +312,7 @@ jobs:
                       compiler:
                         family: rocm
                       runs-on        : [self-hosted, linux, amd64, docker, rocm, amd_gfx1201]
-                      tag_suffix     : -7.14.0-amd_gfx1201
+                      tag_suffix     : -10.0.0-amd_gfx1201
                       platform       : linux/amd64
                       options        : --device /dev/kfd --device /dev/dri
                     - backend        : SYCL
