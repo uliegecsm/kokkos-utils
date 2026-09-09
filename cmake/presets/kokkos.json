@@ -8,7 +8,6 @@
             "binaryDir"     : "${sourceDir}/build-with-${presetName}",
             "cacheVariables" : {
                 "CMAKE_BUILD_TYPE"     : "Release",
-                "CMAKE_CXX_STANDARD"   : "20",
                 "CMAKE_CXX_EXTENSIONS" : "OFF",
                 "BUILD_SHARED_LIBS"    : "ON",
                 "CMAKE_C_COMPILER"     : "should-not-be-needed",
@@ -50,12 +49,6 @@
             "environment" : {
                 "NVCC_WRAPPER_DEFAULT_COMPILER" : "g++"
             }
-        },
-        {
-            "$comment": "Inherit from this preset to use C++23.",
-            "name" : "cxx23",
-            "hidden" : true,
-            "cacheVariables" : {"CMAKE_CXX_STANDARD": "23"}
         },
         {
             "$comment": "Inherit from this preset to use the OpenMP backend.",
@@ -101,11 +94,11 @@
         },
         {
             "name"     : "gcc-OpenMP",
-            "inherits" : ["OpenMP", "gcc", "cxx23", "default"]
+            "inherits" : ["OpenMP", "gcc", "default"]
         },
         {
             "name"     : "clang-OpenMP",
-            "inherits" : ["OpenMP", "clang", "cxx23", "default"]
+            "inherits" : ["OpenMP", "clang", "default"]
         },
         {
             "name"     : "nvidia-gcc-Cuda",

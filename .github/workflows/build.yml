@@ -147,6 +147,7 @@ jobs:
                       kokkos_arch    : AMD_GFX906
                       runs-on        : ubuntu-latest
                       python_version : 3.12
+                      cxxstd         : 20
                     - backend        : HIP
                       compiler:
                         family: rocm
@@ -165,6 +166,7 @@ jobs:
                       kokkos_arch    : VOLTA70
                       runs-on        : ubuntu-latest
                       python_version : 3.12
+                      cxxstd         : 20
                     - backend        : OpenMP
                       compiler:
                         family: gcc
@@ -189,6 +191,7 @@ jobs:
                       platforms      : linux/amd64
                       runs-on        : ubuntu-latest
                       python_version : 3.12
+                      cxxstd         : 20
                     - backend: OpenMP
                       compiler:
                         family: clang
@@ -244,6 +247,7 @@ jobs:
                       KOKKOS_PRESET=${{ env.KOKKOS_PRESET }}
                       KOKKOS_SHA=${{ env.KOKKOS_SHA }}
                       PYTHON_VERSION=${{ matrix.python_version || '3.14' }}
+                      CXX_STD=${{ matrix.cxxstd || '23' }}
                   labels: "org.opencontainers.image.source=${{ github.repositoryUrl }}"
 
     finalize-images:
@@ -308,6 +312,7 @@ jobs:
                       tag_suffix     : -6.4.3-amd_gfx906
                       platform       : linux/amd64
                       options        : --device /dev/kfd --device /dev/dri
+                      cxxstd         : 20
                     - backend        : HIP
                       compiler:
                         family: rocm
@@ -322,6 +327,7 @@ jobs:
                       runs-on        : [self-hosted, linux, amd64, docker, cuda, volta70]
                       tag_suffix     : -volta70
                       platform       : linux/amd64
+                      cxxstd         : 20
                     - backend        : OpenMP
                       compiler:
                         family: gcc
@@ -340,6 +346,7 @@ jobs:
                         version: 18
                       runs-on        : ubuntu-latest
                       platform       : linux/amd64
+                      cxxstd         : 20
                     - backend        : OpenMP
                       compiler:
                         family: clang
@@ -356,7 +363,7 @@ jobs:
 
             - name: Configure and build.
               run : |
-                  cmake -S .    --preset=${{ env.PRESET }} --warn-uninitialized -Werror=dev
+                  cmake -S .    --preset=${{ env.PRESET }} -DCMAKE_CXX_STANDARD=${{ matrix.cxxstd || '23' }} --warn-uninitialized -Werror=dev
                   cmake --build --preset=${{ env.PRESET }} -j$(($(nproc) > 4 ? 4 : $(nproc)))
 
             - name: Test.
@@ -387,7 +394,7 @@ jobs:
 
             - name: Build Doxygen documentation.
               run : |
-                  cmake -S .    --preset=gcc-OpenMP --warn-uninitialized -Werror=dev
+                  cmake -S .    --preset=gcc-OpenMP -DCMAKE_CXX_STANDARD=23 --warn-uninitialized -Werror=dev
                   cmake --build --preset=gcc-OpenMP --target=docs
 
             - name: Check tag file.

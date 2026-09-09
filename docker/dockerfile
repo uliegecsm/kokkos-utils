@@ -211,6 +211,7 @@ EOF
 FROM requirements-compiler-${COMPILER_FAMILY} AS google-test-compile
 
 ARG GOOGLETEST_VERSION
+ARG CXX_STD
 
 RUN <<EOF
     set -ex
@@ -221,6 +222,7 @@ RUN <<EOF
 
     cmake -S . -B build \
         --toolchain /opt/toolchain.cmake \
+        -DCMAKE_CXX_STANDARD=${CXX_STD} \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/opt/google-test-${GOOGLETEST_VERSION}
 
@@ -233,6 +235,7 @@ EOF
 FROM requirements-compiler-${COMPILER_FAMILY} AS google-benchmark-compile
 
 ARG GOOGLEBENCHMARK_VERSION
+ARG CXX_STD
 
 RUN <<EOF
     set -ex
@@ -246,6 +249,7 @@ RUN <<EOF
     cmake -S . -B build \
         --toolchain /opt/toolchain.cmake \
         -DCMAKE_INSTALL_PREFIX=/opt/google-benchmark-${GOOGLEBENCHMARK_VERSION} \
+        -DCMAKE_CXX_STANDARD=${CXX_STD} \
         -DCMAKE_BUILD_TYPE=Release \
         -DBENCHMARK_ENABLE_TESTING=OFF \
         -DBENCHMARK_INSTALL_DOCS=OFF
@@ -261,6 +265,7 @@ FROM requirements-compiler-${COMPILER_FAMILY} AS kokkos-compile
 ARG KOKKOS_ARCH
 ARG KOKKOS_PRESET
 ARG KOKKOS_SHA
+ARG CXX_STD
 
 ADD https://github.com/kokkos/kokkos/archive/${KOKKOS_SHA}.tar.gz /opt/kokkos-sources/${KOKKOS_SHA}.tar.gz
 
@@ -280,6 +285,7 @@ RUN --mount=target=/cmake/presets/kokkos.json,type=bind,source=cmake/presets/kok
     fi
 
     cmake -S . --preset=${KOKKOS_PRESET} \
+        -DCMAKE_CXX_STANDARD=${CXX_STD} \
         -DCMAKE_INSTALL_PREFIX=/opt/kokkos-${KOKKOS_SHA}/${KOKKOS_PRESET} \
         ${KOKKOS_ARCH_ARG}
 

@@ -53,6 +53,11 @@ endif()
 
 kokkos_check(DEVICES "${EXPECTED_Kokkos_DEVICES}")
 
+# Unless explicitly requested, use the standard of the installed Kokkos.
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD "${Kokkos_CXX_STANDARD}")
+endif()
+
 #---- Build the Kokkos::utils library.
 add_library(kokkosutils INTERFACE)
 add_library(Kokkos::utils ALIAS kokkosutils)
