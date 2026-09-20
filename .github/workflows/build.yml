@@ -123,8 +123,8 @@ jobs:
                       compiler:
                         family: gcc
                         version: 15
-                      base_image     : nvcr.io/nvidia/cuda:13.3.1-devel-ubuntu26.04
-                      tag_suffix     : -13.3.1-blackwell120
+                      base_image     : nvcr.io/nvidia/cuda:13.4.1-devel-ubuntu26.04
+                      tag_suffix     : -13.4.1-blackwell120
                       platforms      : linux/amd64
                       kokkos_arch    : BLACKWELL120
                       kokkos_preset  : nvidia-gcc-Cuda
@@ -133,8 +133,8 @@ jobs:
                       compiler:
                         family: clang
                         version: 22
-                      base_image     : nvcr.io/nvidia/cuda:13.3.1-devel-ubuntu26.04
-                      tag_suffix     : -13.3.1-blackwell120
+                      base_image     : nvcr.io/nvidia/cuda:13.4.1-devel-ubuntu26.04
+                      tag_suffix     : -13.4.1-blackwell120
                       platforms      : linux/amd64
                       kokkos_arch    : BLACKWELL120
                       runs-on        : ubuntu-latest
@@ -295,7 +295,7 @@ jobs:
                         family: gcc
                         version: 15
                       runs-on        : [self-hosted, linux, amd64, docker, cuda, blackwell120]
-                      tag_suffix     : -13.3.1-blackwell120
+                      tag_suffix     : -13.4.1-blackwell120
                       platform       : linux/amd64
                       preset         : nvidia-gcc-Cuda
                     - backend        : Cuda
@@ -303,7 +303,7 @@ jobs:
                         family: clang
                         version: 22
                       runs-on        : [self-hosted, linux, amd64, docker, cuda, blackwell120]
-                      tag_suffix     : -13.3.1-blackwell120
+                      tag_suffix     : -13.4.1-blackwell120
                       platform       : linux/amd64
                     - backend        : HIP
                       compiler:
