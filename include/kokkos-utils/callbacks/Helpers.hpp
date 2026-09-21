@@ -239,6 +239,9 @@ struct PartialMatcher<BeginDeepCopyEvent>
     }
 };
 
+//! Defines a matcher @c Equivalent() to match an argument that is equivalent to @c val in the sense of a partial or weak ordering.
+MATCHER_P(Equivalent, val, "") { const auto cmp = arg <=> val; return cmp == std::partial_ordering::equivalent; }
+
 } // namespace Kokkos::utils::callbacks
 
 #endif // KOKKOS_UTILS_CALLBACKS_HELPERS_HPP

@@ -113,6 +113,15 @@ struct AllocDescriptor
     uint64_t size = 0;
 
     bool operator==(const AllocDescriptor&) const = default;
+
+    std::partial_ordering operator<=>(const AllocDescriptor& other) const
+    {
+        if (kpsh != other.kpsh) {
+            return std::partial_ordering::unordered;
+        } else {
+            return std::tie(name, size) <=> std::tie(other.name, other.size);
+        }
+    }
 };
 
 //! Allocate-data event associated with @c Kokkos::Tools::Experimental::EventSet::allocate_data.
@@ -138,6 +147,8 @@ struct BeginDeepCopyEvent
     AllocDescriptor src {};
 
     bool operator==(const BeginDeepCopyEvent&) const = default;
+
+    std::partial_ordering operator<=>(const BeginDeepCopyEvent& other) const = default;
 };
 
 //! End-deep-copy event associated with @c Kokkos::Tools::Experimental::EventSet::end_deep_copy.
