@@ -159,7 +159,7 @@ jobs:
                     - backend        : SYCL
                       compiler:
                         family: intel
-                        version: '2026.0'
+                        version: '2026.1'
                       base_image     : nvcr.io/nvidia/cuda:12.8.1-devel-ubuntu24.04
                       tag_suffix     : -volta70
                       platforms      : linux/amd64
@@ -323,7 +323,7 @@ jobs:
                     - backend        : SYCL
                       compiler:
                         family: intel
-                        version: '2026.0'
+                        version: '2026.1'
                       runs-on        : [self-hosted, linux, amd64, docker, cuda, volta70]
                       tag_suffix     : -volta70
                       platform       : linux/amd64
