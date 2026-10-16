@@ -1,7 +1,12 @@
 #ifndef KOKKOS_UTILS_TESTS_SCOPED_EXECUTIONSPACE_HPP
 #define KOKKOS_UTILS_TESTS_SCOPED_EXECUTIONSPACE_HPP
 
+#include "Kokkos_Macros.hpp"
+#ifdef KOKKOS_ENABLE_EXPERIMENTAL_CXX20_MODULES
+import kokkos.core;
+#else
 #include "Kokkos_Core.hpp"
+#endif
 
 namespace Kokkos::utils::tests::scoped
 {

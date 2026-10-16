@@ -58,6 +58,14 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD "${Kokkos_CXX_STANDARD}")
 endif()
 
+# Once the CMake minimum required version is 3.28 or above, this policy
+# is useless. Otherwise, it is necessary to support modules.
+# See also:
+#   * https://cmake.org/cmake/help/latest/policy/CMP0155.html
+if(Kokkos_ENABLE_EXPERIMENTAL_CXX20_MODULES)
+    cmake_policy(SET CMP0155 NEW)
+endif()
+
 #---- Build the Kokkos::utils library.
 add_library(kokkosutils INTERFACE)
 add_library(Kokkos::utils ALIAS kokkosutils)

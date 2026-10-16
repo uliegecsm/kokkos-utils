@@ -86,6 +86,14 @@ function(add_one_test)
             test_common
     )
 
+    # Even though the Kokkos::kokkoscore target modules may probably be inherited transitively
+    # through Kokkos::utils, it doesn't for now.
+    # See also:
+    #   * https://discourse.cmake.org/t/issues-with-transitive-usage-of-c-modules/15586
+    if(Kokkos_ENABLE_EXPERIMENTAL_CXX20_MODULES)
+        target_link_libraries(${EXECUTABLE_NAME} PRIVATE Kokkos::kokkoscore)
+    endif()
+
     # Add the test to CTest.
     add_test(
         NAME    ${EXECUTABLE_NAME}
