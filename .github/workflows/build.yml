@@ -184,6 +184,13 @@ jobs:
                       runs-on        : ubuntu-26.04-arm
                       tag_suffix     : -arm64
                     - backend        : OpenMP
+                      compiler       : {family: clang, version: 23}
+                      base_image     : ubuntu:26.04
+                      platforms      : linux/amd64
+                      runs-on        : ubuntu-latest
+                      cxxmodules     : ON
+                      cxxstd         : 20
+                    - backend        : OpenMP
                       compiler:
                         family: clang
                         version: 18
@@ -232,8 +239,8 @@ jobs:
                   platforms: ${{ matrix.platforms }}
                   push: ${{ github.ref == 'refs/heads/develop' }}
                   file: docker/dockerfile
-                  tags: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}${{ matrix.compiler.version && '-' || '' }}${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
-                  cache-from: type=registry,ref=${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}${{ matrix.compiler.version && '-' || '' }}${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
+                  tags: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}${{ matrix.compiler.version && '-' || '' }}${{ matrix.compiler.version }}${{ matrix.cxxmodules && '-cxxmodules' || '' }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
+                  cache-from: type=registry,ref=${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}${{ matrix.compiler.version && '-' || '' }}${{ matrix.compiler.version }}${{ matrix.cxxmodules && '-cxxmodules' || '' }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
                   cache-to: type=inline
                   target: final
                   build-args: |
@@ -248,6 +255,7 @@ jobs:
                       KOKKOS_SHA=${{ env.KOKKOS_SHA }}
                       PYTHON_VERSION=${{ matrix.python_version || '3.14' }}
                       CXX_STD=${{ matrix.cxxstd || '23' }}
+                      CXX_MODULES=${{ matrix.cxxmodules || 'OFF' }}
                   labels: "org.opencontainers.image.source=${{ github.repositoryUrl }}"
 
     finalize-images:
@@ -348,6 +356,12 @@ jobs:
                       platform       : linux/amd64
                       cxxstd         : 20
                     - backend        : OpenMP
+                      compiler       : {family: clang, version: 23}
+                      runs-on        : ubuntu-latest
+                      platforms      : linux/amd64
+                      cxxstd         : 20
+                      cxxmodules     : ON
+                    - backend        : OpenMP
                       compiler:
                         family: clang
                         version: 23
@@ -356,14 +370,18 @@ jobs:
         env:
             PRESET: ${{ matrix.preset || format('{0}-{1}', matrix.compiler.family, matrix.backend) }}
         container:
-            image: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}${{ matrix.compiler.version && '-' || '' }}${{ matrix.compiler.version }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
+            image: ${{ needs.set-vars-and-skips.outputs.CI_IMAGE }}:${{ matrix.compiler.family }}${{ matrix.compiler.version && '-' || '' }}${{ matrix.compiler.version }}${{ matrix.cxxmodules && '-cxxmodules' || '' }}-${{ matrix.backend }}${{ matrix.tag_suffix }}
             options: --platform=${{ matrix.platform }} ${{ matrix.options }}
         steps:
             - uses: actions/checkout@v7
 
             - name: Configure and build.
               run : |
-                  cmake -S .    --preset=${{ env.PRESET }} -DCMAKE_CXX_STANDARD=${{ matrix.cxxstd || '23' }} --warn-uninitialized -Werror=dev
+                  cmake -S . --preset=${{ env.PRESET }} \
+                    -LA \
+                    ${{ matrix.cxxmodules == 'ON' && '-GNinja' || '' }} \
+                    -DCMAKE_CXX_STANDARD=${{ matrix.cxxstd || '23' }} \
+                    --warn-uninitialized -Werror=dev
                   cmake --build --preset=${{ env.PRESET }} -j$(($(nproc) > 4 ? 4 : $(nproc)))
 
             - name: Test.
@@ -381,7 +399,10 @@ jobs:
                   test -d include/
                   rm -rf include/
 
-                  bash tests/find_package.sh "${{ matrix.compiler.family }}" "${KOKKOS_UTILS_VERSION}"
+                  bash tests/find_package.sh \
+                    "${{ matrix.compiler.family }}" \
+                    "${{ matrix.cxxmodules || 'OFF' }}" \
+                    "${KOKKOS_UTILS_VERSION}"
 
     build-documentation:
         needs: [set-vars-and-skips, finalize-images]

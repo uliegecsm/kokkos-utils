@@ -266,6 +266,7 @@ ARG KOKKOS_ARCH
 ARG KOKKOS_PRESET
 ARG KOKKOS_SHA
 ARG CXX_STD
+ARG CXX_MODULES
 
 ADD https://github.com/kokkos/kokkos/archive/${KOKKOS_SHA}.tar.gz /opt/kokkos-sources/${KOKKOS_SHA}.tar.gz
 
@@ -284,7 +285,15 @@ RUN --mount=target=/cmake/presets/kokkos.json,type=bind,source=cmake/presets/kok
         KOKKOS_ARCH_ARG=""
     fi
 
+    if [ "${CXX_MODULES}" = "ON" ]; then
+        KOKKOS_CMAKE_CONFIGURE="-GNinja -DKokkos_ENABLE_EXPERIMENTAL_CXX20_MODULES=ON"
+    else
+        KOKKOS_CMAKE_CONFIGURE=""
+    fi
+
     cmake -S . --preset=${KOKKOS_PRESET} \
+        -LA \
+        ${KOKKOS_CMAKE_CONFIGURE} \
         -DCMAKE_CXX_STANDARD=${CXX_STD} \
         -DCMAKE_INSTALL_PREFIX=/opt/kokkos-${KOKKOS_SHA}/${KOKKOS_PRESET} \
         ${KOKKOS_ARCH_ARG}

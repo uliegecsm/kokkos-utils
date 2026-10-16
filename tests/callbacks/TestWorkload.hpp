@@ -1,7 +1,13 @@
 #ifndef KOKKOS_UTILS_TESTS_CALLBACKS_TESTWORKLOAD_HPP
 #define KOKKOS_UTILS_TESTS_CALLBACKS_TESTWORKLOAD_HPP
 
+#include "Kokkos_Macros.hpp"
+#ifdef KOKKOS_ENABLE_EXPERIMENTAL_CXX20_MODULES
+import kokkos.core;
+#else
 #include "Kokkos_Core.hpp"
+#endif
+
 #include "Kokkos_Profiling_ProfileSection.hpp"
 #include "Kokkos_Profiling_ScopedRegion.hpp"
 
