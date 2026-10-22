@@ -340,7 +340,7 @@ private:
     template <DataEvent EventType>
     static auto create_dispatching_callback_for_event_type_impl()
     {
-        return [] (Kokkos_Profiling_SpaceHandle kpsh, const char* name,  const void* ptr, uint64_t size) -> void
+        return [] (Kokkos::Tools::SpaceHandle kpsh, const char* name,  const void* ptr, uint64_t size) -> void
         {
             EventType event{ .alloc = { .kpsh = kpsh, .name = name, .ptr = ptr, .size = size } };
             get_instance().dispatch(event);
@@ -350,8 +350,8 @@ private:
     template <Event EventType> requires std::same_as<EventType, BeginDeepCopyEvent>
     static auto create_dispatching_callback_for_event_type_impl()
     {
-        return [] (Kokkos_Profiling_SpaceHandle dst_kpsh, const char* dst_name,  const void* dst_ptr,
-                   Kokkos_Profiling_SpaceHandle src_kpsh, const char* src_name,  const void* src_ptr, uint64_t size) -> void
+        return [] (Kokkos::Tools::SpaceHandle dst_kpsh, const char* dst_name,  const void* dst_ptr,
+                   Kokkos::Tools::SpaceHandle src_kpsh, const char* src_name,  const void* src_ptr, uint64_t size) -> void
         {
             EventType event{
                 .dst = { .kpsh = dst_kpsh, .name = dst_name, .ptr = dst_ptr, .size = size },

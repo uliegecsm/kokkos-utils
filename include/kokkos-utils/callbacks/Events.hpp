@@ -1,9 +1,17 @@
 #ifndef KOKKOS_UTILS_CALLBACKS_EVENTS_HPP
 #define KOKKOS_UTILS_CALLBACKS_EVENTS_HPP
 
+#include <cstring>
 #include <iomanip>
+#include <memory>
 
-#include "impl/Kokkos_Profiling.hpp"
+#include "Kokkos_Macros.hpp"
+#ifdef KOKKOS_ENABLE_EXPERIMENTAL_CXX20_MODULES
+import kokkos.core;
+#else
+#include "Kokkos_Core.hpp"
+#endif
+#include "Kokkos_TypeInfo.hpp"
 
 #include "kokkos-utils/impl/type_list.hpp"
 
@@ -17,8 +25,8 @@ struct EventTraits {
     static constexpr event_id_t invalid_event_id = Kokkos::Experimental::finite_max_v<event_id_t>;
 };
 
-//! Equality comparison for @c Kokkos_Profiling_SpaceHandle.
-bool operator==(const Kokkos_Profiling_SpaceHandle& fst, const Kokkos_Profiling_SpaceHandle& snd) {
+//! Equality comparison for @c Kokkos::Tools::SpaceHandle.
+bool operator==(const Kokkos::Tools::SpaceHandle& fst, const Kokkos::Tools::SpaceHandle& snd) {
     return strcmp(fst.name, snd.name) == 0;
 };
 
@@ -107,7 +115,7 @@ struct EndFenceEvent
 //! Helper struct to hold descriptors of a data allocation.
 struct AllocDescriptor
 {
-    Kokkos_Profiling_SpaceHandle kpsh {};
+    Kokkos::Tools::SpaceHandle kpsh {};
     std::string name {};
     const void* ptr = nullptr;
     uint64_t size = 0;

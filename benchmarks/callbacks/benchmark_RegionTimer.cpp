@@ -1,3 +1,4 @@
+#include <cmath>
 #include <numeric>
 
 #include "Kokkos_Macros.hpp"
