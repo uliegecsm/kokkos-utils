@@ -209,7 +209,7 @@ struct PartialMatcher<AllocDescriptor>
         return ::testing::AllOf(
             ::testing::Field(
                 &AllocDescriptor::kpsh,
-                ::testing::Field(&Kokkos_Profiling_SpaceHandle::name, ::testing::StrEq(descr.kpsh.name))
+                ::testing::Field(&Kokkos::Tools::SpaceHandle::name, ::testing::StrEq(descr.kpsh.name))
             ),
             ::testing::Field(
                 &AllocDescriptor::name,

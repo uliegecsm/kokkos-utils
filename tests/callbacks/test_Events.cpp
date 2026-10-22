@@ -140,7 +140,7 @@ struct EventTest<EventType> : public ::testing::Test
 template <DataEvent EventType>
 struct EventTest<EventType> : public ::testing::Test
 {
-    EventType event {.alloc = {.kpsh = Kokkos::Profiling::make_space_handle("Host"), .name = "my data event", .ptr = reinterpret_cast<void*>(0x7ffdbc161a70), .size = 2}};
+    EventType event {.alloc = {.kpsh = Kokkos::Tools::make_space_handle("Host"), .name = "my data event", .ptr = reinterpret_cast<void*>(0x7ffdbc161a70), .size = 2}};
     std::string expt_descr {"{name = \"my data event\", space = \"Host\", ptr = 0x7ffdbc161a70, size = 2}"};
 };
 
@@ -148,8 +148,8 @@ template <>
 struct EventTest<BeginDeepCopyEvent> : public ::testing::Test
 {
     BeginDeepCopyEvent event {
-        .dst = {.kpsh = Kokkos::Profiling::make_space_handle("Cuda"), .name = "my destination", .ptr = reinterpret_cast<void*>(0x7ffdbc161a80), .size = 2},
-        .src = {.kpsh = Kokkos::Profiling::make_space_handle("Host"), .name = "my source",      .ptr = reinterpret_cast<void*>(0x7ffdbc161a70), .size = 2}
+        .dst = {.kpsh = Kokkos::Tools::make_space_handle("Cuda"), .name = "my destination", .ptr = reinterpret_cast<void*>(0x7ffdbc161a80), .size = 2},
+        .src = {.kpsh = Kokkos::Tools::make_space_handle("Host"), .name = "my source",      .ptr = reinterpret_cast<void*>(0x7ffdbc161a70), .size = 2}
     };
     std::string expt_descr {"{src = \"my source\" (Host, 0x7ffdbc161a70) -> dst = \"my destination\" (Cuda, 0x7ffdbc161a80) of size 2}"};
 };
