@@ -43,6 +43,7 @@ using named_event_type_list_t = Kokkos::Impl::type_list<
     BeginParallelForEvent,
     BeginParallelReduceEvent,
     BeginParallelScanEvent,
+    BeginSingleEvent,
     BeginFenceEvent,
     AllocateDataEvent,
     DeallocateDataEvent,
@@ -248,6 +249,7 @@ TEST(EventQueueMatcher, traits)
         BeginParallelForEvent,
         BeginParallelReduceEvent,
         BeginParallelScanEvent,
+        BeginSingleEvent,
         BeginFenceEvent
     >;
 
@@ -279,6 +281,7 @@ TEST(EventIdMatcher, traits)
         BeginParallelForEvent,    EndParallelForEvent,
         BeginParallelReduceEvent, EndParallelReduceEvent,
         BeginParallelScanEvent,   EndParallelScanEvent,
+        BeginSingleEvent,         EndSingleEvent,
         BeginFenceEvent,          EndFenceEvent
     >;
 

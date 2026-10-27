@@ -153,7 +153,7 @@ TEST_F(ManagerTest, dispatch_to_call_operators_of_single_listener)
     ASSERT_GT(begin_fence_events.size(), 2);
     ASSERT_THAT(
         begin_fence_events,
-        ::testing::Contains(::testing::Field(&BeginFenceEvent::name, ::testing::StrEq("computation - level 0 - fence after pfor")))
+        ::testing::Contains(::testing::Field(&BeginFenceEvent::name, ::testing::StrEq("computation - level 0 - fence after pfor and single")))
     );
     ASSERT_THAT(
         begin_fence_events,
