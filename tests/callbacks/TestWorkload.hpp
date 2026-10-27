@@ -38,7 +38,12 @@ struct MyWorkload
                 Kokkos::RangePolicy(exec, 0, 1),
                 MyFunctor{}
             );
-            exec.fence("computation - level 0 - fence after pfor");
+            Kokkos::single(
+                "computation - level 0 - single",
+                Kokkos::SinglePolicy<exec>(),
+                MyFunctor{}
+            );
+            exec.fence("computation - level 0 - fence after pfor and single");
 
             Kokkos::Profiling::markEvent("buried marker");
 
