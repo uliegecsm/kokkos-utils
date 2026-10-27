@@ -24,6 +24,12 @@ struct MyWorkload
         void operator()(const T) const {}
     };
 
+    struct MySingleFunctor
+    {
+        KOKKOS_FUNCTION
+        void operator()() const {}
+    };
+
     void execute(const Exec& exec) const
     {
         Kokkos::Profiling::ProfilingSection profile_section("profile section");
@@ -38,7 +44,12 @@ struct MyWorkload
                 Kokkos::RangePolicy(exec, 0, 1),
                 MyFunctor{}
             );
-            exec.fence("computation - level 0 - fence after pfor");
+            Kokkos::single(
+                "computation - level 0 - single",
+                Kokkos::SinglePolicy(exec),
+                MySingleFunctor{}
+            );
+            exec.fence("computation - level 0 - fence after pfor and single");
 
             Kokkos::Profiling::markEvent("buried marker");
 

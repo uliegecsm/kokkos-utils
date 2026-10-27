@@ -94,6 +94,24 @@ struct EndParallelScanEvent
     bool operator==(const EndParallelScanEvent&) const = default;
 };
 
+//! Begin-single event associated with @c Kokkos::Tools::Experimental::EventSet::begin_single.
+struct BeginSingleEvent
+{
+    std::string name {};
+    uint32_t dev_id = 0;
+    EventTraits::event_id_t event_id = EventTraits::invalid_event_id;
+
+    bool operator==(const BeginSingleEvent&) const = default;
+};
+
+//! End-single event associated with @c Kokkos::Tools::Experimental::EventSet::end_single.
+struct EndSingleEvent
+{
+    EventTraits::event_id_t event_id = EventTraits::invalid_event_id;
+
+    bool operator==(const EndSingleEvent&) const = default;
+};
+
 //! Begin-fence event associated with @c Kokkos::Tools::Experimental::EventSet::begin_fence.
 struct BeginFenceEvent
 {
@@ -215,6 +233,7 @@ using EventTypeList = Kokkos::Impl::type_list<
     BeginParallelForEvent,     EndParallelForEvent,
     BeginParallelReduceEvent,  EndParallelReduceEvent,
     BeginParallelScanEvent,    EndParallelScanEvent,
+    BeginSingleEvent,          EndSingleEvent,
     BeginFenceEvent,           EndFenceEvent,
     AllocateDataEvent,         DeallocateDataEvent,
     BeginDeepCopyEvent,        EndDeepCopyEvent,
@@ -308,6 +327,7 @@ struct PairedEventType;
 PAIRED_EVENT_TYPE(BeginParallelForEvent,     EndParallelForEvent)
 PAIRED_EVENT_TYPE(BeginParallelReduceEvent,  EndParallelReduceEvent)
 PAIRED_EVENT_TYPE(BeginParallelScanEvent,    EndParallelScanEvent)
+PAIRED_EVENT_TYPE(BeginSingleEvent,          EndSingleEvent)
 PAIRED_EVENT_TYPE(BeginFenceEvent,           EndFenceEvent)
 PAIRED_EVENT_TYPE(AllocateDataEvent,         DeallocateDataEvent)
 PAIRED_EVENT_TYPE(BeginDeepCopyEvent,        EndDeepCopyEvent)
@@ -412,6 +432,8 @@ GET_CALLBACK_FROM_EVENTSET(BeginParallelReduceEvent,   begin_parallel_reduce)
 GET_CALLBACK_FROM_EVENTSET(EndParallelReduceEvent,     end_parallel_reduce)
 GET_CALLBACK_FROM_EVENTSET(BeginParallelScanEvent,     begin_parallel_scan)
 GET_CALLBACK_FROM_EVENTSET(EndParallelScanEvent,       end_parallel_scan)
+GET_CALLBACK_FROM_EVENTSET(BeginSingleEvent,           begin_single)
+GET_CALLBACK_FROM_EVENTSET(EndSingleEvent,             end_single)
 GET_CALLBACK_FROM_EVENTSET(BeginFenceEvent,            begin_fence)
 GET_CALLBACK_FROM_EVENTSET(EndFenceEvent,              end_fence)
 GET_CALLBACK_FROM_EVENTSET(AllocateDataEvent,          allocate_data)
@@ -441,6 +463,8 @@ GET_CALLBACK_SETTER(BeginParallelReduceEvent,   set_begin_parallel_reduce_callba
 GET_CALLBACK_SETTER(EndParallelReduceEvent,     set_end_parallel_reduce_callback)
 GET_CALLBACK_SETTER(BeginParallelScanEvent,     set_begin_parallel_scan_callback)
 GET_CALLBACK_SETTER(EndParallelScanEvent,       set_end_parallel_scan_callback)
+GET_CALLBACK_SETTER(BeginSingleEvent,           set_begin_single_callback)
+GET_CALLBACK_SETTER(EndSingleEvent,             set_end_single_callback)
 GET_CALLBACK_SETTER(BeginFenceEvent,            set_begin_fence_callback)
 GET_CALLBACK_SETTER(EndFenceEvent,              set_end_fence_callback)
 GET_CALLBACK_SETTER(AllocateDataEvent,          set_allocate_data_callback)

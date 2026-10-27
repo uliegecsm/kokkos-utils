@@ -105,7 +105,9 @@ TEST_F(RecorderListenerTest, recorded_events)
             APushRegionEventWithName(::testing::StrEq("computation - level 0")),
             ABeginParallelForEventWithName(::testing::StrEq("computation - level 0 - pfor")),
             AEndParallelForEvent(),
-            ABeginFenceEventWithName(::testing::StrEq("computation - level 0 - fence after pfor")),
+            ABeginSingleEventWithName(::testing::StrEq("computation - level 0 - single")),
+            AEndSingleEvent(),
+            ABeginFenceEventWithName(::testing::StrEq("computation - level 0 - fence after pfor and single")),
             AEndFenceEvent(),
             AProfileEventWithName(::testing::StrEq("buried marker")),
             APushRegionEventWithName(::testing::StrEq("computation - level 1")),
@@ -139,7 +141,7 @@ TEST_F(RecorderListenerTest, recorded_events)
     }();
 
     ASSERT_THAT(output, ::testing::HasSubstr("computation - level 0 - pfor"));
-    ASSERT_THAT(output, ::testing::HasSubstr("computation - level 0 - fence after pfor"));
+    ASSERT_THAT(output, ::testing::HasSubstr("computation - level 0 - fence after pfor and single"));
 
     Kokkos::utils::callbacks::Manager::unregister_listener(recorder.get());
     Kokkos::utils::callbacks::Manager::unregister_listener(any_event_recorder.get());
@@ -162,8 +164,8 @@ TEST_F(RecorderListenerTest, record)
     ASSERT_THAT(
         RecorderListener<EventTypeList>::record([&exec = this->exec]{ MyWorkload<execution_space>{}.execute(exec); }),
         ::testing::Contains(
-            ABeginParallelForEvent(
-                ::testing::FieldsAre(::testing::StrEq("computation - level 0 - pfor"), ::testing::Eq(Kokkos::Tools::Experimental::device_id(this->exec)), ::testing::_)
+            ABeginSingleEvent(
+                ::testing::FieldsAre(::testing::StrEq("computation - level 0 - single"), ::testing::Eq(Kokkos::Tools::Experimental::device_id(this->exec)), ::testing::_)
             )
         )
     );
@@ -189,7 +191,7 @@ TEST_F_WITH_CB_MGR(FenceFinderTest, recorded_events)
 {
     const auto exec = Kokkos::Experimental::partition_space(execution_space{}, 1)[0];
 
-    const auto fence_finder = std::make_shared<fence_finder_t>(EventRegexMatcher(std::regex("computation - level 0 - fence after pfor")));
+    const auto fence_finder = std::make_shared<fence_finder_t>(EventRegexMatcher(std::regex("computation - level 0 - fence after pfor and single")));
 
     Kokkos::utils::callbacks::Manager::register_listener(fence_finder);
 
@@ -200,7 +202,7 @@ TEST_F_WITH_CB_MGR(FenceFinderTest, recorded_events)
         fence_finder->recorded_events,
         ::testing::Contains(
             ABeginFenceEvent(
-                ::testing::Field(&BeginFenceEvent::name,   ::testing::StrEq("computation - level 0 - fence after pfor")),
+                ::testing::Field(&BeginFenceEvent::name,   ::testing::StrEq("computation - level 0 - fence after pfor and single")),
                 ::testing::Field(&BeginFenceEvent::dev_id, ::testing::Eq(Kokkos::Tools::Experimental::device_id(exec)))
             )
         )

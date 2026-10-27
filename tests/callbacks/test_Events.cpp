@@ -30,6 +30,7 @@ TEST(EventTest, BeginEvent)
     static_assert(BeginEvent<BeginParallelForEvent>);
     static_assert(BeginEvent<BeginParallelReduceEvent>);
     static_assert(BeginEvent<BeginParallelScanEvent>);
+    static_assert(BeginEvent<BeginSingleEvent>);
     static_assert(BeginEvent<BeginFenceEvent>);
 
     static_assert( ! BeginEvent<EndParallelForEvent>);
@@ -43,6 +44,7 @@ TEST(EventTest, EndEvent)
     static_assert(EndEvent<EndParallelForEvent>);
     static_assert(EndEvent<EndParallelReduceEvent>);
     static_assert(EndEvent<EndParallelScanEvent>);
+    static_assert(EndEvent<EndSingleEvent>);
     static_assert(EndEvent<EndFenceEvent>);
 
     static_assert( ! EndEvent<BeginParallelForEvent>);
@@ -112,6 +114,7 @@ TEST(EventTest, paired_event)
     static_assert(std::same_as<paired_event_t<BeginParallelForEvent>   ,  EndParallelForEvent>);
     static_assert(std::same_as<paired_event_t<BeginParallelReduceEvent>,  EndParallelReduceEvent>);
     static_assert(std::same_as<paired_event_t<BeginParallelScanEvent>,    EndParallelScanEvent>);
+    static_assert(std::same_as<paired_event_t<BeginSingleEvent>,          EndSingleEvent>);
     static_assert(std::same_as<paired_event_t<BeginFenceEvent>,           EndFenceEvent>);
     static_assert(std::same_as<paired_event_t<AllocateDataEvent>,         DeallocateDataEvent>);
     static_assert(std::same_as<paired_event_t<BeginDeepCopyEvent>,        EndDeepCopyEvent>);
