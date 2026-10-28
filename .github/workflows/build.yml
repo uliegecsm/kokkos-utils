@@ -175,6 +175,7 @@ jobs:
                       platforms      : linux/amd64
                       tag_suffix     : -amd64
                       runs-on        : ubuntu-latest
+                      cxxstd         : 26
                     - backend        : OpenMP
                       compiler:
                         family: gcc
@@ -183,6 +184,7 @@ jobs:
                       platforms      : linux/arm64
                       runs-on        : ubuntu-26.04-arm
                       tag_suffix     : -arm64
+                      cxxstd         : 26
                     - backend        : OpenMP
                       compiler       : {family: clang, version: 23}
                       base_image     : ubuntu:26.04
@@ -342,12 +344,14 @@ jobs:
                         version: 16
                       runs-on        : ubuntu-latest
                       platform       : linux/amd64
+                      cxxstd         : 26
                     - backend        : OpenMP
                       compiler:
                         family: gcc
                         version: 16
                       runs-on        : ubuntu-26.04-arm
                       platform       : linux/arm64
+                      cxxstd         : 26
                     - backend        : OpenMP
                       compiler:
                         family: clang
