@@ -1,0 +1,156 @@
+name: GPU Simulator
+
+# Optional, non-required check. The hosted runners have no GPU, and the CI
+# images that run the HIP tests need a self-hosted AMD runner. This builds
+# Kokkos with the HIP backend for gfx942 and runs the test suite on a
+# simulated AMD Instinct MI300X (https://github.com/pantheongpu/pantheonsim).
+# A simulator cannot reproduce hardware-specific behavior or timing, so it
+# complements real-GPU testing and does not replace it.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - "include/**"
+      - "tests/**"
+      - "cmake/**"
+      - "CMakeLists.txt"
+      - "version.json"
+      - ".github/workflows/gpu-sim.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  hip-tests:
+    name: ctest (Kokkos HIP and simulated MI300X)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    env:
+      ROCM_PATH: /opt/rocm
+      PREFIX: ${{ github.workspace }}/deps-install
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Set up the simulated GPU and ROCm
+        uses: pantheongpu/setup-pantheonsim@a1b9d4237411f9b2b0e0bb895b4d83377f336a7b # v0.1.9
+        with:
+          gpu: amd/mi300x
+          cuda-toolkit: none
+          rocm: "7.1"
+
+      # The action installs only the compiler side of ROCm. find_package(hip)
+      # also needs comgr and the HSA runtime, and Kokkos needs rocPRIM.
+      - name: Install the ROCm libraries Kokkos needs
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y comgr hsa-rocr rocprim-dev
+
+      - name: Read the dependency versions
+        run: |
+          {
+            echo "CMAKE_VERSION=$(jq -r .dependencies.cmake.value version.json)"
+            echo "GTEST_VERSION=$(jq -r .dependencies.googletest.value version.json)"
+            echo "BENCHMARK_VERSION=$(jq -r .dependencies.googlebenchmark.value version.json)"
+            echo "KOKKOS_SHA=$(jq -r .dependencies.kokkos.sha version.json)"
+          } >> "$GITHUB_ENV"
+
+      - name: Install CMake
+        run: |
+          wget -q "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-x86_64.sh"
+          sudo mkdir -p "/opt/cmake-${CMAKE_VERSION}"
+          sudo sh "cmake-${CMAKE_VERSION}-linux-x86_64.sh" --skip-license --prefix="/opt/cmake-${CMAKE_VERSION}"
+          echo "/opt/cmake-${CMAKE_VERSION}/bin" >> "$GITHUB_PATH"
+
+      - name: Check out Kokkos
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: kokkos/kokkos
+          ref: ${{ env.KOKKOS_SHA }}
+          path: kokkos-src
+          persist-credentials: false
+
+      # Release, not the empty build type: unoptimized HIP code is very slow
+      # on the simulator.
+      - name: Build and install Google Test and Google Benchmark
+        run: |
+          curl -sL "https://github.com/google/googletest/archive/refs/tags/v${GTEST_VERSION}.tar.gz" | tar -xz
+          cmake -S "googletest-${GTEST_VERSION}" -B gtest-build \
+            -DCMAKE_CXX_COMPILER="${ROCM_PATH}/bin/hipcc" \
+            -DCMAKE_CXX_STANDARD=20 -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="${PREFIX}"
+          cmake --build gtest-build --parallel 3 --target install
+          curl -sL "https://github.com/google/benchmark/archive/refs/tags/v${BENCHMARK_VERSION}.tar.gz" | tar -xz
+          cmake -S "benchmark-${BENCHMARK_VERSION}" -B benchmark-build \
+            -DCMAKE_CXX_COMPILER="${ROCM_PATH}/bin/hipcc" \
+            -DCMAKE_CXX_STANDARD=20 -DCMAKE_BUILD_TYPE=Release \
+            -DBENCHMARK_ENABLE_TESTING=OFF -DBENCHMARK_ENABLE_GTEST_TESTS=OFF \
+            -DCMAKE_INSTALL_PREFIX="${PREFIX}"
+          cmake --build benchmark-build --parallel 3 --target install
+
+      - name: Build and install Kokkos
+        run: |
+          cmake -S kokkos-src -B kokkos-build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_STANDARD=20 \
+            -DCMAKE_CXX_EXTENSIONS=OFF \
+            -DBUILD_SHARED_LIBS=ON \
+            -DCMAKE_C_COMPILER=should-not-be-needed \
+            -DCMAKE_CXX_COMPILER="${ROCM_PATH}/bin/hipcc" \
+            -DCMAKE_PREFIX_PATH="${ROCM_PATH}" \
+            -DKokkos_ENABLE_SERIAL=ON \
+            -DKokkos_ENABLE_HIP=ON \
+            -DKokkos_ENABLE_ROCTHRUST=OFF \
+            -DKokkos_ENABLE_IMPL_HIP_MALLOC_ASYNC=ON \
+            -DKokkos_ARCH_AMD_GFX942=ON \
+            -DKokkos_ENABLE_TESTS=OFF \
+            -DCMAKE_INSTALL_PREFIX="${PREFIX}"
+          cmake --build kokkos-build --parallel 3 --target install
+
+      # The options are those of the rocm-HIP preset, with gfx942 (MI300X)
+      # Kokkos and Serial as the only host backend.
+      - name: Configure
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_STANDARD=20 \
+            -DCMAKE_CXX_EXTENSIONS=OFF \
+            -DCMAKE_C_COMPILER=should-not-be-needed \
+            -DCMAKE_CXX_COMPILER="${ROCM_PATH}/bin/hipcc" \
+            -DCMAKE_PREFIX_PATH="${ROCM_PATH};${PREFIX}" \
+            -DKokkos_ROOT="${PREFIX}" \
+            -DEXPECTED_Kokkos_DEVICES="SERIAL;HIP" \
+            -DKokkosUtils_ENABLE_DOC=OFF
+
+      - name: Build
+        run: cmake --build build --parallel 3
+
+      - name: Run the tests
+        run: |
+          set -o pipefail
+          export KOKKOS_PRINT_CONFIGURATION=1
+          vgpu run ctest --test-dir build --output-on-failure --timeout 1800 \
+            --no-tests=error --verbose | tee ctest.log
+
+      # Kokkos aborts when it finds no device, but check anyway that the HIP
+      # device was selected, that no gtest case skipped itself, and that every
+      # test passed.
+      - name: Check the tests ran on the device
+        run: |
+          grep -q '100% tests passed' ctest.log
+          grep -q 'KOKKOS_ENABLE_HIP: yes' ctest.log
+          if grep -E '\[  SKIPPED \]|GTEST_SKIP' ctest.log; then
+            echo "A test was skipped."; exit 1
+          fi
+          echo "passed gtest cases: $(grep -c '\[       OK \]' ctest.log)"
